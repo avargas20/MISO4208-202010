@@ -44,8 +44,12 @@ class Tipo(models.Model):
     def __str__(self):
         return '%s' % self.nombre
 
+def directorio_script(instance, filename):
+    # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
+    return 'scripts/{0}_{1}'.format(instance.estrategia.id, filename)
+
 class Prueba(models.Model):
-    script = models.FileField(upload_to='scripts/')
+    script = models.FileField(upload_to=directorio_script)
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
     herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
