@@ -20,7 +20,7 @@ class Version(models.Model):
     aplicacion = models.ForeignKey(Aplicacion, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s' % self.numero
+        return '%s de la app: %s' % (self.numero, self.aplicacion.nombre)
 
 class Estrategia(models.Model):
     nombre = models.CharField(max_length=30)

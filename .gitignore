@@ -4,3 +4,4 @@ __init__.py*
 /db.sqlite3
 __pycache__*
 /pruebas_app/migrations/
+/archivos/scripts/*
