@@ -1,4 +1,38 @@
 {% extends 'pruebas_app/layout.html' %}
+{% block head %}
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#aplicaciones').change(function () {
+
+      var optionSelected = $(this).find("option:selected");
+      var idAplicacion = optionSelected.val();
+      console.log('idAplicacion', idAplicacion);
+      data = {
+        'aplicacion_id': idAplicacion
+      };
+
+      $.ajax({
+        url: '/obtener_versiones_de_una_estrategia',
+        type: 'GET',
+        data: data,
+        success: function (results) {
+
+          console.log(results);
+          $("#versiones option").remove();
+          for (var i = results.length - 1; i >= 0; i--) {
+            $("#versiones").append('<option>' + results[i].numero + '</option>');
+          };
+        }
+      });
+
+    });
+  });
+</script>
+
+{% endblock head %}
 {% block subtitle %}<h1 class="mt-2">Agregar Estrategia</h1>
 {% endblock subtitle %}
 {% block content %}
@@ -7,10 +41,10 @@
     <div class="row register-form">
       <div class="col-md-8">
         <div class="form-group">
-          <select class="form-control">
+          <select name='aplicaciones' id='aplicaciones' class="form-control">
             <option class="hidden" selected disabled>Seleccione la aplicacion</option>
             {% for a in aplicaciones %}
-            <option>{{a.nombre}}</option>
+            <option value="{{a.id}}">{{a.nombre}}</option>
             {% endfor %}
 
           </select>
@@ -18,11 +52,11 @@
       </div>
       <div class="col-md-4">
         <div class="form-group">
-          <select class="form-control">
+          <select name='versiones' id='versiones' class="form-control">
             <option class="hidden" selected disabled>Seleccione la version</option>
-            {% for v in versiones %}
-            <option>{{v.numero}}</option>
-            {% endfor %}
+
+
+
           </select>
         </div>
       </div>
