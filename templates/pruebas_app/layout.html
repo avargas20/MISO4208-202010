@@ -8,10 +8,11 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>{% block title %}Bare - Start Bootstrap Template{% endblock title %} </title>
+  <title>{% block title %}Pruebas automatizadas{% endblock title %} </title>
 
   {# Cargamos la librería #}
   {% load bootstrap4 %}
+  <script src="https://kit.fontawesome.com/266441d113.js" crossorigin="anonymous"></script>
 
   {# CSS Bootstrap #}
   {% bootstrap_css %}
@@ -19,38 +20,48 @@
 </head>
 
 <body>
-
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+  <header>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Pruebas automatizadas</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+          aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'agregar_estrategia' %}">Agregar estrategias</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'lanzar_estrategia' %}">Lanzar estrategia</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contacto</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
     <div class="container">
-      <a class="navbar-brand" href="#">Start Bootstrap</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Services</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
-          </li>
-        </ul>
+      <div class="row justify-content-center">
+        <div class="col-8">
+          {% block subtitle %}
+          {% endblock %}
+          <hr class="mt-0 mb-4">
+          {% block content %}
+          {% endblock %}
+        </div>
       </div>
     </div>
-  </nav>
-  {% block content %}
 
-  {% endblock %}
+  </main>
 
   {# JS y jQuery Bootstrap #}
   {% bootstrap_javascript jquery='full' %}

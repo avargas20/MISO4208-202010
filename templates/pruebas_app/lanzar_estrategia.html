@@ -1,0 +1,66 @@
+{% extends 'pruebas_app/layout.html' %}
+{% block subtitle %}<h1 class="mt-5">Lanzar Estrategia</h1>
+{% endblock subtitle %}
+{% block content %}
+
+<h6 class="mb-5 mt-5">A continuacion puede escoger alguna estrategia y realizar las siguientes acciones: ver, lanzar, editar o
+    borrar
+</h6>
+
+{% if estrategias %}
+
+<!--Table-->
+<table class="table table-hover table-fixed">
+
+    <!--Table head-->
+    <thead>
+        <tr>
+            <th># ID</th>
+            <th>Nombre estrategia</th>
+            <th>Accion</th>
+
+
+        </tr>
+    </thead>
+    <!--Table head-->
+
+    <!--Table body-->
+    <tbody>
+        {% for e in estrategias %}
+        <tr>
+            <th scope="row">{{e.id}}</th>
+            <td>{{e.nombre}}</td>
+            <td>
+                <button type="button" class="btn btn-info text-right btn-sm">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button type="button" class="btn btn-success text-right btn-sm">
+                    <i class="far fa-play-circle"></i>
+                </button>
+                <button type="button" class="btn btn-warning text-right btn-sm">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-danger text-right btn-sm">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+
+            </td>
+
+        </tr>
+        {% endfor %}
+
+    </tbody>
+    <!--Table body-->
+
+</table>
+<!--Table-->
+
+{% else %}
+
+<em >Aun no hay estrategias creadas, para crear una ingrese <a class="" href="{% url 'agregar_estrategia' %}">aqui</a></em>
+
+{% endif %}
+
+
+
+{% endblock content %}
