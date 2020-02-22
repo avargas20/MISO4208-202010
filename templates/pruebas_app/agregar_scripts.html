@@ -1,0 +1,134 @@
+{% extends 'pruebas_app/layout.html' %}
+{% block head %}
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+
+{% endblock head %}
+{% block subtitle %}<h1 class="mt-3">Agregar Estrategia</h1>
+{% endblock subtitle %}
+{% block content %}
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <select name='aplicaciones' id='aplicaciones' class="form-control">
+                    <option selected disabled>{{aplicacion.nombre}}</option>
+
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <select name='versiones' id='versiones' class="form-control">
+                    <option class="hidden" selected disabled>{{version.numero}}</option>
+
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="{{estrategia.nombre}}"
+            name="nombre_estrategia" />
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Descripcion de la estrategia"
+            value="{{estrategia.descripcion}}" name="descripcion_estrategia" />
+    </div>
+
+
+    <div class="row mb-3">
+
+        <div class="col-9">
+            <h5 class="mt-2">Adicione scripts a esta estrategia</h1>
+        </div>
+        <div class="col-3 text-right">
+
+        </div>
+    </div>
+    <div id="container">
+
+        {% for p in pruebas %}
+        <div class="row" id="fila">
+
+            <div class="col-5">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFileLang" lang="es">
+                    <label class="custom-file-label" for="customFileLang">{{p.script}}</label>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option class="hidden" selected disabled>Herramienta</option>
+                        <option selected disabled>{{p.herramienta.nombre}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option class="hidden" selected disabled>Tipo</option>
+                        <option selected disabled>{{p.tipo.nombre}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-1">
+                <div class="form-group">
+                    <a class="btn btn-danger" href="#">
+                        <i class="far fa-trash-alt"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <form action="{% url 'guardar_script' estrategia.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row register-form">
+
+                <div class="col-5">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
+                        <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <select name="herramienta" id="herramienta" class="form-control">
+                            <option class="hidden" selected disabled>Herramienta</option>
+                            {% for h in herramientas %}
+                            <option value="{{h.id}}">{{h.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="form-group">
+                        <select name="tipo" id="tipo" class="form-control">
+                            <option class="hidden" selected disabled>Tipo</option>
+                            {% for t in tipos %}
+                            <option>{{t.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-1">
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="far fa-plus-square"></i></button>
+                </div>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+</div>
+
+{% endblock content %}

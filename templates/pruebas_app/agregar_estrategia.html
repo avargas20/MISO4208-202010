@@ -23,7 +23,8 @@
           console.log(results);
           $("#versiones option").remove();
           for (var i = results.length - 1; i >= 0; i--) {
-            $("#versiones").append('<option>' + results[i].numero + '</option>');
+            $("#versiones").append('<option value="' + results[i].id + '">' + results[i].numero +
+              '</option>');
           };
         }
       });
@@ -32,22 +33,13 @@
   });
 </script>
 
-<script type='text/javascript'>
-  function agregar_script() {
-
-    var nuevo = document.createElement('div')
-    nuevo.innerHTML = '<div class="row" id="fila"><div class="col-5"><div class="custom-file"><input type="file" class="custom-file-input" id="customFileLang" lang="es"><label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label></div></div><div class="col-3"><div class="form-group"><select class="form-control"><option class="hidden" selected disabled>Herramienta</option>{% for h in herramientas %}<option>{{h.nombre}}</option>{% endfor %}</select></div></div><div class="col-3"><div class="form-group"><select class="form-control"><option class="hidden" selected disabled>Tipo</option>{% for t in tipos %}<option>{{t.nombre}}</option>{% endfor %}</select></div></div><div class="col-1"><div class="form-group"><a class="btn btn-danger" href="#"><i class="far fa-trash-alt"></i></a></div></div></div>'
-    document.getElementById("container").appendChild(nuevo)
-
-  }
-</script>
-
 {% endblock head %}
 {% block subtitle %}<h1 class="mt-3">Agregar Estrategia</h1>
 {% endblock subtitle %}
 {% block content %}
 <div class="container-fluid">
-  <form>
+  <form action="{% url 'guardar_estrategia' %}" method="post">
+    {% csrf_token %}
     <div class="row register-form">
       <div class="col-md-8">
         <div class="form-group">
@@ -65,68 +57,21 @@
           <select name='versiones' id='versiones' class="form-control">
             <option class="hidden" selected disabled>Seleccione la version</option>
 
-
-
           </select>
         </div>
       </div>
     </div>
     <div class="form-group">
-      <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="" />
+      <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="" name="nombre_estrategia" />
     </div>
-    <div class="row mb-3">
-
-      <div class="col-9">
-        <h5 class="mt-2">Adicione scripts a esta estrategia</h1>
-      </div>
-      <div class="col-3 text-right">
-
-
-        <button type="button" class="btn btn-success text-right" onclick="agregar_script()">
-          Agregar otro<i class="m-1 fas fa-folder-plus"></i>
-        </button>
-
-      </div>
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="Descripcion de la estrategia" value="" name="descripcion_estrategia" />
     </div>
-    <div id="container">
-      <div class="row" id="fila">
-
-        <div class="col-5">
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" id="customFileLang" lang="es">
-            <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="form-group">
-            <select class="form-control">
-              <option class="hidden" selected disabled>Herramienta</option>
-              {% for h in herramientas %}
-              <option>{{h.nombre}}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="form-group">
-            <select class="form-control">
-              <option class="hidden" selected disabled>Tipo</option>
-              {% for t in tipos %}
-              <option>{{t.nombre}}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-        <div class="col-1">
-          <div class="form-group">
-            <a class="btn btn-danger" href="#">
-              <i class="far fa-trash-alt"></i></a>
-          </div>
-        </div>
-
-      </div>
-    </div>
+    <button type="submit" class="btn btn-primary">Guardar estrategia</button>
   </form>
+
+
+
 
 </div>
 
