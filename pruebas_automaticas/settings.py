@@ -123,3 +123,5 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
+
+CYPRESS_PATH = 'C://Users//Nicolas Lema//Desktop//Miso uniandes - no version//Pruebas automaticas//Cypress_proyecto'
