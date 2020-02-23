@@ -76,7 +76,7 @@
             </div>
             <div class="col-1">
                 <div class="form-group">
-                    <a class="btn btn-danger" href="#">
+                    <a class="btn btn-danger" href="{% url 'eliminar_prueba' p.id %}">
                         <i class="far fa-trash-alt"></i></a>
                 </div>
             </div>
@@ -85,7 +85,7 @@
 
         {% endfor %}
 
-        <form action="{% url 'guardar_script' estrategia.id %}" method="post" enctype="multipart/form-data">
+        <form action="{% url 'guardar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="row register-form">
 
@@ -110,7 +110,7 @@
                         <select name="tipo" id="tipo" class="form-control">
                             <option class="hidden" selected disabled>Tipo</option>
                             {% for t in tipos %}
-                            <option>{{t.nombre}}</option>
+                            <option value="{{t.id}}">{{t.nombre}}</option>
                             {% endfor %}
                         </select>
                     </div>
