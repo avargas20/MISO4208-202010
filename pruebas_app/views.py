@@ -1,8 +1,13 @@
 from django.shortcuts import render
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 import json
+import os
+import logging
+from django.conf import settings
+import scripts.worker_cypress 
+
 
 # Create your views here.
 
@@ -77,3 +82,26 @@ def obtener_versiones_de_una_estrategia(request):
 def lanzar_estrategia(request):
     estrategias = Estrategia.objects.all()
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias} )
+
+def ver_estrategia(request, estrategia_id):
+    estrategias = Estrategia.objects.all()
+    return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias} )
+
+def ejecutar_estrategia(request, estrategia_id):
+    estrategia = Estrategia.objects.get(id=estrategia_id)
+    solicitud = Solicitud()
+    solicitud.estrategia = estrategia
+    solicitud.save()
+
+    for p in estrategia.prueba_set.all():
+        herramienta = p.herramienta.nombre
+        resultado = Resultado()
+        resultado.solicitud=solicitud
+        resultado.prueba = p
+        resultado.save()
+        #Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
+        if herramienta=='Cypress':
+            scripts.worker_cypress.funcion(resultado.id)
+            pass
+        elif herramienta=='Protractor':
+            pass

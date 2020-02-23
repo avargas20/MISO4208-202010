@@ -55,4 +55,20 @@ class Prueba(models.Model):
     herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
 
     def __str__(self):
-        return 'Prueba numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
+        return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
+
+class Solicitud(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Solicitud id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
+
+def directorio_resultado(instance, filename):
+    # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
+    return 'resultados/{0}_{1}'.format(instance.solicitud.id, id)
+
+class Resultado(models.Model):
+    resultado = models.FileField(upload_to=directorio_resultado)
+    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
+    prueba = models.ForeignKey(Prueba, on_delete=models.CASCADE)
