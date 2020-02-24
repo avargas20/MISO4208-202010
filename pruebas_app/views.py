@@ -12,7 +12,7 @@ import scripts.worker_cypress
 # Create your views here.
 
 def home(request):
-    solicitudes = Solicitud.objects.all().oder_by('-id')
+    solicitudes = Solicitud.objects.all().order_by('-id')
     return render(request, 'pruebas_app/index.html')
 
 def agregar_estrategia(request):
