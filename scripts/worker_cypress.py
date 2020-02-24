@@ -28,7 +28,7 @@ def funcion(resultado_id):
 
     print('La salida es:',salida)
     
-    video = open(settings.CYPRESS_PATH+'//cypress//videos//'+str(resultado.id)+'.js.mp4', encoding="utf-32")
+    video = open(settings.CYPRESS_PATH+'//cypress//videos//'+str(resultado.id)+'.js.mp4', 'rb')
     archivo_video = File(video)
-    resultado.resultado.save(str(resultado.id), archivo_video, save=True)
+    resultado.resultado.save('resultados.mp4', archivo_video, save=True)
     video.close()

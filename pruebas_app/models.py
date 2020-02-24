@@ -66,7 +66,7 @@ class Solicitud(models.Model):
 
 def directorio_resultado(instance, filename):
     # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
-    return 'resultados/{0}_{1}'.format(instance.solicitud.id, id)
+    return 'resultados/{0}_{1}'.format(instance.solicitud.id, filename)
 
 class Resultado(models.Model):
     resultado = models.FileField(upload_to=directorio_resultado)
