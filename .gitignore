@@ -5,3 +5,4 @@ __init__.py*
 __pycache__*
 /pruebas_app/migrations/
 /archivos/scripts/*
+/archivos/

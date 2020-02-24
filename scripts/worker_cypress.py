@@ -2,6 +2,7 @@ from pruebas_automaticas import settings
 import os
 import django
 import subprocess
+from django.core.files import File
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()
 
@@ -27,4 +28,7 @@ def funcion(resultado_id):
 
     print('La salida es:',salida)
     
-
+    video = open(settings.CYPRESS_PATH+'//cypress//videos//'+str(resultado.id)+'.js.mp4', encoding="utf-32")
+    archivo_video = File(video)
+    resultado.resultado.save(str(resultado.id), archivo_video, save=True)
+    video.close()

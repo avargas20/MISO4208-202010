@@ -64,7 +64,7 @@ def eliminar_prueba(request, prueba_id):
     return agregar_prueba(request, estrategia_id)
 
 
-def obtener_versiones_de_una_estrategia(request):
+def obtener_versiones_de_una_aplicacion(request):
     aplicacion_id = int(request.GET['aplicacion_id'])
     print ("ajax aplicacion_id ", aplicacion_id)
 
