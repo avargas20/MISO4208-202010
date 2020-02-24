@@ -15,6 +15,4 @@ def funcion(resultado_id):
     prueba = resultado.prueba
     print(prueba.script)
 
-    
-
     salida = subprocess.call(['npx', 'cypress', 'run'], shell=True, cwd=settings.CYPRESS_PATH)

@@ -1,3 +1,10 @@
+Para ejecutar el proyecto por primera vez:
+    pip install -r requirements.txt
+    python manage.py makemigrations pruebas_app
+    python manage.py migrate
+
+
+
 Lo del file lo saque de aqui https://mdbootstrap.com/docs/jquery/forms/file-input/
 Sacar la version de la app seleccionada, aqui hay un tuto https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
     aqui otro: https://stackoverflow.com/questions/25706639/django-dependent-select (este me gusta mas)
