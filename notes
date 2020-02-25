@@ -3,11 +3,11 @@ Para ejecutar el proyecto por primera vez:
     python manage.py makemigrations pruebas_app
     python manage.py migrate
 
-
-
 Lo del file lo saque de aqui https://mdbootstrap.com/docs/jquery/forms/file-input/
 Sacar la version de la app seleccionada, aqui hay un tuto https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
     aqui otro: https://stackoverflow.com/questions/25706639/django-dependent-select (este me gusta mas)
 
 En la ruta del worker de cypress es necesario instalar cypress con el siguiente comando 
     npm install cypress --save-dev
+PAra referenciar la ruta de instalacion de cypress se debe agregar la variable de entorno: 
+    PA_CYPRESS_PATH
