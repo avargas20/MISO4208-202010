@@ -15,5 +15,5 @@ urlpatterns = [
     path('eliminar_estrategia/<int:estrategia_id>', views.eliminar_estrategia, name='eliminar_estrategia'),
     path('ejecutar_estrategia/<int:estrategia_id>', views.ejecutar_estrategia, name='ejecutar_estrategia'),
     path('ver_estrategia/<int:estrategia_id>', views.ver_estrategia, name='ver_estrategia'),
-    path('listar_estrategias/', views.listar_estrategias, name='listar_estrategias'),
+    path('listar_solicitudes/', views.listar_solicitudes, name='listar_solicitudes'),
 ]

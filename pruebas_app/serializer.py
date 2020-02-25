@@ -25,4 +25,13 @@ class EstrategiaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estrategia
 
-        fields = ('id', 'nombre', 'descripcion', 'version')
+        fields = ('nombre', 'descripcion', 'version')
+
+
+class SolicitudSerializer(serializers.ModelSerializer):
+    estrategia = EstrategiaSerializer()
+
+    class Meta:
+        model = Solicitud
+
+        fields = ('id', 'fecha', 'estrategia')

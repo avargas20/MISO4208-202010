@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .serializer import EstrategiaSerializer
+from .serializer import EstrategiaSerializer, SolicitudSerializer
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
@@ -117,7 +117,7 @@ def ejecutar_estrategia(request, estrategia_id):
             pass
 
 
-def listar_estrategias(self):
-    estrategia = Estrategia.objects.all()
-    serializer = EstrategiaSerializer(estrategia, many=True)
+def listar_solicitudes(self):
+    solicitud = Solicitud.objects.all()
+    serializer = SolicitudSerializer(solicitud, many=True)
     return JsonResponse(serializer.data, safe=False)
