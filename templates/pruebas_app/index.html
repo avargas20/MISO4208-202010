@@ -13,10 +13,10 @@
 
         <!--Table head-->
         <thead>
-            <tr>
+            <tr class="text-center">
                 <th># ID</th>
-                <th>Aplicacion</th>
-                <th>Version</th>
+                <th>Aplicación</th>
+                <th>Versión</th>
                 <th>Estrategia</th>
                 <th>Estado</th>
                 <th>Resultado</th>
@@ -27,15 +27,17 @@
 
         <!--Table body-->
         <tbody>
-            <tr>
-                <th scope="row">4</th>
-                <td>Jerry</td>
-                <td>Horwitz</td>
-                <td>Italy</td>
-                <td>Bari</td>
-                <td><a href="{% url 'home' %}"><i class="fas fa-download"></i></a></td>
+            {% for solicitud in solicitudes %}
+                <tr>
+                    <th scope="row" class="text-center">{{ solicitud.id }}</th>
+                    <td>{{ solicitud.estrategia.version.aplicacion.nombre }}</td>
+                    <td class="text-center">{{ solicitud.estrategia.version.numero }}</td>
+                    <td>{{ solicitud.estrategia.nombre }}</td>
+                    <td>{{ solicitud.status }}</td>
+                    <td class="text-center"><a href="{% url 'home' %}"><i class="fas fa-download"></i></a></td>
 
-            </tr>
+                </tr>
+            {% endfor %}
         </tbody>
         <!--Table body-->
 
