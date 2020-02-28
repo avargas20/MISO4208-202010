@@ -57,9 +57,13 @@ class Prueba(models.Model):
     def __str__(self):
         return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
 
+class Estado(models.Model):
+    descripcion = models.CharField(max_length=50)
+
 class Solicitud(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
+    estado = models.ForeignKey(Estado, on_delete=models.CASCADE)
 
     def __str__(self):
         return 'Solicitud id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
@@ -70,5 +74,7 @@ def directorio_resultado(instance, filename):
 
 class Resultado(models.Model):
     resultado = models.FileField(upload_to=directorio_resultado)
+    terminada = models.BooleanField(default=False)
     solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
     prueba = models.ForeignKey(Prueba, on_delete=models.CASCADE)
+
