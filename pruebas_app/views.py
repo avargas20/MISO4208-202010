@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from .serializer import EstrategiaSerializer, SolicitudSerializer
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, Estado
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 import json
@@ -99,8 +99,10 @@ def ver_estrategia(request, estrategia_id):
 
 def ejecutar_estrategia(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
+    estado = Estado.objects.get(id=1)
     solicitud = Solicitud()
     solicitud.estrategia = estrategia
+    solicitud.estado = estado
     solicitud.save()
 
     for p in estrategia.prueba_set.all():

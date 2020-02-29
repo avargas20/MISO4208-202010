@@ -28,10 +28,18 @@ class EstrategiaSerializer(serializers.ModelSerializer):
         fields = ('nombre', 'descripcion', 'version')
 
 
+class EstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Estado
+
+        fields = '__all__'
+
+
 class SolicitudSerializer(serializers.ModelSerializer):
     estrategia = EstrategiaSerializer()
+    estado = EstadoSerializer()
 
     class Meta:
         model = Solicitud
 
-        fields = ('id', 'fecha', 'estrategia')
+        fields = ('id', 'fecha', 'estrategia', 'estado')
