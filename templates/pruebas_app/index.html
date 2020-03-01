@@ -28,15 +28,20 @@
         <!--Table body-->
         <tbody>
             {% for solicitud in solicitudes %}
-                <tr>
-                    <th scope="row" class="text-center">{{ solicitud.id }}</th>
-                    <td>{{ solicitud.estrategia.version.aplicacion.nombre }}</td>
-                    <td class="text-center">{{ solicitud.estrategia.version.numero }}</td>
-                    <td>{{ solicitud.estrategia.nombre }}</td>
-                    <td>{{ solicitud.estado.descripcion }}</td>
-                    <td class="text-center"><a href="{% url 'home' %}"><i class="fas fa-download"></i></a></td>
+            <tr>
+                <th scope="row" class="text-center">{{ solicitud.id }}</th>
+                <td>{{ solicitud.estrategia.version.aplicacion.nombre }}</td>
+                <td class="text-center">{{ solicitud.estrategia.version.numero }}</td>
+                <td>{{ solicitud.estrategia.nombre }}</td>
+                <td>{{ solicitud.estado }}</td>
+                {% if solicitud.terminada %}
+                <td class="text-center"><a href="{% url 'home' %}"><i class="fas fa-download"></i></a></td>
+                {% else %}
+                <td class="text-center">Pendiente</td>
+                {% endif %}
 
-                </tr>
+
+            </tr>
             {% endfor %}
         </tbody>
         <!--Table body-->

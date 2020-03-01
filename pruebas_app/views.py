@@ -99,11 +99,9 @@ def ver_estrategia(request, estrategia_id):
 
 
 def ejecutar_estrategia(request, estrategia_id):
-    estrategia = Estrategia.objects.get(id=estrategia_id)
-    estado = Estado.objects.get(id=1)
+    estrategia = Estrategia.objects.get(id=estrategia_id)  
     solicitud = Solicitud()
     solicitud.estrategia = estrategia
-    solicitud.estado = estado
     solicitud.save()
 
     for p in estrategia.prueba_set.all():

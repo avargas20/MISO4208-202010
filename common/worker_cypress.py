@@ -25,3 +25,4 @@ def funcion(resultado_id):
     resultado.terminada = True
     resultado.save()
     video.close()
+    util.validar_ultimo(resultado.solicitud)
