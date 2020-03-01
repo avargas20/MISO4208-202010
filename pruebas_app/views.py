@@ -13,7 +13,7 @@ import threading
 
 def home(request):
     solicitudes = Solicitud.objects.all().order_by('-id')
-    return render(request, 'pruebas_app/index.html')
+    return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes})
 
 
 def agregar_estrategia(request):
