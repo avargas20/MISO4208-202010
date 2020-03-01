@@ -2,7 +2,7 @@
 {% block subtitle %}<h1 class="mt-2">Home</h1>{% endblock subtitle %}
 {% block content %}
 
-<h6 class="m-5">A continuacion observe un resumen de las solicitudes lanzadas
+<h6 class="m-5">A continuación observe un resumen de las solicitudes lanzadas
 </h6>
 
 
@@ -48,6 +48,45 @@
 
     </table>
     <!--Table-->
+    <div class="row justify-content-center">
+        <nav aria-label="Page navigation example">
+            {% if solicitudes.has_other_pages %}
+                <ul class="pagination justify-content-center">
+                    {% if solicitudes.has_previous %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?page={{ solicitudes.previous_page_number }}"><span
+                                aria-hidden="true">&laquo;</span></a></li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
+                                    aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% endif %}
+                    {% for i in solicitudes.paginator.page_range %}
+                        {% if solicitudes.number == i %}
+                            <li class="page-item active"><a class="page-link"
+                                                            href="?page={{ i }}"><span>{{ i }} <span
+                                    class="sr-only">(current)</span></span></a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if solicitudes.has_next %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="?page={{ solicitudes.next_page_number }}"><span
+                                aria-hidden="true">&raquo;</span></a></li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
+                                    aria-hidden="true">&raquo;</span></a>
+                        </li>
+
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </nav>
+    </div>
 </div>
 
 

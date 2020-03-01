@@ -7,13 +7,17 @@ from django.urls import reverse
 import json
 from  common import worker_cypress
 import threading
+from django.core.paginator import Paginator
 
 
 # Create your views here.
 
 def home(request):
     solicitudes = Solicitud.objects.all().order_by('-id')
-    return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes})
+    paginator = Paginator(solicitudes, 10)  # Show 10 solicitudes per page
+    page = request.GET.get('page')
+    solicitudes_out = paginator.get_page(page)
+    return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes_out})
 
 
 def agregar_estrategia(request):
