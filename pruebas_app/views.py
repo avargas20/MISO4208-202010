@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from .serializer import EstrategiaSerializer, SolicitudSerializer
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, Estado
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
@@ -122,8 +121,7 @@ def ejecutar_estrategia(request, estrategia_id):
             tarea.start()
         elif herramienta == 'Protractor':
             pass
-
-    return home(request)
+    return HttpResponseRedirect(reverse('home'))
 
 
 def descargar_evidencias(request, solicitud_id):
