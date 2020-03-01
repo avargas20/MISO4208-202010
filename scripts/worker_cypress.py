@@ -30,5 +30,7 @@ def funcion(resultado_id):
     
     video = open(settings.CYPRESS_PATH+'//cypress//videos//'+str(resultado.id)+'.js.mp4', 'rb')
     archivo_video = File(video)
-    resultado.resultado.save('resultados.mp4', archivo_video, save=True)
+    resultado.resultado.save('cypress.mp4', archivo_video, save=True)
+    resultado.terminada = True
+    resultado.save()
     video.close()

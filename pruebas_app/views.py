@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 import json
 import scripts.worker_cypress
+import threading
 
 
 # Create your views here.
@@ -113,8 +114,10 @@ def ejecutar_estrategia(request, estrategia_id):
         resultado.save()
         # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
         if herramienta == 'Cypress':
-            scripts.worker_cypress.funcion(resultado.id)
-            pass
+            tarea = threading.Thread(target=scripts.worker_cypress.funcion, args=[resultado.id])
+            tarea.setDaemon(True)
+            tarea.start()
+            return home(request)
         elif herramienta == 'Protractor':
             pass
 
