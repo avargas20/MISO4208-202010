@@ -5,7 +5,7 @@ from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 import json
-import scripts.worker_cypress
+from  common import worker_cypress
 import threading
 
 
@@ -114,12 +114,13 @@ def ejecutar_estrategia(request, estrategia_id):
         resultado.save()
         # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
         if herramienta == 'Cypress':
-            tarea = threading.Thread(target=scripts.worker_cypress.funcion, args=[resultado.id])
+            tarea = threading.Thread(target=worker_cypress.funcion, args=[resultado.id])
             tarea.setDaemon(True)
             tarea.start()
-            return home(request)
         elif herramienta == 'Protractor':
             pass
+    
+    return home(request)
 
 
 def listar_solicitudes(self):

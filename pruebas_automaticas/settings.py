@@ -125,3 +125,7 @@ MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
 CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
+
+RUTAS_INTERNAS = {
+    'Cypress': 'cypress/integration/',
+}
