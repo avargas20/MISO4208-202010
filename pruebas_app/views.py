@@ -1,13 +1,14 @@
 from django.shortcuts import render
-
 from .serializer import EstrategiaSerializer, SolicitudSerializer
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, Estado
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.urls import reverse
 import json
-from  common import worker_cypress
+from common import worker_cypress
 import threading
 from django.core.paginator import Paginator
+from django.conf import settings
+import os
 
 
 # Create your views here.
@@ -34,7 +35,8 @@ def guardar_estrategia(request):
         version = Version.objects.get(id=request.POST['versiones'])
         nombre_estrategia = request.POST['nombre_estrategia']
         descripcion_estrategia = request.POST['descripcion_estrategia']
-        estrategia = Estrategia(nombre=nombre_estrategia, descripcion=descripcion_estrategia, version=version)
+        estrategia = Estrategia(
+            nombre=nombre_estrategia, descripcion=descripcion_estrategia, version=version)
         estrategia.save()
         return HttpResponseRedirect(reverse('agregar_prueba', args=(estrategia.id,)))
 
@@ -62,7 +64,8 @@ def guardar_prueba(request, estrategia_id):
         herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        prueba = Prueba(script=script, herramienta=herramienta, tipo=tipo, estrategia=estrategia)
+        prueba = Prueba(script=script, herramienta=herramienta,
+                        tipo=tipo, estrategia=estrategia)
         prueba.save()
 
         print(request.POST)
@@ -103,7 +106,7 @@ def ver_estrategia(request, estrategia_id):
 
 
 def ejecutar_estrategia(request, estrategia_id):
-    estrategia = Estrategia.objects.get(id=estrategia_id)  
+    estrategia = Estrategia.objects.get(id=estrategia_id)
     solicitud = Solicitud()
     solicitud.estrategia = estrategia
     solicitud.save()
@@ -116,16 +119,23 @@ def ejecutar_estrategia(request, estrategia_id):
         resultado.save()
         # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
         if herramienta == 'Cypress':
-            tarea = threading.Thread(target=worker_cypress.funcion, args=[resultado.id])
+            tarea = threading.Thread(
+                target=worker_cypress.funcion, args=[resultado.id])
             tarea.setDaemon(True)
             tarea.start()
         elif herramienta == 'Protractor':
             pass
-    
-    return home(request)
+    return HttpResponseRedirect(reverse('home'))
 
 
-def listar_solicitudes(self):
-    solicitud = Solicitud.objects.all()
-    serializer = SolicitudSerializer(solicitud, many=True)
-    return JsonResponse(serializer.data, safe=False)
+def descargar_evidencias(request, solicitud_id):
+    solicitud = Solicitud.objects.get(id=solicitud_id)
+    file_path = solicitud.evidencia.path
+    print("ruta buscada", file_path)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/")
+            response['Content-Disposition'] = 'inline; filename=' + \
+                os.path.basename(file_path)
+            return response
+    raise Http404

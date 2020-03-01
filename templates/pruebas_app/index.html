@@ -35,7 +35,7 @@
                 <td>{{ solicitud.estrategia.nombre }}</td>
                 <td>{{ solicitud.estado }}</td>
                 {% if solicitud.terminada %}
-                <td class="text-center"><a href="{% url 'home' %}"><i class="fas fa-download"></i></a></td>
+                <td class="text-center"><a href="{% url 'descargar_evidencias' solicitud.id %}"><i class="fas fa-download"></i></a></td>
                 {% else %}
                 <td class="text-center">Pendiente</td>
                 {% endif %}

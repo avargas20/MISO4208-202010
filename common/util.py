@@ -37,7 +37,7 @@ def validar_ultimo(solicitud):
     if(solicitud.terminada):
         zip_objetcs = ZipFile('evidencias.zip', 'w')
         for r in solicitud.resultado_set.all():
-            zip_objetcs.write(r.resultado.path)
+            zip_objetcs.write(r.resultado.path, r.resultado.name)
         zip_objetcs.close()
         archivo = open(settings.BASE_DIR+"//evidencias.zip", 'rb')    
         archivo_zip = File(archivo)
