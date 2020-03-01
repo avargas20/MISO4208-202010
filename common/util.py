@@ -11,14 +11,8 @@ from pruebas_automaticas import settings
 from django.core.files import File
 import subprocess
 from zipfile import ZipFile
+from pathlib import Path
 
-def main():
-    solicitud = Solicitud.objects.filter(id=90)
-    validar_ultimo(solicitud)
-
-
-if __name__ == '__main__':
-    main()
 
 # Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
 
@@ -44,5 +38,17 @@ def validar_ultimo(solicitud):
         zip_objetcs = ZipFile('evidencias.zip', 'w')
         for r in solicitud.resultado_set.all():
             zip_objetcs.write(r.resultado.path)
-        solicitud.evidencia.save('evidencias.zip', zip_objetcs, save=True)
         zip_objetcs.close()
+        archivo = open(settings.BASE_DIR+"//evidencias.zip", 'rb')    
+        archivo_zip = File(archivo)
+        solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
+        archivo_zip.close()
+        os.remove(settings.BASE_DIR+"//evidencias.zip")
+
+def main():
+    solicitud = Solicitud.objects.filter(id=90)
+    validar_ultimo(solicitud)
+
+
+if __name__ == '__main__':
+    main()
