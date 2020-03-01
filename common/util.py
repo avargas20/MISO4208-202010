@@ -1,15 +1,16 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
+import django
+from django.conf import settings
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
+django.setup()
 
 from pruebas_app.models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
+
 from pruebas_automaticas import settings
 from django.core.files import File
 import subprocess
 from zipfile import ZipFile
-import django
-django.setup()
-
-
 
 def main():
     solicitud = Solicitud.objects.filter(id=90)
