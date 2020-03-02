@@ -41,7 +41,7 @@
     <div class="row mb-3">
 
         <div class="col-9">
-            <h5 class="mt-2">Adicione scripts a esta estrategia</h1>
+            <h5 class="mt-2">Adicione scripts a esta estrategia</h5>
         </div>
         <div class="col-3 text-right">
 
@@ -52,12 +52,20 @@
         {% for p in pruebas %}
         <div class="row" id="fila">
 
-            <div class="col-5">
+            <!--<div class="col-5">
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" id="customFileLang" lang="es">
                     <label class="custom-file-label" for="customFileLang">{{p.script}}</label>
                 </div>
+            </div>-->
+            <div class=" col-5 input-group mb-3">
+                <div class="custom-file">
+                <input type="file" class="custom-file-input" id="customFileLang">
+                <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">{{p.script}}</label>
+              </div>
             </div>
+
+
             <div class="col-3">
                 <div class="form-group">
                     <select class="form-control">
@@ -89,11 +97,17 @@
             {% csrf_token %}
             <div class="row register-form">
 
-                <div class="col-5">
+                <!--<div class="col-5">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
                         <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label>
                     </div>
+                </div>-->
+                <div class=" col-5 input-group mb-3">
+                    <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
+                    <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar Archivo</label>
+                  </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
