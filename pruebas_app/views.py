@@ -136,6 +136,58 @@ def descargar_evidencias(request, solicitud_id):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/")
             response['Content-Disposition'] = 'inline; filename=' + \
-                os.path.basename(file_path)
+                                              os.path.basename(file_path)
             return response
     raise Http404
+
+
+def nueva_aplicacion(request):
+    aplicaciones = Aplicacion.objects.all()
+    return render(request, 'pruebas_app/nueva_aplicacion.html',
+                  {'aplicaciones': aplicaciones})
+
+
+def guardar_aplicacion(request):
+    if request.method == 'POST':
+        print(request.POST)
+        nombre_aplicacion = request.POST['nombre_aplicacion']
+        descripcion_aplicacion = request.POST['descripcion_aplicacion']
+        tipo = request.POST['tipo']
+
+        aplicacion = Aplicacion(
+            nombre=nombre_aplicacion, descripcion=descripcion_aplicacion, tipo=tipo)
+        aplicacion.save()
+        return HttpResponseRedirect(reverse('nueva_aplicacion'))
+
+
+def eliminar_aplicacion(request, aplicacion_id):
+    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+    aplicacion.delete()
+    return nueva_aplicacion(request)
+
+
+def agregar_version(request, aplicacion_id):
+    versiones = Version.objects.filter(aplicacion=aplicacion_id)
+    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+    return render(request, 'pruebas_app/agregar_version.html',
+                  {'versiones': versiones, 'aplicacion': aplicacion})
+
+
+def guardar_version(request, aplicacion_id):
+    if request.method == 'POST':
+        print(request.POST)
+        numero_version = request.POST['numero_version']
+        descripcion_version = request.POST['descripcion_version']
+
+        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+
+        version = Version(
+            numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion)
+        version.save()
+        return nueva_aplicacion(request)
+
+
+def eliminar_version(request, version_id):
+    version = Version.objects.get(id=version_id)
+    version.delete()
+    return nueva_aplicacion(request)
