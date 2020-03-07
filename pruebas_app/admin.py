@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import Aplicacion, Version, Estrategia, Herramienta, Tipo, Prueba, Estado, Solicitud
 
 # Register your models here.

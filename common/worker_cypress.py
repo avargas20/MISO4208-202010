@@ -1,13 +1,16 @@
-from pruebas_automaticas import settings
 import os
-import django
 import subprocess
+
+import django
 from django.core.files import File
+
+from pruebas_automaticas import settings
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()
 from common import util
 
-from pruebas_app.models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
+from pruebas_app.models import Resultado
 
 
 def funcion(resultado_id):

@@ -1,14 +1,14 @@
-from django.shortcuts import render
-from .serializer import EstrategiaSerializer, SolicitudSerializer
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, Estado
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
-from django.urls import reverse
 import json
-from common import worker_cypress
-import threading
-from django.core.paginator import Paginator
-from django.conf import settings
 import os
+import threading
+
+from django.core.paginator import Paginator
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render
+from django.urls import reverse
+
+from common import worker_cypress
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
 
 
 # Create your views here.

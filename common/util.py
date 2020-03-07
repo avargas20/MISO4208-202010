@@ -1,17 +1,16 @@
 import os
+
 import django
 from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
 
-from pruebas_app.models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
+from pruebas_app.models import Solicitud, Resultado
 
 from pruebas_automaticas import settings
 from django.core.files import File
-import subprocess
 from zipfile import ZipFile
-from pathlib import Path
 
 
 # Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
