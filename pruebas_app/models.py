@@ -3,14 +3,18 @@ from django.db import models
 
 # Primer mundo
 
+
+class TipoAplicacion(models.Model):
+    tipo = models.CharField(max_length=30)
+
+    def __str__(self):
+        return '%s' % self.tipo
+
+
 class Aplicacion(models.Model):
     nombre = models.CharField(max_length=30)
     descripcion = models.TextField(verbose_name='descripción')
-    TIPOS = (
-        ("movil", "móvil"),
-        ("web", "web"),
-    )
-    tipo = models.CharField(max_length=10, choices=TIPOS)
+    tipo = models.ForeignKey(TipoAplicacion, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s' % self.nombre
@@ -95,7 +99,7 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return 'Solicitud id numero: %s de la estrategia: %s estado: %s terminada %s' % (
-        self.id, self.estrategia.nombre, self.estado, self.terminada)
+            self.id, self.estrategia.nombre, self.estado, self.terminada)
 
 
 def directorio_resultado(instance, filename):

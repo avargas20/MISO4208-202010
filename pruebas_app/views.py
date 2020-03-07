@@ -8,10 +8,14 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from common import worker_cypress
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 
+import logging
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
+
 
 def home(request):
     solicitudes = Solicitud.objects.all().order_by('-id')
@@ -143,8 +147,10 @@ def descargar_evidencias(request, solicitud_id):
 
 def nueva_aplicacion(request):
     aplicaciones = Aplicacion.objects.all()
+    tipos = TipoAplicacion.objects.all()
+    logger.info(aplicaciones)
     return render(request, 'pruebas_app/nueva_aplicacion.html',
-                  {'aplicaciones': aplicaciones})
+                  {'aplicaciones': aplicaciones, 'tipos': tipos})
 
 
 def guardar_aplicacion(request):
@@ -154,8 +160,9 @@ def guardar_aplicacion(request):
         descripcion_aplicacion = request.POST['descripcion_aplicacion']
         tipo = request.POST['tipo']
 
+        tipo_aplicacion = TipoAplicacion.objects.get(id=tipo)
         aplicacion = Aplicacion(
-            nombre=nombre_aplicacion, descripcion=descripcion_aplicacion, tipo=tipo)
+            nombre=nombre_aplicacion, descripcion=descripcion_aplicacion, tipo=tipo_aplicacion)
         aplicacion.save()
         return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
