@@ -69,7 +69,6 @@ def guardar_prueba(request, estrategia_id):
         estrategia = Estrategia.objects.get(id=estrategia_id)
         #Si el tipo es E2E necesitamos el script y la herramienta
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
-            print('entro1')
             _, script = request.FILES.popitem()
             script = script[0]
             herramienta = Herramienta.objects.get(id=request.POST['herramienta'])          
@@ -77,7 +76,6 @@ def guardar_prueba(request, estrategia_id):
                             tipo=tipo, estrategia=estrategia)
         #Si el tipo es random no necesitamos nada mas
         elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
-            print('entro')
             prueba = Prueba(tipo=tipo, estrategia=estrategia)
         print(prueba)
         prueba.save()
