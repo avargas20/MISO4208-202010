@@ -9,6 +9,8 @@ from django.urls import reverse
 
 from common import worker_cypress
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
+from pruebas_automaticas import settings
+import subprocess
 
 import logging
 
@@ -183,18 +185,38 @@ def agregar_version(request, aplicacion_id):
 def guardar_version(request, aplicacion_id):
     if request.method == 'POST':
         print(request.POST)
+        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
         numero_version = request.POST['numero_version']
         descripcion_version = request.POST['descripcion_version']
+        # Dependiendo del tipo de aplicacion se saca o el .apk (movil) o la url (web)
+        if aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
+            url = request.POST['url_version']
+            version = Version(
+                numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, url=url)
+            version.save()
+        elif aplicacion.tipo.tipo == settings.TIPOS_APLICACION["movil"]:
+            # Para sacar archivos adjuntos de un input file se hace accediendo a FILES del request y como es una lista se saca el primero porque en el html solo dejamos esocger uno
+            _, apk = request.FILES.popitem()
+            apk = apk[0]
+            version = Version(
+                numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, apk=apk)
+            version.save()
+            #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
+            ruta_apk = version.apk.path.replace("\\", "//")
+            salida = subprocess.run(['aapt', 'dump', 'badging', ruta_apk, '|', 'findstr', '-i', 'package:'],
+                                    shell=True, cwd= os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+            #
+            #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
+            salida = salida.stdout.decode('utf-8')
+            #Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
+            nombre_paquete = salida.split()[1].split("=")[1].replace("'","")
+            version.nombre_paquete = nombre_paquete
+            version.save()
 
-        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
-
-        version = Version(
-            numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion)
-        version.save()
-        return nueva_aplicacion(request)
+        return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
 
 def eliminar_version(request, version_id):
     version = Version.objects.get(id=version_id)
     version.delete()
-    return nueva_aplicacion(request)
+    return HttpResponseRedirect(reverse('nueva_aplicacion'))

@@ -19,11 +19,17 @@ class Aplicacion(models.Model):
     def __str__(self):
         return '%s' % self.nombre
 
+def directorio_apk(instance, filename):
+    # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
+    return 'apk/{0}_{1}_{2}'.format(instance.aplicacion.nombre, instance.numero, filename)
 
 class Version(models.Model):
     numero = models.CharField(max_length=30)
     descripcion = models.TextField(verbose_name='descripción')
     aplicacion = models.ForeignKey(Aplicacion, on_delete=models.CASCADE)
+    apk = models.FileField(upload_to=directorio_apk, null=True)
+    url = models.CharField(max_length=200, null=True)
+    nombre_paquete = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return '%s de la app: %s' % (self.numero, self.aplicacion.nombre)

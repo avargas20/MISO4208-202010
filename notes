@@ -11,3 +11,6 @@ En la ruta del worker de cypress es necesario instalar cypress con el siguiente 
     npm install cypress --save-dev
 PAra referenciar la ruta de instalacion de cypress se debe agregar la variable de entorno: 
     PA_CYPRESS_PATH
+
+Para saber el nombre de un paquete del apk ejecutar el comando:
+    aapt dump badging "C://Users//Nicolas Lema//Desktop//Miso uniandes - no version//Pruebas automaticas//MISO4208-202010//archivos//apk//Car_Report_1_RedReader-modificada_mSWayic.apk"  | findstr -i "package:"

@@ -125,7 +125,18 @@ MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
 CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
+ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
+RUTAS_INTERNAS_SDK_ANDROID = {
+    'platform-tools': 'platform-tools',
+    'build-tools': os.path.join('build-tools', os.environ["PA_VERSION_ANDROID_STUDIO"])
+}
 
 RUTAS_INTERNAS = {
     'Cypress': 'cypress/integration/',
+}
+
+# Asi deberiamos agregar los tipos de aplicacion, asi se validan en la pagina agregar_version.html
+TIPOS_APLICACION = {
+    'movil': 'Móvil',
+    'web': 'Web',
 }
