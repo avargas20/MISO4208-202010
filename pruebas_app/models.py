@@ -66,10 +66,10 @@ def directorio_script(instance, filename):
 
 
 class Prueba(models.Model):
-    script = models.FileField(upload_to=directorio_script)
+    script = models.FileField(upload_to=directorio_script, null=True)
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
-    herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
+    herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
@@ -114,7 +114,11 @@ def directorio_resultado(instance, filename):
 
 
 class Resultado(models.Model):
-    resultado = models.FileField(upload_to=directorio_resultado)
+    resultado = models.FileField(upload_to=directorio_resultado, null=True)
+    log = models.FileField(upload_to=directorio_resultado, null=True)
     terminada = models.BooleanField(default=False)
     solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
     prueba = models.ForeignKey(Prueba, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s %s %s' % (self.resultado, self.log, self.terminada, self.solicitud, self.prueba)

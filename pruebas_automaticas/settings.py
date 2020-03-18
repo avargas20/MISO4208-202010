@@ -140,3 +140,14 @@ TIPOS_APLICACION = {
     'movil': 'Móvil',
     'web': 'Web',
 }
+
+# Asi deberiamos agregar los tipos de pruebas, asi se validan en la pagina agregar_prueba.html
+TIPOS_PRUEBAS = {
+    'e2e': 'E2E',
+    'aleatorias': 'Aleatorias',
+}
+
+# Asi deberiamos agregar los tipos de herramientas, asi se validan en la pagina agregar_prueba.html
+TIPOS_HERRAMIENTAS = {
+    'cypress': 'Cypress',
+}

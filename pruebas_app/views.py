@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-from common import worker_cypress
+from common import worker_cypress, worker_monkey_movil
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 from pruebas_automaticas import settings
 import subprocess
@@ -65,13 +65,21 @@ def agregar_prueba(request, estrategia_id):
 
 def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
-        _, script = request.FILES.popitem()
-        script = script[0]
-        herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        prueba = Prueba(script=script, herramienta=herramienta,
-                        tipo=tipo, estrategia=estrategia)
+        #Si el tipo es E2E necesitamos el script y la herramienta
+        if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
+            print('entro1')
+            _, script = request.FILES.popitem()
+            script = script[0]
+            herramienta = Herramienta.objects.get(id=request.POST['herramienta'])          
+            prueba = Prueba(script=script, herramienta=herramienta,
+                            tipo=tipo, estrategia=estrategia)
+        #Si el tipo es random no necesitamos nada mas
+        elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            print('entro')
+            prueba = Prueba(tipo=tipo, estrategia=estrategia)
+        print(prueba)
         prueba.save()
 
         print(request.POST)
@@ -116,21 +124,29 @@ def ejecutar_estrategia(request, estrategia_id):
     solicitud = Solicitud()
     solicitud.estrategia = estrategia
     solicitud.save()
+    tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
 
     for p in estrategia.prueba_set.all():
-        herramienta = p.herramienta.nombre
+        tipo_prueba = p.tipo.nombre      
         resultado = Resultado()
         resultado.solicitud = solicitud
         resultado.prueba = p
         resultado.save()
-        # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
-        if herramienta == 'Cypress':
-            tarea = threading.Thread(
-                target=worker_cypress.funcion, args=[resultado.id])
-            tarea.setDaemon(True)
-            tarea.start()
-        elif herramienta == 'Protractor':
-            pass
+        if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
+            herramienta = p.herramienta.nombre
+            # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
+            if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
+                tarea = threading.Thread(
+                    target=worker_cypress.funcion, args=[resultado.id])
+                tarea.setDaemon(True)
+                tarea.start()
+            elif herramienta == 'Protractor':
+                pass
+        elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
+            if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
+                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado.id])
+                tarea.setDaemon(True)
+                tarea.start()
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -202,8 +218,7 @@ def guardar_version(request, aplicacion_id):
                 numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, apk=apk)
             version.save()
             #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
-            ruta_apk = version.apk.path.replace("\\", "//")
-            salida = subprocess.run(['aapt', 'dump', 'badging', ruta_apk, '|', 'findstr', '-i', 'package:'],
+            salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
                                     shell=True, cwd= os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
             #
             #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
