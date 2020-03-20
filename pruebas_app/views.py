@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-from common import worker_cypress, worker_monkey_movil
+from common import worker_cypress, worker_monkey_movil, worker_calabash
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 from pruebas_automaticas import settings
 import subprocess
@@ -112,7 +112,7 @@ def lanzar_estrategia(request):
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
 
-def ver_estrategia(request, estrategia_id):
+def ver_estrategia(request):
     estrategias = Estrategia.objects.all()
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
@@ -135,14 +135,21 @@ def ejecutar_estrategia(request, estrategia_id):
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
                 tarea = threading.Thread(
-                    target=worker_cypress.funcion, args=[resultado.id])
+                    target=worker_cypress.funcion, args=[resultado])
                 tarea.setDaemon(True)
                 tarea.start()
             elif herramienta == 'Protractor':
                 pass
+            elif herramienta == 'Pupperteer':
+                pass
+            elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
+                tarea = threading.Thread(target=worker_calabash.funcion, args=[resultado])
+                tarea.setDaemon(True)
+                tarea.start()
+
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado.id])
+                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado])
                 tarea.setDaemon(True)
                 tarea.start()
     return HttpResponseRedirect(reverse('home'))
@@ -217,7 +224,7 @@ def guardar_version(request, aplicacion_id):
             version.save()
             #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
             salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
-                                    shell=True, cwd= os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
             #
             #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')

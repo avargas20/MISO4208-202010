@@ -125,6 +125,7 @@ MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
 CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
+CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
 ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
 RUTAS_INTERNAS_SDK_ANDROID = {
     'platform-tools': 'platform-tools',
@@ -133,6 +134,7 @@ RUTAS_INTERNAS_SDK_ANDROID = {
 
 RUTAS_INTERNAS = {
     'Cypress': 'cypress/integration/',
+    'Calabash': 'features/',
 }
 
 # Asi deberiamos agregar los tipos de aplicacion, asi se validan en la pagina agregar_version.html
@@ -150,4 +152,5 @@ TIPOS_PRUEBAS = {
 # Asi deberiamos agregar los tipos de herramientas, asi se validan en la pagina agregar_prueba.html
 TIPOS_HERRAMIENTAS = {
     'cypress': 'Cypress',
+    'calabash': 'Calabash',
 }
