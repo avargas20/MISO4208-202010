@@ -1,6 +1,6 @@
 describe('Ghost UI links redirection', function() {
     it('Goes to site when its link is clicked', function() {
-        cy.visit('https://ghost-grupo6.herokuapp.com/ghost/#/signin');
+        cy.visit('http://ec2-52-54-255-159.compute-1.amazonaws.com/ghost/#/signin');
         cy.get('#ember8').click().type("jc.piza@uniandes.edu.co");
         cy.get('#ember10').click().type("tRjX$FapKvGsz5G");
         cy.get('#ember12').contains("Sign in");
@@ -9,7 +9,7 @@ describe('Ghost UI links redirection', function() {
         cy.url().should('eq', 'https://ghost-grupo6.herokuapp.com/ghost/#/site');
     });
     it('Goes to posts when its link is clicked', function() {
-        cy.visit('https://ghost-grupo6.herokuapp.com/ghost/#/signin');
+        cy.visit('http://ec2-52-54-255-159.compute-1.amazonaws.com/ghost/#/signin');
         cy.get('#ember8').click().type("jc.piza@uniandes.edu.co");
         cy.get('#ember10').click().type("tRjX$FapKvGsz5G");
         cy.get('#ember12').contains("Sign in");
@@ -18,7 +18,7 @@ describe('Ghost UI links redirection', function() {
         cy.url().should('eq', 'https://ghost-grupo6.herokuapp.com/ghost/#/posts');
     });
     it('Goes to pages when its link is clicked', function() {
-        cy.visit('https://ghost-grupo6.herokuapp.com/ghost/#/signin');
+        cy.visit('http://ec2-52-54-255-159.compute-1.amazonaws.com/ghost/#/signin');
         cy.get('#ember8').click().type("jc.piza@uniandes.edu.co");
         cy.get('#ember10').click().type("tRjX$FapKvGsz5G");
         cy.get('#ember12').contains("Sign in");
