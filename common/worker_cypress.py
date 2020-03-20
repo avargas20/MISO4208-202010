@@ -10,13 +10,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()
 from common import util
 
-from pruebas_app.models import Resultado
 
-
-def funcion(resultado_id):
+def funcion(resultado):
     
-    nuevo_archivo = util.copiar_contenido(resultado_id, settings.RUTAS_INTERNAS["Cypress"])
-    resultado = Resultado.objects.get(id=resultado_id)
+    nuevo_archivo = util.copiar_contenido(resultado, settings.CYPRESS_PATH, settings.RUTAS_INTERNAS["Cypress"], '.js')
     
     salida = subprocess.call(['npx', 'cypress', 'run', 'cypress:run', '--spec', nuevo_archivo], shell=True, cwd=settings.CYPRESS_PATH)
 

@@ -1,37 +1,29 @@
 import os
-
+from zipfile import ZipFile
+from django.core.files import File
 import django
 from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
 
-from pruebas_app.models import Solicitud, Resultado
-
-from pruebas_automaticas import settings
-from django.core.files import File
-from zipfile import ZipFile
-
-
 # Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
-
-
-def copiar_contenido(resultado_id, ruta_interna):
-    print("En el resultado:", resultado_id)
-    resultado = Resultado.objects.get(id=resultado_id)
+def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archivo):
+    print("En el resultado:", resultado)
     prueba = resultado.prueba
     print("El script es:", prueba.script)
 
-    f = open(prueba.script.path, "r")
-    contenido = f.read()
+    archivo = open(prueba.script.path, "r")
+    contenido = archivo.read()
     print("El contenido es:", contenido)
-    nuevo_archivo = ruta_interna+str(resultado.id)+".js"
-    ruta_nuevo_ejecutable = os.path.join(settings.CYPRESS_PATH, nuevo_archivo)
+    nuevo_archivo = ruta_interna+str(resultado.id)+extension_archivo
+    ruta_nuevo_ejecutable = os.path.join(ruta_herramienta, nuevo_archivo)
     with open(ruta_nuevo_ejecutable, "w+") as file:
         file.write(contenido)
     return nuevo_archivo
 
 
+# Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y guardarlos como evidencias, todos los workers lo deben llamar
 def validar_ultimo(solicitud):
     if(solicitud.terminada):
         zip_objetcs = ZipFile('evidencias.zip', 'w')
@@ -46,11 +38,3 @@ def validar_ultimo(solicitud):
         solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
         archivo_zip.close()
         os.remove(settings.BASE_DIR+"//evidencias.zip")
-
-def main():
-    solicitud = Solicitud.objects.filter(id=90)
-    validar_ultimo(solicitud)
-
-
-if __name__ == '__main__':
-    main()
