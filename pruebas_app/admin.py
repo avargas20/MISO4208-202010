@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Aplicacion, Version, Estrategia, Herramienta, Tipo, Prueba, Estado, Solicitud
+
+from .models import Aplicacion, Version, Estrategia, Herramienta, Tipo, Prueba, Estado, Solicitud, TipoAplicacion, Resultado
 
 # Register your models here.
 admin.site.register(Aplicacion)
@@ -10,3 +11,5 @@ admin.site.register(Tipo)
 admin.site.register(Prueba)
 admin.site.register(Estado)
 admin.site.register(Solicitud)
+admin.site.register(TipoAplicacion)
+admin.site.register(Resultado)

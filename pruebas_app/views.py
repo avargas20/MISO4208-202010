@@ -1,17 +1,23 @@
-from django.shortcuts import render
-from .serializer import EstrategiaSerializer, SolicitudSerializer
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, Estado
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
-from django.urls import reverse
 import json
-from common import worker_cypress
-import threading
-from django.core.paginator import Paginator
-from django.conf import settings
 import os
+import threading
 
+from django.core.paginator import Paginator
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render
+from django.urls import reverse
+
+from common import worker_cypress, worker_monkey_movil, worker_calabash
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
+from pruebas_automaticas import settings
+import subprocess
+
+import logging
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
+
 
 def home(request):
     solicitudes = Solicitud.objects.all().order_by('-id')
@@ -59,13 +65,19 @@ def agregar_prueba(request, estrategia_id):
 
 def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
-        _, script = request.FILES.popitem()
-        script = script[0]
-        herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        prueba = Prueba(script=script, herramienta=herramienta,
-                        tipo=tipo, estrategia=estrategia)
+        #Si el tipo es E2E necesitamos el script y la herramienta
+        if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
+            _, script = request.FILES.popitem()
+            script = script[0]
+            herramienta = Herramienta.objects.get(id=request.POST['herramienta'])          
+            prueba = Prueba(script=script, herramienta=herramienta,
+                            tipo=tipo, estrategia=estrategia)
+        #Si el tipo es random no necesitamos nada mas
+        elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            prueba = Prueba(tipo=tipo, estrategia=estrategia)
+        print(prueba)
         prueba.save()
 
         print(request.POST)
@@ -100,7 +112,7 @@ def lanzar_estrategia(request):
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
 
-def ver_estrategia(request, estrategia_id):
+def ver_estrategia(request):
     estrategias = Estrategia.objects.all()
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
@@ -110,21 +122,36 @@ def ejecutar_estrategia(request, estrategia_id):
     solicitud = Solicitud()
     solicitud.estrategia = estrategia
     solicitud.save()
+    tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
 
     for p in estrategia.prueba_set.all():
-        herramienta = p.herramienta.nombre
+        tipo_prueba = p.tipo.nombre      
         resultado = Resultado()
         resultado.solicitud = solicitud
         resultado.prueba = p
         resultado.save()
-        # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
-        if herramienta == 'Cypress':
-            tarea = threading.Thread(
-                target=worker_cypress.funcion, args=[resultado.id])
-            tarea.setDaemon(True)
-            tarea.start()
-        elif herramienta == 'Protractor':
-            pass
+        if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
+            herramienta = p.herramienta.nombre
+            # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
+            if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
+                tarea = threading.Thread(
+                    target=worker_cypress.funcion, args=[resultado])
+                tarea.setDaemon(True)
+                tarea.start()
+            elif herramienta == 'Protractor':
+                pass
+            elif herramienta == 'Pupperteer':
+                pass
+            elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
+                tarea = threading.Thread(target=worker_calabash.funcion, args=[resultado])
+                tarea.setDaemon(True)
+                tarea.start()
+
+        elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
+            if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
+                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado])
+                tarea.setDaemon(True)
+                tarea.start()
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -136,6 +163,80 @@ def descargar_evidencias(request, solicitud_id):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/")
             response['Content-Disposition'] = 'inline; filename=' + \
-                os.path.basename(file_path)
+                                              os.path.basename(file_path)
             return response
     raise Http404
+
+
+def nueva_aplicacion(request):
+    aplicaciones = Aplicacion.objects.all()
+    tipos = TipoAplicacion.objects.all()
+    logger.info(aplicaciones)
+    return render(request, 'pruebas_app/nueva_aplicacion.html',
+                  {'aplicaciones': aplicaciones, 'tipos': tipos})
+
+
+def guardar_aplicacion(request):
+    if request.method == 'POST':
+        print(request.POST)
+        nombre_aplicacion = request.POST['nombre_aplicacion']
+        descripcion_aplicacion = request.POST['descripcion_aplicacion']
+        tipo = request.POST['tipo']
+
+        tipo_aplicacion = TipoAplicacion.objects.get(id=tipo)
+        aplicacion = Aplicacion(
+            nombre=nombre_aplicacion, descripcion=descripcion_aplicacion, tipo=tipo_aplicacion)
+        aplicacion.save()
+        return HttpResponseRedirect(reverse('nueva_aplicacion'))
+
+
+def eliminar_aplicacion(request, aplicacion_id):
+    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+    aplicacion.delete()
+    return nueva_aplicacion(request)
+
+
+def agregar_version(request, aplicacion_id):
+    versiones = Version.objects.filter(aplicacion=aplicacion_id)
+    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+    return render(request, 'pruebas_app/agregar_version.html',
+                  {'versiones': versiones, 'aplicacion': aplicacion})
+
+
+def guardar_version(request, aplicacion_id):
+    if request.method == 'POST':
+        print(request.POST)
+        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+        numero_version = request.POST['numero_version']
+        descripcion_version = request.POST['descripcion_version']
+        # Dependiendo del tipo de aplicacion se saca o el .apk (movil) o la url (web)
+        if aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
+            url = request.POST['url_version']
+            version = Version(
+                numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, url=url)
+            version.save()
+        elif aplicacion.tipo.tipo == settings.TIPOS_APLICACION["movil"]:
+            # Para sacar archivos adjuntos de un input file se hace accediendo a FILES del request y como es una lista se saca el primero porque en el html solo dejamos esocger uno
+            _, apk = request.FILES.popitem()
+            apk = apk[0]
+            version = Version(
+                numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, apk=apk)
+            version.save()
+            #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
+            salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
+                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+            #
+            #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
+            salida = salida.stdout.decode('utf-8')
+            #Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
+            nombre_paquete = salida.split()[1].split("=")[1].replace("'","")
+            version.nombre_paquete = nombre_paquete
+            version.save()
+
+        return HttpResponseRedirect(reverse('nueva_aplicacion'))
+
+
+def eliminar_version(request, version_id):
+    version = Version.objects.get(id=version_id)
+    version.delete()
+    return HttpResponseRedirect(reverse('nueva_aplicacion'))

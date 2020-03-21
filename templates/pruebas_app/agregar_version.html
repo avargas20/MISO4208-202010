@@ -1,0 +1,84 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+        <form role="form" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3>Nueva versión de {{aplicacion.nombre}}</h3>
+                <button type="button" class="close" data-dismiss="modal">x</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Número de versión" value=""
+                        name="numero_version" />
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" placeholder="Descripción de la versión" value=""
+                        name="descripcion_version"></textarea>
+                </div>
+                {% if aplicacion.tipo.tipo == 'Web' %}
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="URL" value=""
+                        name="url_version" />
+                </div>
+                {% elif aplicacion.tipo.tipo == 'Móvil'%}
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile" name="apk_version">
+                    <label class="custom-file-label" for="customFile">Seleccionar APK</label>
+                </div>
+                {% else %}
+                El tipo de aplicacion no se encuentra registrado
+                {% endif %}
+                <!--Table-->
+                <table class="table table-hover table-fixed">
+
+                    <!--Table head-->
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Número</th>
+                            <th>Descripción</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <!--Table head-->
+
+                    <!--Table body-->
+                    <tbody>
+                        {% for version in versiones %}
+                        <tr>
+                            <th scope="row" class="text-center">{{ version.id }}</th>
+                            <td>{{ version.numero }}</td>
+                            <td>{{ version.descripcion}}</td>
+                            <td>
+                                <a class="btn btn-danger text-right btn-sm"
+                                    href="{% url 'eliminar_version' version.id %}">
+                                    <i class="far fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <!--Table body-->
+
+                </table>
+                <!--Table-->
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-lg-12 text-right">
+                    <input type="submit" class="btn btn-primary" name="submit" value="Guardar">
+                    <button type="button" class="btn btn-danger" onclick="return cerrar_modal()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Add the following code if you want the name of the file appear on select
+$(".custom-file-input").on("change", function() {
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+</script>
