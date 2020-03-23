@@ -77,14 +77,11 @@ WSGI_APPLICATION = 'pruebas_automaticas.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['PA_RDS_DB_NAME'],
-        'USER': os.environ['PA_RDS_USERNAME'],
-        'PASSWORD': os.environ['PA_RDS_PASSWORD'],
-        'HOST': os.environ['PA_RDS_HOSTNAME'],
-        'PORT': os.environ['PA_RDS_PORT'],
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 
 # Password validation
@@ -161,6 +158,7 @@ TIPOS_HERRAMIENTAS = {
 
 SQS_CALABASH_NAME = os.environ["PA_SQS_CALABASH_NAME"]
 SQS_CYPRESS_NAME = os.environ["PA_SQS_CYPRESS_NAME"]
+SQS_MONKEY_MOVIL_NAME = os.environ["PA_SQS_MONKEY_MOVIL_NAME"]
 
 AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]

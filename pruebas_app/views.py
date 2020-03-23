@@ -20,6 +20,7 @@ LOGGER = logging.getLogger(__name__)
 SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
 COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
+COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NAME)
 
 
 def home(request):
@@ -158,10 +159,12 @@ def ejecutar_estrategia(request, estrategia_id):
 
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                tarea = threading.Thread(
-                    target=worker_monkey_movil.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil', MessageAttributes={
+                    'Id': {
+                        'StringValue': str(resultado.id),
+                        'DataType': 'Number'
+                    }
+                })
     return HttpResponseRedirect(reverse('home'))
 
 
