@@ -13,13 +13,13 @@ from common import worker_cypress, worker_monkey_movil, worker_calabash
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 
-
 # Create your views here.
 
 LOGGER = logging.getLogger(__name__)
 SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
 COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
+COLA_PUPPETEER = SQS.get_queue_by_name(QueueName=settings.SQS_PUPPETEER_NAME)
 COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NAME)
 
 
@@ -139,32 +139,41 @@ def ejecutar_estrategia(request, estrategia_id):
             herramienta = prueba.herramienta.nombre
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
+                                                     MessageAttributes={
+                                                         'Id': {
+                                                             'StringValue': str(resultado.id),
+                                                             'DataType': 'Number'
+                                                         }
+                                                     })
             elif herramienta == 'Protractor':
                 pass
-            elif herramienta == 'Pupperteer':
-                pass
+            elif herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+                response = COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
+                                                      MessageAttributes={
+                                                          'Id': {
+                                                              'StringValue': str(resultado.id),
+                                                              'DataType': 'Number'
+                                                          }
+                                                      })
             elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
+                                                      MessageAttributes={
+                                                          'Id': {
+                                                              'StringValue': str(resultado.id),
+                                                              'DataType': 'Number'
+                                                          }
+                                                      })
 
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil',
+                                                          MessageAttributes={
+                                                              'Id': {
+                                                                  'StringValue': str(resultado.id),
+                                                                  'DataType': 'Number'
+                                                              }
+                                                          })
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -237,7 +246,10 @@ def guardar_version(request, aplicacion_id):
             version.save()
             # Ejecuto el siguiente comando para obtener el nombre del paquete del apk
             salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
-                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK,
+                                                                              settings.RUTAS_INTERNAS_SDK_ANDROID[
+                                                                                  'build-tools']),
+                                    stdout=subprocess.PIPE)
             #
             # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')
