@@ -154,3 +154,8 @@ TIPOS_HERRAMIENTAS = {
     'cypress': 'Cypress',
     'calabash': 'Calabash',
 }
+
+SQS_CALABASH_NAME = os.environ["PA_SQS_CALABASH_NAME"]
+
+AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]

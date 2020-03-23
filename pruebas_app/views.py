@@ -1,22 +1,24 @@
 import json
 import os
 import threading
-
+import logging
+import subprocess
+import boto3
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
 from common import worker_cypress, worker_monkey_movil, worker_calabash
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 from pruebas_automaticas import settings
-import subprocess
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 
-import logging
 
 # Create your views here.
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+SQS = boto3.resource('sqs', region_name='us-east-1')
+COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
 
 
 def home(request):
@@ -67,14 +69,15 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        #Si el tipo es E2E necesitamos el script y la herramienta
+        # Si el tipo es E2E necesitamos el script y la herramienta
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
             _, script = request.FILES.popitem()
             script = script[0]
-            herramienta = Herramienta.objects.get(id=request.POST['herramienta'])          
+            herramienta = Herramienta.objects.get(
+                id=request.POST['herramienta'])
             prueba = Prueba(script=script, herramienta=herramienta,
                             tipo=tipo, estrategia=estrategia)
-        #Si el tipo es random no necesitamos nada mas
+        # Si el tipo es random no necesitamos nada mas
         elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
             prueba = Prueba(tipo=tipo, estrategia=estrategia)
         print(prueba)
@@ -101,9 +104,9 @@ def obtener_versiones_de_una_aplicacion(request):
     aplicacion = Aplicacion.objects.get(id=aplicacion_id)
     print("selected app name ", aplicacion)
     versiones = Version.objects.filter(aplicacion=aplicacion)
-    for v in versiones:
-        print("version number", v.numero)
-        result_set.append({'numero': v.numero, 'id': v.id})
+    for version in versiones:
+        print("version number", version.numero)
+        result_set.append({'numero': version.numero, 'id': version.id})
     return HttpResponse(json.dumps(result_set), content_type='application/json')
 
 
@@ -124,14 +127,14 @@ def ejecutar_estrategia(request, estrategia_id):
     solicitud.save()
     tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
 
-    for p in estrategia.prueba_set.all():
-        tipo_prueba = p.tipo.nombre      
+    for prueba in estrategia.prueba_set.all():
+        tipo_prueba = prueba.tipo.nombre
         resultado = Resultado()
         resultado.solicitud = solicitud
-        resultado.prueba = p
+        resultado.prueba = prueba
         resultado.save()
         if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-            herramienta = p.herramienta.nombre
+            herramienta = prueba.herramienta.nombre
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
                 tarea = threading.Thread(
@@ -143,13 +146,17 @@ def ejecutar_estrategia(request, estrategia_id):
             elif herramienta == 'Pupperteer':
                 pass
             elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                tarea = threading.Thread(target=worker_calabash.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash', MessageAttributes={
+                    'Id': {
+                        'StringValue': str(resultado.id),
+                        'DataType': 'Number'
+                    }
+                })
 
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado])
+                tarea = threading.Thread(
+                    target=worker_monkey_movil.funcion, args=[resultado])
                 tarea.setDaemon(True)
                 tarea.start()
     return HttpResponseRedirect(reverse('home'))
@@ -160,8 +167,8 @@ def descargar_evidencias(request, solicitud_id):
     file_path = solicitud.evidencia.path
     print("ruta buscada", file_path)
     if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/")
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type="application/")
             response['Content-Disposition'] = 'inline; filename=' + \
                                               os.path.basename(file_path)
             return response
@@ -171,7 +178,7 @@ def descargar_evidencias(request, solicitud_id):
 def nueva_aplicacion(request):
     aplicaciones = Aplicacion.objects.all()
     tipos = TipoAplicacion.objects.all()
-    logger.info(aplicaciones)
+    LOGGER.info(aplicaciones)
     return render(request, 'pruebas_app/nueva_aplicacion.html',
                   {'aplicaciones': aplicaciones, 'tipos': tipos})
 
@@ -222,14 +229,14 @@ def guardar_version(request, aplicacion_id):
             version = Version(
                 numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, apk=apk)
             version.save()
-            #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
+            # Ejecuto el siguiente comando para obtener el nombre del paquete del apk
             salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
                                     shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
             #
-            #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
+            # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')
-            #Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
-            nombre_paquete = salida.split()[1].split("=")[1].replace("'","")
+            # Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
+            nombre_paquete = salida.split()[1].split("=")[1].replace("'", "")
             version.nombre_paquete = nombre_paquete
             version.save()
 
