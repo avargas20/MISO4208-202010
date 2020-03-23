@@ -19,6 +19,7 @@ from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, 
 LOGGER = logging.getLogger(__name__)
 SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
+COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
 
 
 def home(request):
@@ -137,10 +138,12 @@ def ejecutar_estrategia(request, estrategia_id):
             herramienta = prueba.herramienta.nombre
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                tarea = threading.Thread(
-                    target=worker_cypress.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress', MessageAttributes={
+                    'Id': {
+                        'StringValue': str(resultado.id),
+                        'DataType': 'Number'
+                    }
+                })
             elif herramienta == 'Protractor':
                 pass
             elif herramienta == 'Pupperteer':
