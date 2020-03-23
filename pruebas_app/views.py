@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-from common import worker_cypress, worker_monkey_movil, worker_calabash
+from common import worker_cypress, worker_monkey_movil, worker_calabash, worker_cypress_monkey
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 from pruebas_automaticas import settings
 import subprocess
@@ -150,6 +150,10 @@ def ejecutar_estrategia(request, estrategia_id):
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
                 tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado])
+                tarea.setDaemon(True)
+                tarea.start()
+            elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
+                tarea = threading.Thread(target=worker_cypress_monkey.funcion, args=[resultado])
                 tarea.setDaemon(True)
                 tarea.start()
     return HttpResponseRedirect(reverse('home'))
