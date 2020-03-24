@@ -88,6 +88,7 @@ class Solicitud(models.Model):
     evidencia = models.FileField(upload_to=directorio_evidencia, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
+    solicitud_VRT = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
 
     def _pruebas_ejecutadas_(self):
         cantidad_total = self.resultado_set.all().count()
@@ -133,3 +134,18 @@ class ScreenShot(models.Model):
     resultado = models.ForeignKey(Resultado, on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to=directorio_screenshots, null=True)
     nombre = models.CharField(max_length=30, null=True)
+
+    def __str__(self):
+        return '%s' % (self.nombre)
+
+
+def directorio_vrt(instance, filename):
+    return 'screenshots/VRT/{0}_{1}'.format(instance.solicitud.id, filename)
+
+
+class ResultadoVRT(models.Model):
+    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
+    screenshoot_previo = models.ImageField(upload_to=directorio_vrt, null=True)
+    screenshoot_posterior = models.ImageField(upload_to=directorio_vrt, null=True)
+    imagen_diferencias = models.ImageField(upload_to=directorio_vrt, null=True)
+    informacion = models.CharField(max_length=200, null=True)

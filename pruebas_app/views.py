@@ -122,9 +122,23 @@ def ver_estrategia(request):
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
 
-def ejecutar_estrategia(request, estrategia_id):
+def condiciones_de_lanzamiento(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
+    #Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
+    solicitudes = Solicitud.objects.filter(estrategia__version__aplicacion=estrategia.version.aplicacion).order_by('-id')
+    return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
+                  {'solicitudes': solicitudes, 'estrategia': estrategia})
+
+
+def ejecutar_estrategia(request, estrategia_id):
     solicitud = Solicitud()
+    if request.method == 'POST':
+        print('solicitud POST', request.POST)
+        if 'solicitud_VRT' in request.POST:
+            id_solicitud_VRT = request.POST['solicitud_VRT']
+            solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
+            solicitud.solicitud_VRT = solicitud_VRT
+    estrategia = Estrategia.objects.get(id=estrategia_id)
     solicitud.estrategia = estrategia
     solicitud.save()
     tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo

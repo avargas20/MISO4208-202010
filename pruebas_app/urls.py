@@ -22,4 +22,5 @@ urlpatterns = [
     path('agregar_version/<int:aplicacion_id>', views.agregar_version, name='agregar_version'),
     path('guardar_version/<int:aplicacion_id>', views.guardar_version, name='guardar_version'),
     path('eliminar_version/<int:version_id>', views.eliminar_version, name='eliminar_version'),
+    path('condiciones_de_lanzamiento/<int:estrategia_id>', views.condiciones_de_lanzamiento, name='condiciones_de_lanzamiento'),
 ]
