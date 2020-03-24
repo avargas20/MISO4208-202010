@@ -127,6 +127,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
 CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
 CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
+RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
 ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
 RUTAS_INTERNAS_SDK_ANDROID = {
     'platform-tools': 'platform-tools',

@@ -122,3 +122,14 @@ class Resultado(models.Model):
 
     def __str__(self):
         return '%s %s %s %s %s' % (self.resultado, self.log, self.terminada, self.solicitud, self.prueba)
+
+
+def directorio_screenshots(instance, filename):
+    # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
+    return 'screenshots/{0}_{1}_{2}'.format(instance.resultado.id, instance.id, filename)
+
+
+class ScreenShot(models.Model):
+    resultado = models.ForeignKey(Resultado, on_delete=models.CASCADE)
+    imagen = models.ImageField(upload_to=directorio_screenshots, null=True)
+    nombre = models.CharField(max_length=30, null=True)

@@ -39,5 +39,6 @@ if __name__ == '__main__':
                 resultado.save()
                 archivo_log.close()
                 os.remove(archivo_log.name)
+                util.recoger_screenshoots(resultado)
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)

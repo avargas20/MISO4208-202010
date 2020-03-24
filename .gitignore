@@ -10,3 +10,4 @@ __pycache__*
 /archivos/evidencias/*
 /venv/
 .idea/*
+/archivos/screenshots/*

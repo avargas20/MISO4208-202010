@@ -2,10 +2,13 @@ import os
 from zipfile import ZipFile
 from django.core.files import File
 import django
+import glob
 from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
+
+from pruebas_app.models import ScreenShot
 
 # Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
 def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archivo):
@@ -38,3 +41,36 @@ def validar_ultimo(solicitud):
         solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
         archivo_zip.close()
         os.remove(settings.BASE_DIR+"//evidencias.zip")
+
+
+# Este metodo busca recoger todos los screenshoots tomados por los scripts y guardarlos en la tabla ScreenShoot
+def recoger_screenshoots(resultado):
+    #La ruta depende de la herramienta que ejecuto la prueba
+    ruta_a_recoger = determinar_ruta(resultado)
+    #Se crea una expresion con *.png para que recoja esos tipos de archivos
+    ruta_con_filtro = os.path.join(ruta_a_recoger, '*.png')
+    imagenes = glob.glob(ruta_con_filtro)
+    for imagen in imagenes:
+        print('screens:', imagen)
+        #Se saca el nombre del archivo sin extension
+        nombre = imagen.split('\\')[-1].split('.')[0]
+        screenshoot = ScreenShot()
+        screenshoot.resultado = resultado
+        #Se guarda para generar el id y que quede guardado el screenshoot con ese id
+        screenshoot.save()
+        file = open(imagen, 'rb')
+        archivo = File(file)
+        screenshoot.imagen.save(nombre, archivo, save=True)
+        screenshoot.nombre = nombre
+        screenshoot.save()
+        archivo.close()
+        #se borra al final cada screenshoot tomado porque ya existe en la ruta del proyecto
+        os.remove(imagen)
+
+
+def determinar_ruta(resultado):
+    nombre_herramienta = resultado.prueba.herramienta.nombre
+    if nombre_herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
+        return settings.CYPRESS_PATH
+    elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
+        return settings.CALABASH_PATH
