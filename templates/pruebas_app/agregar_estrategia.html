@@ -38,13 +38,13 @@
 {% endblock subtitle %}
 {% block content %}
 <div class="container-fluid">
-  <form action="{% url 'guardar_estrategia' %}" method="post">
+  <form action="{% url 'guardar_estrategia' %}" method="post" class="needs-validation" novalidate>
     {% csrf_token %}
     <div class="row register-form">
       <div class="col-md-8">
         <div class="form-group">
-          <select name='aplicaciones' id='aplicaciones' class="form-control">
-            <option class="hidden" selected disabled>Seleccione la aplicación</option>
+          <select name='aplicaciones' id='aplicaciones' class="form-control" required>
+            <option class="hidden" value="" selected disabled>Seleccione la aplicación</option>
             {% for a in aplicaciones %}
             <option value="{{a.id}}">{{a.nombre}}</option>
             {% endfor %}
@@ -54,18 +54,18 @@
       </div>
       <div class="col-md-4">
         <div class="form-group">
-          <select name='versiones' id='versiones' class="form-control">
-            <option class="hidden" selected disabled>Seleccione la versión</option>
+          <select name='versiones' id='versiones' class="form-control" required>
+            <option class="hidden" value="" selected disabled>Seleccione la versión</option>
 
           </select>
         </div>
       </div>
     </div>
     <div class="form-group">
-      <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="" name="nombre_estrategia" />
+      <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="" name="nombre_estrategia" required />
     </div>
     <div class="form-group">
-      <textarea class="form-control" placeholder="Descripción de la estrategia" value="" name="descripcion_estrategia"></textarea>
+      <textarea class="form-control" placeholder="Descripción de la estrategia" value="" name="descripcion_estrategia" required></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Guardar estrategia</button>
   </form>
@@ -74,5 +74,26 @@
 
 
 </div>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
 
 {% endblock content %}
