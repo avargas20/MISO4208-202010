@@ -4,6 +4,7 @@ import threading
 import logging
 import subprocess
 import boto3
+from django.core.files import File
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
@@ -87,8 +88,8 @@ def guardar_prueba(request, estrategia_id):
             elif tipo_aplicacion == settings.TIPOS_APLICACION["web"]:
                 prueba = Prueba(herramienta=herramienta,
                                 tipo=tipo, estrategia=estrategia)
-                script = util.reemplazar_token_con_url(prueba)
-                prueba.script = script
+                prueba.save()
+                util.reemplazar_token_con_url(prueba)
         print(prueba)
         prueba.save()
 

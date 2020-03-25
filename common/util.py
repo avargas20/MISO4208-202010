@@ -42,7 +42,8 @@ def reemplazar_token_con_url(prueba):
     nuevo_archivo = "monkey_con_url.js"
     with open(nuevo_archivo, "w+") as file:
         file.write(contenido)
-    return nuevo_archivo
+        prueba.script.save('monkey.js', File(file), save=True)
+    os.remove(nuevo_archivo)
 
 
 # Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y guardarlos como evidencias, todos los workers lo deben llamar
