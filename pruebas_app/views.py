@@ -1,22 +1,25 @@
 import json
 import os
 import threading
-
+import logging
+import subprocess
+import boto3
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-from common import worker_cypress, worker_monkey_movil, worker_calabash, worker_cypress_monkey
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
+from common import worker_cypress, worker_monkey_movil, worker_calabash, util
 from pruebas_automaticas import settings
-import subprocess
-
-import logging
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
 
 # Create your views here.
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+SQS = boto3.resource('sqs', region_name='us-east-1')
+COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
+COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
+COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NAME)
 
 
 def home(request):
@@ -67,16 +70,25 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        #Si el tipo es E2E necesitamos el script y la herramienta
+        tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
+        herramienta = Herramienta.objects.get(
+            id=request.POST['herramienta'])
+        # Si el tipo es E2E necesitamos el script y la herramienta
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
             _, script = request.FILES.popitem()
             script = script[0]
-            herramienta = Herramienta.objects.get(id=request.POST['herramienta'])          
             prueba = Prueba(script=script, herramienta=herramienta,
                             tipo=tipo, estrategia=estrategia)
-        #Si el tipo es random no necesitamos nada mas
         elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
-            prueba = Prueba(tipo=tipo, estrategia=estrategia)
+            # Si el tipo es random y movil no necesitamos nada mas
+            if tipo_aplicacion == settings.TIPOS_APLICACION["movil"]:
+                prueba = Prueba(tipo=tipo, estrategia=estrategia)
+            # Si el tipo es random y web no necesitamos el script
+            elif tipo_aplicacion == settings.TIPOS_APLICACION["web"]:
+                prueba = Prueba(herramienta=herramienta,
+                                tipo=tipo, estrategia=estrategia)
+                script = util.reemplazar_token_con_url(prueba)
+                prueba.script = script
         print(prueba)
         prueba.save()
 
@@ -101,9 +113,9 @@ def obtener_versiones_de_una_aplicacion(request):
     aplicacion = Aplicacion.objects.get(id=aplicacion_id)
     print("selected app name ", aplicacion)
     versiones = Version.objects.filter(aplicacion=aplicacion)
-    for v in versiones:
-        print("version number", v.numero)
-        result_set.append({'numero': v.numero, 'id': v.id})
+    for version in versiones:
+        print("version number", version.numero)
+        result_set.append({'numero': version.numero, 'id': version.id})
     return HttpResponse(json.dumps(result_set), content_type='application/json')
 
 
@@ -117,45 +129,75 @@ def ver_estrategia(request):
     return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
 
-def ejecutar_estrategia(request, estrategia_id):
+def condiciones_de_lanzamiento(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
+    # Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
+    solicitudes = Solicitud.objects.filter(estrategia__version__aplicacion=estrategia.version.aplicacion).order_by(
+        '-id')
+    return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
+                  {'solicitudes': solicitudes, 'estrategia': estrategia})
+
+
+def ejecutar_estrategia(request, estrategia_id):
     solicitud = Solicitud()
+    if request.method == 'POST':
+        print('solicitud POST', request.POST)
+        if 'solicitud_VRT' in request.POST:
+            id_solicitud_VRT = request.POST['solicitud_VRT']
+            solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
+            solicitud.solicitud_VRT = solicitud_VRT
+    estrategia = Estrategia.objects.get(id=estrategia_id)
     solicitud.estrategia = estrategia
     solicitud.save()
     tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
 
-    for p in estrategia.prueba_set.all():
-        tipo_prueba = p.tipo.nombre      
+    for prueba in estrategia.prueba_set.all():
+        tipo_prueba = prueba.tipo.nombre
         resultado = Resultado()
         resultado.solicitud = solicitud
-        resultado.prueba = p
+        resultado.prueba = prueba
         resultado.save()
         if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-            herramienta = p.herramienta.nombre
+            herramienta = prueba.herramienta.nombre
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                tarea = threading.Thread(
-                    target=worker_cypress.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
+                                                     MessageAttributes={
+                                                         'Id': {
+                                                             'StringValue': str(resultado.id),
+                                                             'DataType': 'Number'
+                                                         }
+                                                     })
             elif herramienta == 'Protractor':
                 pass
             elif herramienta == 'Pupperteer':
                 pass
             elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                tarea = threading.Thread(target=worker_calabash.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
+                                                      MessageAttributes={
+                                                          'Id': {
+                                                              'StringValue': str(resultado.id),
+                                                              'DataType': 'Number'
+                                                          }
+                                                      })
 
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                tarea = threading.Thread(target=worker_monkey_movil.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil',
+                                                          MessageAttributes={
+                                                              'Id': {
+                                                                  'StringValue': str(resultado.id),
+                                                                  'DataType': 'Number'
+                                                              }
+                                                          })
             elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
-                tarea = threading.Thread(target=worker_cypress_monkey.funcion, args=[resultado])
-                tarea.setDaemon(True)
-                tarea.start()
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
+                                                     MessageAttributes={
+                                                         'Id': {
+                                                             'StringValue': str(resultado.id),
+                                                             'DataType': 'Number'
+                                                         }
+                                                     })
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -164,8 +206,8 @@ def descargar_evidencias(request, solicitud_id):
     file_path = solicitud.evidencia.path
     print("ruta buscada", file_path)
     if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/")
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type="application/")
             response['Content-Disposition'] = 'inline; filename=' + \
                                               os.path.basename(file_path)
             return response
@@ -175,7 +217,7 @@ def descargar_evidencias(request, solicitud_id):
 def nueva_aplicacion(request):
     aplicaciones = Aplicacion.objects.all()
     tipos = TipoAplicacion.objects.all()
-    logger.info(aplicaciones)
+    LOGGER.info(aplicaciones)
     return render(request, 'pruebas_app/nueva_aplicacion.html',
                   {'aplicaciones': aplicaciones, 'tipos': tipos})
 
@@ -226,14 +268,17 @@ def guardar_version(request, aplicacion_id):
             version = Version(
                 numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, apk=apk)
             version.save()
-            #Ejecuto el siguiente comando para obtener el nombre del paquete del apk
+            # Ejecuto el siguiente comando para obtener el nombre del paquete del apk
             salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
-                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK,
+                                                                              settings.RUTAS_INTERNAS_SDK_ANDROID[
+                                                                                  'build-tools']),
+                                    stdout=subprocess.PIPE)
             #
-            #este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
+            # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')
-            #Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
-            nombre_paquete = salida.split()[1].split("=")[1].replace("'","")
+            # Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
+            nombre_paquete = salida.split()[1].split("=")[1].replace("'", "")
             version.nombre_paquete = nombre_paquete
             version.save()
 

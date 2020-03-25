@@ -3,6 +3,9 @@ Para ejecutar el proyecto por primera vez:
     python manage.py makemigrations pruebas_app
     python manage.py migrate
 
+PAra guardar un archivo local en un modelo de Django seguir estas practicas:
+    https://gist.github.com/avoiney/5248673
+
 Lo del file lo saque de aqui https://mdbootstrap.com/docs/jquery/forms/file-input/
 Sacar la version de la app seleccionada, aqui hay un tuto https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
     aqui otro: https://stackoverflow.com/questions/25706639/django-dependent-select (este me gusta mas)
@@ -35,3 +38,11 @@ Para poder que me funcionara Calabash segui la sugerencia de este post:
         calabash-android build "C://Users//Nicolas Lema//Desktop//Miso uniandes - no version//Pruebas automaticas//Taller5-BDD//2. Calabash//Transmilenio.apk"
     Luego correr las pruebas
         calabash-android run "C://Users//Nicolas Lema//Desktop//Miso uniandes - no version//Pruebas automaticas//Taller5-BDD//2. Calabash//Transmilenio.apk"
+
+En la ruta de resemblejs es necesario seguir los siguientes pasos:
+    iniciar un proyecto npm con: npm init
+    instalar resemblejs con el comando: npm install resemblejs
+    instalar fs con el comando: npm install fs
+    Pegar el archivo index.js que dejo en el grupo de teams
+    Este archivo se usa asi: salida = subprocess.run(['node', 'index.js',imagen1_1, imagen2_2, imagen3], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
+    recibe las dos imagenes a comparar y escribe en la tercera la diferencia, ademas con salida.stdout.decode('utf-8') se obtiene la diferencia que entrega resemblejs en JSON
