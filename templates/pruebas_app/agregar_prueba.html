@@ -3,6 +3,27 @@
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+<script>
+ $(document).ready(function () {
+    $("#tipo").change(function() {
+      if ( $("#tipo option:selected").html() != "E2E") {
+        $('#e2e-required').hide();
+      } else {
+        $('#e2e-required').show();
+      }
+    });
+    $("#tipo").trigger("change");
+
+    $("#select-tipo").change(function() {
+      if ( $("#select-tipo option:selected").html() != "E2E") {
+        $('#e2e-required-query').hide();
+      } else {
+        $('#e2e-required-query').show();
+      }
+    });
+    $("#select-tipo").trigger("change");
+ });
+</script>
 
 {% endblock head %}
 {% block subtitle %}<h1 class="mt-3">Agregar Estrategia</h1>
@@ -58,28 +79,28 @@
                     <label class="custom-file-label" for="customFileLang">{{p.script}}</label>
                 </div>
             </div>-->
-            <div class=" col-5 input-group mb-3">
-                <div class="custom-file">
-                <input type="file" class="custom-file-input" id="customFileLang">
-                <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">{{p.script}}</label>
-              </div>
-            </div>
-
-
             <div class="col-3">
                 <div class="form-group">
-                    <select class="form-control">
-                        <option class="hidden" selected disabled>Herramienta</option>
-                        <option selected disabled>{{p.herramienta.nombre}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="form-group">
-                    <select class="form-control">
+                    <select class="form-control" id="select-tipo">
                         <option class="hidden" selected disabled>Tipo</option>
                         <option selected disabled>{{p.tipo.nombre}}</option>
                     </select>
+                </div>
+            </div>
+            <div id="e2e-required-query" class="row col-8">
+                <div class=" col-8 input-group mb-3">
+                    <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFileLang">
+                    <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">{{p.script}}</label>
+                  </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <select class="form-control">
+                            <option class="hidden" selected disabled>Herramienta</option>
+                            <option selected disabled>{{p.herramienta.nombre}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="col-1">
@@ -103,22 +124,6 @@
                         <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label>
                     </div>
                 </div>-->
-                <div class=" col-5 input-group mb-3">
-                    <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
-                    <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar Archivo</label>
-                  </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <select name="herramienta" id="herramienta" class="form-control">
-                            <option class="hidden" selected disabled>Herramienta</option>
-                            {% for h in herramientas %}
-                            <option value="{{h.id}}">{{h.nombre}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
                 <div class="col-3">
                     <div class="form-group">
                         <select name="tipo" id="tipo" class="form-control">
@@ -129,6 +134,26 @@
                         </select>
                     </div>
                 </div>
+                <div id="e2e-required" class="row col-8">
+                    <div class=" col-8 input-group mb-3">
+                        <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
+                        <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar Archivo</label>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <select name="herramienta" id="herramienta" class="form-control">
+                                <option class="hidden" selected disabled>Herramienta</option>
+                                {% for h in herramientas %}
+                                <option value="{{h.id}}">{{h.nombre}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="col-1">
 
                     <button type="submit" class="btn btn-success">
