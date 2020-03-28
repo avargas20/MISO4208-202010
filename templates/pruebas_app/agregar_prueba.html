@@ -8,8 +8,12 @@
     $("#tipo").change(function() {
       if ( $("#tipo option:selected").html() != "E2E") {
         $('#e2e-required').hide();
+        $("#customFileLang").attr("required", false);
+        $("#herramienta").attr("required", false);
       } else {
         $('#e2e-required').show();
+        $("#customFileLang").attr("required", true);
+        $("#herramienta").attr("required", true);
       }
     });
     $("#tipo").trigger("change");
@@ -22,6 +26,32 @@
       }
     });
     $("#select-tipo").trigger("change");
+
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function() {
+      var fileName = $(this).val().split("\\").pop();
+      $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+
  });
 </script>
 
@@ -137,13 +167,13 @@
                 <div id="e2e-required" class="row col-8">
                     <div class=" col-8 input-group mb-3">
                         <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo" required="form.tipo.value != '2'">
+                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
                         <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar Archivo</label>
                       </div>
                     </div>
                     <div class="col-4">
                         <div class="form-group">
-                            <select name="herramienta" id="herramienta" class="form-control custom-select" required>
+                            <select name="herramienta" id="herramienta" class="form-control custom-select">
                                 <option class="hidden" value="" selected disabled>Herramienta</option>
                                 {% for h in herramientas %}
                                 <option value="{{h.id}}">{{h.nombre}}</option>
@@ -189,6 +219,16 @@
     });
   }, false);
 })();
+
+
+if ( $("#select-tipo option:selected").html() != "E2E") {
+$('#e2e-required-query').hide();
+} else {
+$('#e2e-required-query').show();
+}
+
+$("#select-tipo").trigger("change");
 </script>
+
 
 {% endblock content %}
