@@ -4,15 +4,15 @@ import threading
 import logging
 import subprocess
 import boto3
+from django.core.files import File
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-from common import worker_cypress, worker_monkey_movil, worker_calabash
+from common import worker_cypress, worker_monkey_movil, worker_calabash, util
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
-
 
 # Create your views here.
 
@@ -71,17 +71,25 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
+        tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
+        herramienta = Herramienta.objects.get(
+            id=request.POST['herramienta'])
         # Si el tipo es E2E necesitamos el script y la herramienta
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
             _, script = request.FILES.popitem()
             script = script[0]
-            herramienta = Herramienta.objects.get(
-                id=request.POST['herramienta'])
             prueba = Prueba(script=script, herramienta=herramienta,
                             tipo=tipo, estrategia=estrategia)
-        # Si el tipo es random no necesitamos nada mas
         elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
-            prueba = Prueba(tipo=tipo, estrategia=estrategia)
+            # Si el tipo es random y movil no necesitamos nada mas
+            if tipo_aplicacion == settings.TIPOS_APLICACION["movil"]:
+                prueba = Prueba(tipo=tipo, estrategia=estrategia)
+            # Si el tipo es random y web no necesitamos el script
+            elif tipo_aplicacion == settings.TIPOS_APLICACION["web"]:
+                prueba = Prueba(herramienta=herramienta,
+                                tipo=tipo, estrategia=estrategia)
+                prueba.save()
+                util.reemplazar_token_con_url(prueba)
         print(prueba)
         prueba.save()
 
@@ -124,8 +132,9 @@ def ver_estrategia(request):
 
 def condiciones_de_lanzamiento(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
-    #Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
-    solicitudes = Solicitud.objects.filter(estrategia__version__aplicacion=estrategia.version.aplicacion).order_by('-id')
+    # Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
+    solicitudes = Solicitud.objects.filter(estrategia__version__aplicacion=estrategia.version.aplicacion).order_by(
+        '-id')
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
                   {'solicitudes': solicitudes, 'estrategia': estrategia})
 
@@ -153,32 +162,43 @@ def ejecutar_estrategia(request, estrategia_id):
             herramienta = prueba.herramienta.nombre
             # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
             if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
+                                                     MessageAttributes={
+                                                         'Id': {
+                                                             'StringValue': str(resultado.id),
+                                                             'DataType': 'Number'
+                                                         }
+                                                     })
             elif herramienta == 'Protractor':
                 pass
             elif herramienta == 'Pupperteer':
                 pass
             elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
+                                                      MessageAttributes={
+                                                          'Id': {
+                                                              'StringValue': str(resultado.id),
+                                                              'DataType': 'Number'
+                                                          }
+                                                      })
 
         elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
             if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil', MessageAttributes={
-                    'Id': {
-                        'StringValue': str(resultado.id),
-                        'DataType': 'Number'
-                    }
-                })
+                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil',
+                                                          MessageAttributes={
+                                                              'Id': {
+                                                                  'StringValue': str(resultado.id),
+                                                                  'DataType': 'Number'
+                                                              }
+                                                          })
+            elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
+                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
+                                                     MessageAttributes={
+                                                         'Id': {
+                                                             'StringValue': str(resultado.id),
+                                                             'DataType': 'Number'
+                                                         }
+                                                     })
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -251,7 +271,10 @@ def guardar_version(request, aplicacion_id):
             version.save()
             # Ejecuto el siguiente comando para obtener el nombre del paquete del apk
             salida = subprocess.run(['aapt', 'dump', 'badging', version.apk.path, '|', 'findstr', '-i', 'package:'],
-                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['build-tools']), stdout=subprocess.PIPE)
+                                    shell=True, check=False, cwd=os.path.join(settings.ANDROID_SDK,
+                                                                              settings.RUTAS_INTERNAS_SDK_ANDROID[
+                                                                                  'build-tools']),
+                                    stdout=subprocess.PIPE)
             #
             # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')
