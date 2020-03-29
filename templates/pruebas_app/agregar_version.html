@@ -1,8 +1,19 @@
+<style>
+    /* .invalid class prevents CSS from automatically applying */
+    .invalid input:required:invalid {
+      background: #BE4C54;
+    }
+
+    /* Mark valid inputs during .invalid state */
+    .invalid input:required:valid {
+      background: #17D654;
+    }
+</style>
 
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-        <form role="form" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form role="form" id="form-version" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data" class="needs-validation">
             {% csrf_token %}
             <div class="modal-header">
                 <h3>Nueva versión de {{aplicacion.nombre}}</h3>
@@ -77,12 +88,16 @@
     </div>
 </div>
 
+</body>
 
+<script>
+    // $("#form-version")[0].reset();
+</script>
 
 <script>
 // Example starter JavaScript for disabling form submissions if there are invalid fields
- //$(document).ready(function () {
-(function() {
+//$(document).ready(function () {
+/*(function() {
   'use strict';
   window.addEventListener('load', function() {
     // Fetch all the forms we want to apply custom Bootstrap validation styles to
@@ -98,7 +113,7 @@
       }, false);
     });
   }, false);
-})();
+})();*/
 //});
 </script>
 
@@ -109,3 +124,5 @@ $(".custom-file-input").on("change", function() {
   $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
 </script>
+
+
