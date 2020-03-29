@@ -18,40 +18,11 @@
     });
     $("#tipo").trigger("change");
 
-    $("#select-tipo").change(function() {
-      if ( $("#select-tipo option:selected").html() != "E2E") {
-        $('#e2e-required-query').hide();
-      } else {
-        $('#e2e-required-query').show();
-      }
-    });
-    $("#select-tipo").trigger("change");
-
     // Add the following code if you want the name of the file appear on select
     $(".custom-file-input").on("change", function() {
       var fileName = $(this).val().split("\\").pop();
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
-
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() {
-  'use strict';
-  window.addEventListener('load', function() {
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.getElementsByClassName('needs-validation');
-    // Loop over them and prevent submission
-    var validation = Array.prototype.filter.call(forms, function(form) {
-      form.addEventListener('submit', function(event) {
-        if (form.checkValidity() === false) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  }, false);
-})();
-
  });
 </script>
 
@@ -99,16 +70,10 @@
         </div>
     </div>
     <div id="container">
-
+        <!-- Pruebas existentes -->
         {% for p in pruebas %}
         <div class="row" id="fila">
 
-            <!--<div class="col-5">
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFileLang" lang="es">
-                    <label class="custom-file-label" for="customFileLang">{{p.script}}</label>
-                </div>
-            </div>-->
             <div class="col-3">
                 <div class="form-group">
                     <select class="form-control" id="select-tipo">
@@ -117,7 +82,8 @@
                     </select>
                 </div>
             </div>
-            <div id="e2e-required-query" class="row col-8">
+            {% if  p.tipo.nombre == 'E2E' %}
+            <div class="row col-8">
                 <div class=" col-8 input-group mb-3">
                     <div class="custom-file">
                     <input type="file" class="custom-file-input" id="customFileLang">
@@ -133,6 +99,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             <div class="col-1">
                 <div class="form-group">
                     <a class="btn btn-danger" href="{% url 'eliminar_prueba' p.id %}">
@@ -143,7 +110,7 @@
         </div>
 
         {% endfor %}
-
+        <!-- Pruebas Nuevas -->
         <form action="{% url 'guardar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row register-form">
@@ -182,53 +149,18 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="col-1">
-
                     <button type="submit" class="btn btn-success">
-                        <i class="far fa-plus-square"></i></button>
+                        <i class="far fa-plus-square"></i>
+                    </button>
                 </div>
 
             </div>
-
-
         </form>
 
     </div>
 
 
 </div>
-
-<script>
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() {
-  'use strict';
-  window.addEventListener('load', function() {
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.getElementsByClassName('needs-validation');
-    // Loop over them and prevent submission
-    var validation = Array.prototype.filter.call(forms, function(form) {
-      form.addEventListener('submit', function(event) {
-        if (form.checkValidity() === false) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  }, false);
-})();
-
-
-if ( $("#select-tipo option:selected").html() != "E2E") {
-$('#e2e-required-query').hide();
-} else {
-$('#e2e-required-query').show();
-}
-
-$("#select-tipo").trigger("change");
-</script>
-
 
 {% endblock content %}
