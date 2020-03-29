@@ -83,6 +83,7 @@ DATABASES = {
 }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -129,6 +130,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
 CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
 CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
+RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
 ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
 RUTAS_INTERNAS_SDK_ANDROID = {
     'platform-tools': 'platform-tools',
@@ -157,3 +159,10 @@ TIPOS_HERRAMIENTAS = {
     'cypress': 'Cypress',
     'calabash': 'Calabash',
 }
+
+SQS_CALABASH_NAME = os.environ["PA_SQS_CALABASH_NAME"]
+SQS_CYPRESS_NAME = os.environ["PA_SQS_CYPRESS_NAME"]
+SQS_MONKEY_MOVIL_NAME = os.environ["PA_SQS_MONKEY_MOVIL_NAME"]
+
+AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]

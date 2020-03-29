@@ -1,0 +1,31 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+        <form role="form" action="{% url 'ejecutar_estrategia' estrategia.id %}" method="post"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3>Escoja las condiciones para lanzar esta estrategia {{ estrategia.nombre }}</h3>
+                <button type="button" class="close" data-dismiss="modal">x</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <select name='solicitud_VRT' class="form-control">
+                        <option class="hidden" selected disabled>Seleccione la solicitud para VRT</option>
+                        {% for s in solicitudes %}
+                            <option value="{{ s.id }}">{{ s.id }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-lg-12 text-right">
+                    <input type="submit" class="btn btn-success" name="submit" value="Ejecutar">
+                    <button type="button" class="btn btn-danger" onclick="return cerrar_modal()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
