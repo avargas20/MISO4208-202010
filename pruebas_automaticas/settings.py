@@ -128,15 +128,15 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'archivos')
 
-#CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
+CYPRESS_PATH = os.environ["PA_CYPRESS_PATH"]
 PUPPETEER_PATH = os.environ["PA_PUPPETEER_PATH"]
-#CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
-#RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
-#ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
-#RUTAS_INTERNAS_SDK_ANDROID = {
-#    'platform-tools': 'platform-tools',
-#    'build-tools': os.path.join('build-tools', os.environ["PA_VERSION_ANDROID_STUDIO"])
-#}
+CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
+RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
+ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
+RUTAS_INTERNAS_SDK_ANDROID = {
+    'platform-tools': 'platform-tools',
+    'build-tools': os.path.join('build-tools', os.environ["PA_VERSION_ANDROID_STUDIO"])
+}
 
 RUTAS_INTERNAS = {
     'Cypress': 'cypress/integration/',
@@ -162,11 +162,13 @@ TIPOS_HERRAMIENTAS = {
     'calabash': 'Calabash',
     'puppeteer': 'Puppeteer',
 }
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 SQS_PUPPETEER_NAME = os.environ.get("PA_SQS_PUPPETEER_NAME")
 SQS_CALABASH_NAME = os.environ.get("PA_SQS_CALABASH_NAME")
 SQS_CYPRESS_NAME = os.environ.get("PA_SQS_CYPRESS_NAME")
 SQS_MONKEY_MOVIL_NAME = os.environ.get("PA_SQS_MONKEY_MOVIL_NAME")
 
+AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+
+TIEMPO_ESPERA_WORKERS = 5
