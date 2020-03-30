@@ -2,6 +2,7 @@ import os
 import subprocess
 import django
 import boto3
+import time
 from common import util
 from pruebas_automaticas import settings
 from pruebas_app.models import Resultado
@@ -12,8 +13,8 @@ SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
 
 if __name__ == '__main__':
-    print('entra')
     while True:
+        print('Entra ciclo')
         for message in COLA_CALABASH.receive_messages(MaxNumberOfMessages=1, MessageAttributeNames=['Id']):
             if message.message_attributes is not None:
 
@@ -42,3 +43,5 @@ if __name__ == '__main__':
                 util.recoger_screenshoots(resultado)
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)
+        time.sleep(settings.TIEMPO_ESPERA_WORKERS)
+

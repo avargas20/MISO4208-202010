@@ -2,6 +2,7 @@ import os
 import subprocess
 import boto3
 import django
+import time
 from django.core.files import File
 from common import util
 from pruebas_automaticas import settings
@@ -14,8 +15,8 @@ SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
 
 if __name__ == '__main__':
-    print('entra')
     while True:
+        print('Entra ciclo')
         for message in COLA_CYPRESS.receive_messages(MaxNumberOfMessages=1, MessageAttributeNames=['Id']):
             if message.message_attributes is not None:
 
@@ -36,3 +37,4 @@ if __name__ == '__main__':
                 video.close()
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)
+        time.sleep(settings.TIEMPO_ESPERA_WORKERS)
