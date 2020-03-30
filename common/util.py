@@ -28,6 +28,24 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
     return nuevo_archivo
 
 
+# Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
+# , reemplazando el token por la URL del archivo
+def reemplazar_token_con_url(prueba):
+    print("En la prueba:", prueba)
+    prueba.script = "Monkey.js"
+    print("El script es:", prueba.script)
+    url = prueba.estrategia.version.url
+    archivo = open(prueba.script.path, "r")
+    contenido = archivo.read()
+    contenido = contenido.replace('-urlToken-', url)
+    print("El contenido luego de reemplazar es:", contenido)
+    nuevo_archivo = "monkey_con_url.js"
+    with open(nuevo_archivo, "w+") as file:
+        file.write(contenido)
+        prueba.script.save('monkey.js', File(file), save=True)
+    os.remove(nuevo_archivo)
+
+
 # Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y guardarlos como evidencias, todos los workers lo deben llamar
 def validar_ultimo(solicitud):
     if (solicitud.terminada):
@@ -50,27 +68,27 @@ def validar_ultimo(solicitud):
 # Este metodo se ejecuta cuando una solicitud tiene VRT y lo que hace es recorrer todos los resultados de ambas solicitudes y todos sus screenshoots y a cada screensoot reciproco
 # le ejecuta VRT
 def ejecutar_vrt(solicitud_posterior):
-    #Se sacan los resultados de ambas solicitudes
+    # Se sacan los resultados de ambas solicitudes
     resultados_posteriores = solicitud_posterior.resultado_set.all()
     resultados_anteriores = solicitud_posterior.solicitud_VRT.resultado_set.all()
     print('posteriores:', resultados_posteriores)
     print('anteriores:', resultados_anteriores)
-    #Se recorren los resultados, note que para que funcione deben tener la misma cantidad de resultados y haberse ejecutado en el mismo orden
+    # Se recorren los resultados, note que para que funcione deben tener la misma cantidad de resultados y haberse ejecutado en el mismo orden
     for i in range(resultados_anteriores.count()):
         # de cada resultado de cada solicitud se sacan los screenshots
         screenshots_posteriores = resultados_posteriores[i].screenshot_set.all()
         screenshots_anteriores = resultados_anteriores[i].screenshot_set.all()
         print('screen posteriores:', screenshots_posteriores)
         print('screen anteriores:', screenshots_anteriores)
-        #Se recorre cada screenshot de cada resultado y esos son los que se comparan
+        # Se recorre cada screenshot de cada resultado y esos son los que se comparan
         for j in range(screenshots_anteriores.count()):
             resultado_vrt = ResultadoVRT()
             resultado_vrt.solicitud = solicitud_posterior
             resultado_vrt.save()
-            #las imagenes para comparar no es necesario subirlas nuevamente, solo se referencian las originales
+            # las imagenes para comparar no es necesario subirlas nuevamente, solo se referencian las originales
             imagen_posterior = screenshots_posteriores[j].imagen
             imagen_anterior = screenshots_anteriores[j].imagen
-            #para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
+            # para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
             imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(resultado_vrt.id) + '.png'
             resultado_vrt.screenshoot_posterior = imagen_posterior
             resultado_vrt.screenshoot_previo = imagen_anterior

@@ -1,7 +1,19 @@
+<style>
+    /* .invalid class prevents CSS from automatically applying */
+    .invalid input:required:invalid {
+      background: #BE4C54;
+    }
+
+    /* Mark valid inputs during .invalid state */
+    .invalid input:required:valid {
+      background: #17D654;
+    }
+</style>
+
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-        <form role="form" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data">
+        <form role="form" id="form-version" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data" class="needs-validation">
             {% csrf_token %}
             <div class="modal-header">
                 <h3>Nueva versión de {{aplicacion.nombre}}</h3>
@@ -10,25 +22,26 @@
             <div class="modal-body">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Número de versión" value=""
-                        name="numero_version" />
+                        name="numero_version" required />
                 </div>
                 <div class="form-group">
                     <textarea class="form-control" placeholder="Descripción de la versión" value=""
-                        name="descripcion_version"></textarea>
+                        name="descripcion_version" required></textarea>
                 </div>
                 {% if aplicacion.tipo.tipo == 'Web' %}
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="URL" value=""
-                        name="url_version" />
+                        name="url_version" required/>
                 </div>
                 {% elif aplicacion.tipo.tipo == 'Móvil'%}
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFile" name="apk_version">
+                    <input type="file" class="custom-file-input" id="customFile" name="apk_version" required>
                     <label class="custom-file-label" for="customFile">Seleccionar APK</label>
                 </div>
                 {% else %}
                 El tipo de aplicacion no se encuentra registrado
                 {% endif %}
+                <br><br>
                 <!--Table-->
                 <table class="table table-hover table-fixed">
 
@@ -75,6 +88,35 @@
     </div>
 </div>
 
+</body>
+
+<script>
+    // $("#form-version")[0].reset();
+</script>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+//$(document).ready(function () {
+/*(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();*/
+//});
+</script>
+
 <script>
 // Add the following code if you want the name of the file appear on select
 $(".custom-file-input").on("change", function() {
@@ -82,3 +124,5 @@ $(".custom-file-input").on("change", function() {
   $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
 </script>
+
+
