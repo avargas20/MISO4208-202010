@@ -27,6 +27,18 @@
                             {% endfor %}
                         </select>
                     </div>
+                    {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                        <div class="form-group">
+                            <select name='dispositivo' class="form-control" required>
+                                <option value="" class="hidden" selected disabled>Seleccione el dispositivo donde quiere lanzar
+                                    la prueba
+                                </option>
+                                {% for d in dispositivos %}
+                                    <option value="{{ d.id }}">{{ d.device_definition }} API {{ d.api_level }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
                 </div>
 
             </div>
