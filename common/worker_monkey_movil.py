@@ -20,11 +20,11 @@ if __name__ == '__main__':
 
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
-                nombre_paquete = resultado.prueba.estrategia.version.nombre_paquete
+                nombre_paquete = resultado.solicitud.version.nombre_paquete
                 # primero desinstalamos la aplicacion y luego la volvemos a instalar para limpiar cualquier estado
                 subprocess.call(['adb', 'uninstall', nombre_paquete], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
-                subprocess.call(['adb', 'install', resultado.prueba.estrategia.version.apk.path], shell=True, cwd=os.path.join(
+                subprocess.call(['adb', 'install', resultado.solicitud.version.apk.path], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 # Ahora ejecutar el monkey
 
