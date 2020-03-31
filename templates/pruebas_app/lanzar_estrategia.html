@@ -40,6 +40,7 @@
             <tr>
                 <th># ID</th>
                 <th>Nombre estrategia</th>
+                <th>Aplicación</th>
                 <th>Acción</th>
 
 
@@ -53,6 +54,7 @@
                 <tr>
                     <th scope="row">{{ e.id }}</th>
                     <td>{{ e.nombre }}</td>
+                    <td>{{ e.aplicacion.nombre }}</td>
                     <td>
 
                         <a class="btn btn-info text-right btn-sm" href="{% url 'ver_estrategia' %}">

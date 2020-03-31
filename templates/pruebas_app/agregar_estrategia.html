@@ -3,35 +3,6 @@
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
-<script>
-  $(document).ready(function () {
-    $('#aplicaciones').change(function () {
-
-      var optionSelected = $(this).find("option:selected");
-      var idAplicacion = optionSelected.val();
-      console.log('idAplicacion', idAplicacion);
-      data = {
-        'aplicacion_id': idAplicacion
-      };
-
-      $.ajax({
-        url: '/obtener_versiones_de_una_aplicacion',
-        type: 'GET',
-        data: data,
-        success: function (results) {
-
-          console.log(results);
-          $("#versiones option").remove();
-          for (var i = results.length - 1; i >= 0; i--) {
-            $("#versiones").append('<option value="' + results[i].id + '">' + results[i].numero +
-              '</option>');
-          };
-        }
-      });
-
-    });
-  });
-</script>
 
 {% endblock head %}
 {% block subtitle %}<h1 class="mt-3">Agregar Estrategia</h1>
@@ -41,21 +12,13 @@
     <form action="{% url 'guardar_estrategia' %}" method="post" class="needs-validation" novalidate>
         {% csrf_token %}
         <div class="row register-form">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="form-group">
-                    <select name='aplicaciones' id='aplicaciones' class="form-control" required>
+                    <select name='aplicacion' class="form-control" required>
                         <option class="hidden" value="" selected disabled>Seleccione la aplicación</option>
                         {% for a in aplicaciones %}
                         <option value="{{a.id}}">{{a.nombre}}</option>
                         {% endfor %}
-
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <select name='versiones' id='versiones' class="form-control" required>
-                        <option class="hidden" value="" selected disabled>Seleccione la versión</option>
 
                     </select>
                 </div>

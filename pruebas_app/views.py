@@ -43,11 +43,11 @@ def agregar_estrategia(request):
 def guardar_estrategia(request):
     if request.method == 'POST':
         print(request.POST)
-        version = Version.objects.get(id=request.POST['versiones'])
         nombre_estrategia = request.POST['nombre_estrategia']
         descripcion_estrategia = request.POST['descripcion_estrategia']
+        aplicacion = Aplicacion.objects.get(id=int(request.POST['aplicacion']))
         estrategia = Estrategia(
-            nombre=nombre_estrategia, descripcion=descripcion_estrategia, version=version)
+            nombre=nombre_estrategia, descripcion=descripcion_estrategia, aplicacion=aplicacion)
         estrategia.save()
         return HttpResponseRedirect(reverse('agregar_prueba', args=(estrategia.id,)))
 
@@ -64,7 +64,7 @@ def agregar_prueba(request, estrategia_id):
     tipos = Tipo.objects.all()
     pruebas = Prueba.objects.filter(estrategia=estrategia)
     return render(request, 'pruebas_app/agregar_prueba.html',
-                  {'aplicacion': estrategia.version.aplicacion, 'version': estrategia.version, 'estrategia': estrategia,
+                  {'aplicacion': estrategia.aplicacion, 'estrategia': estrategia,
                    'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
 
 
@@ -72,30 +72,20 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
-        herramienta = Herramienta.objects.get(
-            id=request.POST['herramienta'])
+        prueba = Prueba()
+        prueba.estrategia = estrategia
+        prueba.tipo = tipo
         # Si el tipo es E2E necesitamos el script y la herramienta
+        # Si el tipo es aleatorio no se necesita nada mas
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
+            herramienta = Herramienta.objects.get(
+                id=request.POST['herramienta'])
             _, script = request.FILES.popitem()
             script = script[0]
-            prueba = Prueba(script=script, herramienta=herramienta,
-                            tipo=tipo, estrategia=estrategia)
-        elif tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
-            # Si el tipo es random y movil no necesitamos nada mas
-            if tipo_aplicacion == settings.TIPOS_APLICACION["movil"]:
-                prueba = Prueba(tipo=tipo, estrategia=estrategia)
-            # Si el tipo es random y web no necesitamos el script
-            elif tipo_aplicacion == settings.TIPOS_APLICACION["web"]:
-                prueba = Prueba(herramienta=herramienta,
-                                tipo=tipo, estrategia=estrategia)
-                prueba.save()
-                util.reemplazar_token_con_url(prueba)
-        print(prueba)
+            prueba.script = script
+            prueba.herramienta = herramienta
         prueba.save()
-
-        print(request.POST)
-        print(request.FILES)
+        print(prueba)
         return agregar_prueba(request, estrategia_id)
 
 
@@ -134,78 +124,80 @@ def ver_estrategia(request):
 def condiciones_de_lanzamiento(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
     # Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
-    solicitudes = Solicitud.objects.filter(estrategia__version__aplicacion=estrategia.version.aplicacion).order_by(
+    solicitudes = Solicitud.objects.filter(estrategia=estrategia).order_by(
         '-id')
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
                   {'solicitudes': solicitudes, 'estrategia': estrategia})
 
 
-def ejecutar_estrategia(request, estrategia_id):
-    solicitud = Solicitud()
+def ejecutar_estrategia(request):
     if request.method == 'POST':
+        solicitud = Solicitud()
         print('solicitud POST', request.POST)
         if 'solicitud_VRT' in request.POST:
             id_solicitud_VRT = request.POST['solicitud_VRT']
             solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
             solicitud.solicitud_VRT = solicitud_VRT
-    estrategia = Estrategia.objects.get(id=estrategia_id)
-    solicitud.estrategia = estrategia
-    solicitud.save()
-    tipo_aplicacion = estrategia.version.aplicacion.tipo.tipo
+        estrategia = Estrategia.objects.get(id=int(request.POST['estrategia']))
+        solicitud.estrategia = estrategia
+        solicitud.version = Version.objects.get(id=int(request.POST['version']))
+        solicitud.save()
+        tipo_aplicacion = estrategia.aplicacion.tipo.tipo
 
-    for prueba in estrategia.prueba_set.all():
-        tipo_prueba = prueba.tipo.nombre
-        resultado = Resultado()
-        resultado.solicitud = solicitud
-        resultado.prueba = prueba
-        resultado.save()
-        if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-            herramienta = prueba.herramienta.nombre
-            # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
-            if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
-                                                     MessageAttributes={
-                                                         'Id': {
-                                                             'StringValue': str(resultado.id),
-                                                             'DataType': 'Number'
-                                                         }
-                                                     })
-            elif herramienta == 'Protractor':
-                pass
-            elif herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
-                response = COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
-                                                      MessageAttributes={
-                                                          'Id': {
-                                                              'StringValue': str(resultado.id),
-                                                              'DataType': 'Number'
-                                                          }
-                                                      })
-            elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
-                                                      MessageAttributes={
-                                                          'Id': {
-                                                              'StringValue': str(resultado.id),
-                                                              'DataType': 'Number'
-                                                          }
-                                                      })
-
-        elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
-            if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                response = COLA_MONKEY_MOVIL.send_message(MessageBody='Id del resultado a procesar para monkey movil',
+        for prueba in estrategia.prueba_set.all():
+            tipo_prueba = prueba.tipo.nombre
+            resultado = Resultado()
+            resultado.solicitud = solicitud
+            resultado.prueba = prueba
+            resultado.save()
+            if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
+                herramienta = prueba.herramienta.nombre
+                # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
+                if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
+                    response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
+                                                         MessageAttributes={
+                                                             'Id': {
+                                                                 'StringValue': str(resultado.id),
+                                                                 'DataType': 'Number'
+                                                             }
+                                                         })
+                elif herramienta == 'Protractor':
+                    pass
+                elif herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+                    response = COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
+                                                           MessageAttributes={
+                                                               'Id': {
+                                                                   'StringValue': str(resultado.id),
+                                                                   'DataType': 'Number'
+                                                               }
+                                                           })
+                elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
+                    response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
                                                           MessageAttributes={
                                                               'Id': {
                                                                   'StringValue': str(resultado.id),
                                                                   'DataType': 'Number'
                                                               }
                                                           })
-            elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
-                response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
-                                                     MessageAttributes={
-                                                              'Id': {
-                                                                  'StringValue': str(resultado.id),
-                                                                  'DataType': 'Number'
-                                                              }
-                                                          })
+
+            elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
+                if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
+                    response = COLA_MONKEY_MOVIL.send_message(
+                        MessageBody='Id del resultado a procesar para monkey movil',
+                        MessageAttributes={
+                            'Id': {
+                                'StringValue': str(resultado.id),
+                                'DataType': 'Number'
+                            }
+                        })
+                elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
+                    response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
+                                                         MessageAttributes={
+                                                             'Id': {
+                                                                 'StringValue': str(resultado.id),
+                                                                 'DataType': 'Number'
+                                                             }
+                                                         })
     return HttpResponseRedirect(reverse('home'))
 
 
