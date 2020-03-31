@@ -88,6 +88,7 @@ class Solicitud(models.Model):
     evidencia = models.FileField(upload_to=directorio_evidencia, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
+    sensibilidad_VRT = models.CharField(max_length=30, null=True)
     solicitud_VRT = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     version = models.ForeignKey(Version, on_delete=models.CASCADE)
 
@@ -149,4 +150,5 @@ class ResultadoVRT(models.Model):
     screenshoot_previo = models.ImageField(upload_to=directorio_vrt, null=True)
     screenshoot_posterior = models.ImageField(upload_to=directorio_vrt, null=True)
     imagen_diferencias = models.ImageField(upload_to=directorio_vrt, null=True)
+    fallida = models.BooleanField(default=False)
     informacion = models.CharField(max_length=200, null=True)
