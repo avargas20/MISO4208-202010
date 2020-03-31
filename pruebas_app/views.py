@@ -138,8 +138,10 @@ def ejecutar_estrategia(request):
         print('solicitud POST', request.POST)
         if 'solicitud_VRT' in request.POST:
             id_solicitud_VRT = request.POST['solicitud_VRT']
+            sensibilidad_VRT = request.POST['sensibilidad_VRT']
             solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
             solicitud.solicitud_VRT = solicitud_VRT
+            solicitud.sensibilidad_VRT = sensibilidad_VRT
         estrategia = Estrategia.objects.get(id=int(request.POST['estrategia']))
         solicitud.estrategia = estrategia
         solicitud.version = Version.objects.get(id=int(request.POST['version']))

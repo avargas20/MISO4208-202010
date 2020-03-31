@@ -11,6 +11,7 @@
         });
         $("#solicitud_VRT").trigger("change");
      });
+
 </script>
 
 <div class="modal-dialog modal-lg">
@@ -44,8 +45,9 @@
                     </div>
                 </div>
                 <div id="sensibilidad-required" class="form-group">
-                    <input class="form-control" id="sensibilidad_VRT" name="sensibilidad_VRT" type="text"
-                           placeholder="% de sensibilidad en VRT" value="{{ s.sensibilidad_VRT }}"/>
+                    <input class="form-control" id="sensibilidad_VRT" name="sensibilidad_VRT" type="number"
+                           placeholder="% de sensibilidad en VRT" value="{{ s.sensibilidad_VRT }}" step="0.01" min="0"
+                           max="1"/>
                 </div>
             </div>
 
