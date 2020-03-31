@@ -24,10 +24,10 @@ if __name__ == '__main__':
                 ruta_archivo = util.copiar_contenido(
                     resultado, settings.CALABASH_PATH, settings.RUTAS_INTERNAS["Calabash"], '.feature')
                 # Se firma el .apk
-                salida_firmado = subprocess.run(['calabash-android', 'resign', resultado.prueba.estrategia.version.apk.path],
+                salida_firmado = subprocess.run(['calabash-android', 'resign', resultado.solicitud.version.apk.path],
                                                 shell=True, check=False, cwd=settings.CALABASH_PATH, stdout=subprocess.PIPE)
                 # Ejecutar el comando de calabash
-                salida_ejecucion = subprocess.run(['calabash-android', 'run', resultado.prueba.estrategia.version.apk.path,
+                salida_ejecucion = subprocess.run(['calabash-android', 'run', resultado.solicitud.version.apk.path,
                                                 ruta_archivo], check=False, shell=True, cwd=settings.CALABASH_PATH, stdout=subprocess.PIPE)
                 print('La salida firmado:', salida_firmado.stdout.decode('utf-8'))
                 #print('La salida ejecucion:', salida_ejecucion.stdout.decode('utf-8'))

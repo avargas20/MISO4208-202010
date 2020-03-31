@@ -38,7 +38,7 @@ class Version(models.Model):
 class Estrategia(models.Model):
     nombre = models.CharField(max_length=30)
     descripcion = models.TextField(verbose_name='descripción')
-    version = models.ForeignKey(Version, on_delete=models.CASCADE)
+    aplicacion = models.ForeignKey(Aplicacion, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s' % self.nombre
@@ -89,6 +89,7 @@ class Solicitud(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
     solicitud_VRT = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    version = models.ForeignKey(Version, on_delete=models.CASCADE)
 
     def _pruebas_ejecutadas_(self):
         cantidad_total = self.resultado_set.all().count()

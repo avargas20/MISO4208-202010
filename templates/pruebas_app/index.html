@@ -30,8 +30,8 @@
             {% for solicitud in solicitudes %}
             <tr>
                 <th scope="row" class="text-center">{{ solicitud.id }}</th>
-                <td>{{ solicitud.estrategia.version.aplicacion.nombre }}</td>
-                <td class="text-center">{{ solicitud.estrategia.version.numero }}</td>
+               <td>{{ solicitud.estrategia.aplicacion.nombre }}</td>
+                <td class="text-center">{{ solicitud.version.numero }}</td>
                 <td>{{ solicitud.estrategia.nombre }}</td>
                 <td>{{ solicitud.estado }}</td>
                 {% if solicitud.terminada %}
