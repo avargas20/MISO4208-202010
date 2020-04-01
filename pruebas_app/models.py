@@ -70,6 +70,7 @@ class Prueba(models.Model):
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
     herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE, null=True)
+    numero_eventos = models.BigIntegerField(blank=True, null=True)
 
     def __str__(self):
         return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)

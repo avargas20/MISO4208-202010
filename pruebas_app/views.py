@@ -86,6 +86,7 @@ def guardar_prueba(request, estrategia_id):
             prueba.herramienta = herramienta
         if tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
             prueba.script = "Monkey.js"
+            prueba.numero_eventos = request.POST['numero_eventos']
         prueba.save()
         print(prueba)
         return agregar_prueba(request, estrategia_id)
