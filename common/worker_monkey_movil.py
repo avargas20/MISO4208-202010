@@ -21,7 +21,7 @@ if __name__ == '__main__':
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
                 nombre_paquete = resultado.solicitud.version.nombre_paquete
-                numero_eventos = resultado.prueba.numero_eventos
+                numero_eventos = str(resultado.prueba.numero_eventos)
                 # levantamos el emulador
                 subprocess.Popen(['emulator', resultado.solicitud.dispositivo.nombre_tecnico], shell=True,
                                  cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
