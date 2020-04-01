@@ -21,6 +21,9 @@ if __name__ == '__main__':
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
                 nombre_paquete = resultado.solicitud.version.nombre_paquete
+                # levantamos el emulador
+                subprocess.Popen(['emulator', resultado.solicitud.dispositivo.nombre_tecnico], shell=True,
+                                 cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
                 # primero desinstalamos la aplicación y luego la volvemos a instalar para limpiar cualquier estado
                 subprocess.call(['adb', 'uninstall', nombre_paquete], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
@@ -33,7 +36,10 @@ if __name__ == '__main__':
                     check=False,
                     cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
                     stdout=subprocess.PIPE)
-
+                # matamos el emulador
+                subprocess.call("adb -s emulator-5554 emu kill".split(), shell=True,
+                                cwd=os.path.join(settings.ANDROID_SDK,
+                                                 settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 archivo_log = open("log.txt", "w+")
                 archivo_log.write(salida.stdout.decode('utf-8'))
 
