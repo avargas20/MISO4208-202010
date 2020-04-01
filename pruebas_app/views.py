@@ -69,22 +69,27 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        prueba = Prueba()
-        prueba.estrategia = estrategia
-        prueba.tipo = tipo
         # Si el tipo es E2E necesitamos el script y la herramienta
         # Si el tipo es aleatorio no se necesita nada mas
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
-            herramienta = Herramienta.objects.get(
-                id=request.POST['herramienta'])
-            _, script = request.FILES.popitem()
-            script = script[0]
-            prueba.script = script
-            prueba.herramienta = herramienta
+            files = request.FILES.getlist('archivo')
+            print("Los archivos recibidos son:", files)
+            for script in files:
+                prueba = Prueba()
+                prueba.estrategia = estrategia
+                prueba.tipo = tipo
+                herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
+                prueba.script = script
+                prueba.herramienta = herramienta
+                prueba.save()
+                print(prueba)
         if tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            prueba = Prueba()
+            prueba.estrategia = estrategia
+            prueba.tipo = tipo
             prueba.script = "Monkey.js"
-        prueba.save()
-        print(prueba)
+            prueba.save()
+            print(prueba)
         return agregar_prueba(request, estrategia_id)
 
 
