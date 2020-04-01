@@ -1,3 +1,5 @@
+import signal
+
 import boto3
 import os
 import subprocess
@@ -21,25 +23,21 @@ if __name__ == '__main__':
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
                 nombre_paquete = resultado.solicitud.version.nombre_paquete
-                # levantamos el emulador
-                subprocess.Popen(['emulator', resultado.solicitud.dispositivo.nombre_tecnico], shell=True,
-                                 cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
+                # iniciamos el emulador y esperamos a que este listo (el metodo lo hace)
+                util.iniciar_emulador(resultado.solicitud.dispositivo.nombre_tecnico)
                 # primero desinstalamos la aplicación y luego la volvemos a instalar para limpiar cualquier estado
                 subprocess.call(['adb', 'uninstall', nombre_paquete], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 subprocess.call(['adb', 'install', resultado.solicitud.version.apk.path], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 # Ahora ejecutar el monkey
-
                 salida = subprocess.run(
                     ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-v', '10'], shell=True,
                     check=False,
                     cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
                     stdout=subprocess.PIPE)
                 # matamos el emulador
-                subprocess.call("adb -s emulator-5554 emu kill".split(), shell=True,
-                                cwd=os.path.join(settings.ANDROID_SDK,
-                                                 settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
+                util.eliminar_emulador()
                 archivo_log = open("log.txt", "w+")
                 archivo_log.write(salida.stdout.decode('utf-8'))
 
