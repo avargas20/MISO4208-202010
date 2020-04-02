@@ -24,6 +24,9 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
     if prueba.herramienta is not "Calabash":
         contenido = contenido.replace("-urlToken-", resultado.solicitud.version.url)
         print("El nuevo contenido es:", contenido)
+        if resultado.prueba.tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            contenido = contenido.replace("-randomToken-", str(prueba.numero_eventos))
+            print("El nuevo contenido con random es:", contenido)
 
     nuevo_archivo = ruta_interna + str(resultado.id) + extension_archivo
     ruta_nuevo_ejecutable = os.path.join(ruta_herramienta, nuevo_archivo)
