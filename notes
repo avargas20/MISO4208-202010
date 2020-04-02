@@ -66,3 +66,20 @@ Para referenciar la ruta de instalacion de puppeteer se debe agregar la variable
     PA_PUPPETEER_PATH
 Para referenciar la cola de puppeteer se debe agregar la variable de entorno:
     PA_SQS_PUPPETEER_NAME
+
+Para iniciar un emulador se requiere ejecutar el comando:
+    emulator @Nexus_5_API_29 parado en la ruta ../SDK/emulator
+    el emulador ya debe estar creado en el computador
+Agregue la tabla Dispositivo que tiene 3 campos y se deben agregar asi:
+    devide_definition:  Nexus 5
+    api_level:          22
+    nombre_tecnico:     se genera solo al guardar y produce el campo: @Nexus_5_API_29 que es como lo recibe el comando
+Para matar un emulador se requiere ejecutar el comando:
+    adb -s emulator-5554 emu kill
+emulator-5554 es el nombre del dispositivo que esta corriendo, para obtener los dispositivos que estan corriendo
+    se ejecuta el comando:
+        adb devices (parado en la ruta del SDK)
+    este comando entrega una salida asi:
+        List of devices attached
+        emulator-5554	device
+        emulator-5556	device
