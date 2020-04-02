@@ -23,8 +23,8 @@ if __name__ == '__main__':
                 nombre_paquete = resultado.solicitud.version.nombre_paquete
                 numero_eventos = str(resultado.prueba.numero_eventos)
                 # levantamos el emulador
-                # subprocess.Popen(['emulator', resultado.solicitud.dispositivo.nombre_tecnico], shell=True,
-                #                  cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
+                subprocess.Popen(['emulator', resultado.solicitud.dispositivo.nombre_tecnico], shell=True,
+                                 cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
                 # primero desinstalamos la aplicación y luego la volvemos a instalar para limpiar cualquier estado
                 subprocess.call(['adb', 'uninstall', nombre_paquete], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
