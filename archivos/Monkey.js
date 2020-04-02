@@ -1,12 +1,12 @@
 describe('Your WebApp under monkeys', function() {
     it('visits your WebApp and survives monkeys', function() {
         cy.visit('-urlToken-');
-        randomEvent(100);
+        randomEvent('-randomToken-');
     })
 })
 
 function randomEvent(monkeysQty) {
-    var monkeysLeft = monkeysQty;
+    var monkeysLeft = parseInt(monkeysQty);
     if (monkeysLeft > 0) {
         console.log("--- Quedan " + monkeysLeft + " Monkeys ---");
         monkeysLeft = monkeysLeft - 1;
