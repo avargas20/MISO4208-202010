@@ -1,18 +1,15 @@
 import json
 import os
-import threading
 import logging
 import subprocess
 import boto3
-from django.core.files import File
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
-
-from common import worker_cypress, worker_monkey_movil, worker_calabash, util
 from pruebas_automaticas import settings
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion
+from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
+    Dispositivo
 
 # Create your views here.
 
@@ -72,22 +69,28 @@ def guardar_prueba(request, estrategia_id):
     if request.method == 'POST':
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         estrategia = Estrategia.objects.get(id=estrategia_id)
-        prueba = Prueba()
-        prueba.estrategia = estrategia
-        prueba.tipo = tipo
         # Si el tipo es E2E necesitamos el script y la herramienta
         # Si el tipo es aleatorio no se necesita nada mas
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
-            herramienta = Herramienta.objects.get(
-                id=request.POST['herramienta'])
-            _, script = request.FILES.popitem()
-            script = script[0]
-            prueba.script = script
-            prueba.herramienta = herramienta
+            files = request.FILES.getlist('archivo')
+            print("Los archivos recibidos son:", files)
+            for script in files:
+                prueba = Prueba()
+                prueba.estrategia = estrategia
+                prueba.tipo = tipo
+                herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
+                prueba.script = script
+                prueba.herramienta = herramienta
+                prueba.save()
+                print(prueba)
         if tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            prueba = Prueba()
+            prueba.estrategia = estrategia
+            prueba.tipo = tipo
             prueba.script = "Monkey.js"
-        prueba.save()
-        print(prueba)
+            prueba.numero_eventos = request.POST['numero_eventos']
+            prueba.save()
+            print(prueba)
         return agregar_prueba(request, estrategia_id)
 
 
@@ -96,21 +99,6 @@ def eliminar_prueba(request, prueba_id):
     estrategia_id = prueba.estrategia.id
     prueba.delete()
     return agregar_prueba(request, estrategia_id)
-
-
-def obtener_versiones_de_una_aplicacion(request):
-    aplicacion_id = int(request.GET['aplicacion_id'])
-    print("ajax aplicacion_id ", aplicacion_id)
-
-    result_set = []
-    versiones = []
-    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
-    print("selected app name ", aplicacion)
-    versiones = Version.objects.filter(aplicacion=aplicacion)
-    for version in versiones:
-        print("version number", version.numero)
-        result_set.append({'numero': version.numero, 'id': version.id})
-    return HttpResponse(json.dumps(result_set), content_type='application/json')
 
 
 def lanzar_estrategia(request):
@@ -125,11 +113,12 @@ def ver_estrategia(request):
 
 def condiciones_de_lanzamiento(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
-    # Mostrar solo solicitudes existentes que haya tenido la misma aplicacion que se esta intentando lanzar
-    solicitudes = Solicitud.objects.filter(estrategia=estrategia).order_by(
-        '-id')
+    # Mostrar solo solicitudes existentes que haya tenido la misma aplicación que se esta intentando lanzar
+    dispositivos = Dispositivo.objects.all()
+    solicitudes = Solicitud.objects.filter(estrategia=estrategia).order_by('-id')
+
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
-                  {'solicitudes': solicitudes, 'estrategia': estrategia})
+                  {'solicitudes': solicitudes, 'estrategia': estrategia, 'dispositivos': dispositivos})
 
 
 def ejecutar_estrategia(request):
@@ -142,7 +131,10 @@ def ejecutar_estrategia(request):
             solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
             solicitud.solicitud_VRT = solicitud_VRT
             solicitud.sensibilidad_VRT = sensibilidad_VRT
+
         estrategia = Estrategia.objects.get(id=int(request.POST['estrategia']))
+        if estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION['movil']:
+            solicitud.dispositivo = Dispositivo.objects.get(id=int(request.POST['dispositivo']))
         solicitud.estrategia = estrategia
         solicitud.version = Version.objects.get(id=int(request.POST['version']))
         solicitud.save()
@@ -156,37 +148,37 @@ def ejecutar_estrategia(request):
             resultado.save()
             if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
                 herramienta = prueba.herramienta.nombre
-                # Aqui se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
+                # Aquí se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
                 if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                    response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
-                                                         MessageAttributes={
-                                                             'Id': {
-                                                                 'StringValue': str(resultado.id),
-                                                                 'DataType': 'Number'
-                                                             }
-                                                         })
+                    COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
+                                              MessageAttributes={
+                                                  'Id': {
+                                                      'StringValue': str(resultado.id),
+                                                      'DataType': 'Number'
+                                                  }
+                                              })
                 elif herramienta == 'Protractor':
                     pass
                 elif herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
-                    response = COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
-                                                           MessageAttributes={
-                                                               'Id': {
-                                                                   'StringValue': str(resultado.id),
-                                                                   'DataType': 'Number'
-                                                               }
-                                                           })
+                    COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
+                                                MessageAttributes={
+                                                    'Id': {
+                                                        'StringValue': str(resultado.id),
+                                                        'DataType': 'Number'
+                                                    }
+                                                })
                 elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                    response = COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
-                                                          MessageAttributes={
-                                                              'Id': {
-                                                                  'StringValue': str(resultado.id),
-                                                                  'DataType': 'Number'
-                                                              }
-                                                          })
+                    COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
+                                               MessageAttributes={
+                                                   'Id': {
+                                                       'StringValue': str(resultado.id),
+                                                       'DataType': 'Number'
+                                                   }
+                                               })
 
             elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
                 if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                    response = COLA_MONKEY_MOVIL.send_message(
+                    COLA_MONKEY_MOVIL.send_message(
                         MessageBody='Id del resultado a procesar para monkey movil',
                         MessageAttributes={
                             'Id': {
@@ -195,13 +187,13 @@ def ejecutar_estrategia(request):
                             }
                         })
                 elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
-                    response = COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
-                                                         MessageAttributes={
-                                                             'Id': {
-                                                                 'StringValue': str(resultado.id),
-                                                                 'DataType': 'Number'
-                                                             }
-                                                         })
+                    COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
+                                              MessageAttributes={
+                                                  'Id': {
+                                                      'StringValue': str(resultado.id),
+                                                      'DataType': 'Number'
+                                                  }
+                                              })
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -266,7 +258,8 @@ def guardar_version(request, aplicacion_id):
                 numero=numero_version, descripcion=descripcion_version, aplicacion=aplicacion, url=url)
             version.save()
         elif aplicacion.tipo.tipo == settings.TIPOS_APLICACION["movil"]:
-            # Para sacar archivos adjuntos de un input file se hace accediendo a FILES del request y como es una lista se saca el primero porque en el html solo dejamos esocger uno
+            # Para sacar archivos adjuntos de un input file se hace accediendo a FILES del request y como es una lista
+            # se saca el primero porque en el html solo dejamos esocger uno
             _, apk = request.FILES.popitem()
             apk = apk[0]
             version = Version(
@@ -279,9 +272,12 @@ def guardar_version(request, aplicacion_id):
                                                                                   'build-tools']),
                                     stdout=subprocess.PIPE)
             #
-            # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package: name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28' compileSdkVersionCodename='9'
+            # este print('nombre paquete', salida.stdout.decode('utf-8')) imprime esto: package:
+            # name='org.quantumbadger.redreader' versionCode='87' versionName='1.9.10' compileSdkVersion='28'
+            # compileSdkVersionCodename='9'
             salida = salida.stdout.decode('utf-8')
-            # Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples restantes
+            # Para obtener el nombre del paquete hago split por espacio, luego por = y luego quito las comillas simples
+            # restantes
             nombre_paquete = salida.split()[1].split("=")[1].replace("'", "")
             version.nombre_paquete = nombre_paquete
             version.save()

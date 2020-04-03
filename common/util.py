@@ -22,10 +22,14 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
     archivo = open(prueba.script.path, "r")
     contenido = archivo.read()
     print("El contenido inicial es:", contenido)
-
-    if prueba.herramienta is not "Calabash":
+    print('Heeramienta', prueba.herramienta.nombre)
+    print(prueba.herramienta.nombre != "Calabash")
+    if prueba.herramienta.nombre != "Calabash":
         contenido = contenido.replace("-urlToken-", resultado.solicitud.version.url)
         print("El nuevo contenido es:", contenido)
+        if resultado.prueba.tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
+            contenido = contenido.replace("-randomToken-", str(prueba.numero_eventos))
+            print("El nuevo contenido con random es:", contenido)
 
     nuevo_archivo = ruta_interna + str(resultado.id) + extension_archivo
     ruta_nuevo_ejecutable = os.path.join(ruta_herramienta, nuevo_archivo)
@@ -154,3 +158,28 @@ def determinar_ruta(resultado):
         return settings.CYPRESS_PATH
     elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
         return settings.CALABASH_PATH
+
+
+# Este metodo inicia el emulador que tenga como nombre el parametro y espera a que este arranque
+def iniciar_emulador(nombre_tecnico):
+    # levantamos el emulador
+    subprocess.Popen(['emulator', nombre_tecnico], shell=True, cwd=os.path.join(settings.ANDROID_SDK, 'emulator'))
+    # esperamos hasta que este disponible
+    subprocess.call(['adb', 'wait-for-device'], shell=True, cwd=settings.ANDROID_SDK)
+
+
+# Este metodo consulta los emuladores encendidos y los detiene todos
+def eliminar_emulador():
+    # consultamos todos los emuladores prendidos
+    comando_devices = subprocess.run(['adb', 'devices'], shell=True, check=False, cwd=settings.ANDROID_SDK,
+                                     stdout=subprocess.PIPE)
+    salida = comando_devices.stdout.decode('utf-8')
+    print('devices: ', salida)
+    # partir por saltos de lineas (splitlines()) y coger desde la segunda hasta la penultima ([1:-1])
+    # y luego partir por \t y validar si la segunda posicion indica que el dispositivo esta prendido (== 'device')
+    # en caso de estarlo tomar la primer posicion que indica el nombre del dispositivo
+    devices = [linea.split('\t')[0] for linea in salida.splitlines()[1:-1] if linea.split('\t')[1] == 'device']
+    print('lineas', devices)
+    for d in devices:
+        subprocess.call(d.join(['adb -s ', ' emu kill']).split(), shell=True,
+                        cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))

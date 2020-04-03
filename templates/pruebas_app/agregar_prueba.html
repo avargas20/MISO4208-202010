@@ -6,14 +6,21 @@
 <script>
  $(document).ready(function () {
     $("#tipo").change(function() {
-      if ( $("#tipo option:selected").html() != "E2E") {
+      if ($("#tipo option:selected").html() == "Tipo") {
+        $('#e2e-required').hide();
+        $("#random-required").hide();
+      } else if ( $("#tipo option:selected").html() != "E2E") {
+        $("#random-required").show();
+        $("#numero_eventos").attr("required", true);
         $('#e2e-required').hide();
         $("#customFileLang").attr("required", false);
         $("#herramienta").attr("required", false);
       } else {
-        $('#e2e-required').show();
+        $("#e2e-required").show();
         $("#customFileLang").attr("required", true);
         $("#herramienta").attr("required", true);
+        $("#random-required").hide();
+        $("#numero_eventos").attr("required", false);
       }
     });
     $("#tipo").trigger("change");
@@ -24,6 +31,9 @@
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
  });
+
+
+
 </script>
 
 {% endblock head %}
@@ -44,11 +54,11 @@
     </div>
     <div class="form-group">
         <input type="text" class="form-control" placeholder="Nombre de la estrategia" value="{{estrategia.nombre}}"
-            name="nombre_estrategia" />
+               name="nombre_estrategia"/>
     </div>
     <div class="form-group">
         <input type="text" class="form-control" placeholder="Descripcion de la estrategia"
-            value="{{estrategia.descripcion}}" name="descripcion_estrategia" />
+               value="{{estrategia.descripcion}}" name="descripcion_estrategia"/>
     </div>
 
 
@@ -74,20 +84,29 @@
                     </select>
                 </div>
             </div>
-            {% if  p.tipo.nombre == 'E2E' %}
+            {% if p.tipo.nombre == 'Aleatorias' %}
             <div class="row col-8">
-                <div class=" col-8 input-group mb-3">
-                    <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFileLang">
-                    <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">{{p.script}}</label>
-                  </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Número de eventos" disabled
+                           value="{{p.numero_eventos}}"
+                    />
                 </div>
+            </div>
+            {% endif %}
+            {% if p.tipo.nombre == 'E2E' %}
+            <div class="row col-8">
                 <div class="col-4">
                     <div class="form-group">
                         <select class="form-control">
                             <option class="hidden" selected disabled>Herramienta</option>
                             <option selected disabled>{{p.herramienta.nombre}}</option>
                         </select>
+                    </div>
+                </div>
+                <div class=" col-8 input-group mb-3">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFileLang">
+                        <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">{{p.script}}</label>
                     </div>
                 </div>
             </div>
@@ -103,16 +122,10 @@
 
         {% endfor %}
         <!-- Pruebas Nuevas -->
-        <form action="{% url 'guardar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'guardar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data"
+              class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row register-form">
-
-                <!--<div class="col-5">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
-                        <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label>
-                    </div>
-                </div>-->
                 <div class="col-3">
                     <div class="form-group">
                         <select name="tipo" id="tipo" class="form-control custom-select" required>
@@ -123,12 +136,19 @@
                         </select>
                     </div>
                 </div>
+                <div id="random-required" class="row col-6">
+                    <div class="form-group">
+                        <input type="number" class="form-control" placeholder="Número de eventos"
+                               name="numero_eventos" min="1" id="numero_eventos"/>
+                    </div>
+                </div>
                 <div id="e2e-required" class="row col-8">
                     <div class=" col-8 input-group mb-3">
                         <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo">
-                        <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar Archivo</label>
-                      </div>
+                        <input type="file" class="custom-file-input" id="customFileLang" lang="es" name="archivo" multiple="multiple">
+                            <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar
+                                Archivo</label>
+                        </div>
                     </div>
                     <div class="col-4">
                         <div class="form-group">
