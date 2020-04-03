@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.clickjacking import xframe_options_exempt, xframe_options_sameorigin
+
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
     Dispositivo
@@ -286,3 +288,21 @@ def eliminar_version(request, version_id):
     version = Version.objects.get(id=version_id)
     version.delete()
     return HttpResponseRedirect(reverse('nueva_aplicacion'))
+
+
+def ver_resultados(request, solicitud_id):
+    try:
+        solicitud = Solicitud.objects.get(id=int(solicitud_id))
+    except Solicitud.DoesNotExist:
+        raise Http404("Solicitud no encontrada")
+    resultados = solicitud.resultado_set.all()
+    videos = []
+    logs = []
+    for r in resultados:
+        if r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cypress"]:
+            videos.append(r)
+            print(r.resultado.path)
+        elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["calabash"] or r.prueba.tipo.nombre == \
+                settings.TIPOS_PRUEBAS['aleatorias']:
+            logs.append(r)
+    return render(request, 'pruebas_app/ver_resultados.html', {'solicitud': solicitud, 'videos': videos, 'logs': logs})
