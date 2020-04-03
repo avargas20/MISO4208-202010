@@ -106,6 +106,16 @@ class Solicitud(models.Model):
 
     terminada = property(_solicitud_terminada_)
 
+    def _fallo_vrt_(self):
+        fallo_vrt = ResultadoVRT.objects.filter(fallida=True, solicitud=self).count()
+        if fallo_vrt > 0:
+            resultado = "Cambios encontrados"
+        else:
+            resultado = "Sin cambios"
+        return resultado
+
+    resultado_vrt = property(_fallo_vrt_)
+
     def __str__(self):
         return 'Solicitud id numero: %s de la estrategia: %s estado: %s terminada %s' % (
             self.id, self.estrategia.nombre, self.estado, self.terminada)
