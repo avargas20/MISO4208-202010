@@ -38,7 +38,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Número</th>
-                            <th>Descripción</th>
+                            {% if aplicacion.tipo.tipo == 'Web' %}
+                                <th>URL</th>
+                            {% else %}
+                                <th>APK</th>
+                            {% endif %}
                             <th></th>
                         </tr>
                     </thead>
@@ -50,7 +54,11 @@
                         <tr>
                             <th scope="row" class="text-center">{{ version.id }}</th>
                             <td>{{ version.numero }}</td>
-                            <td>{{ version.descripcion}}</td>
+                            {% if aplicacion.tipo.tipo == 'Web' %}
+                                <td>{{ version.url}}</td>
+                            {% else %}
+                                <td>{{ version.apk}}</td>
+                            {% endif %}
                             <td>
                                 <a class="btn btn-danger text-right btn-sm"
                                     href="{% url 'eliminar_version' version.id %}">
