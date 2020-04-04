@@ -56,6 +56,9 @@ def validar_ultimo(solicitud):
                 zip_objetcs.write(r.resultado.path, r.resultado.name)
             if bool(r.log):
                 zip_objetcs.write(r.log.path, r.log.name)
+            for s in r.screenshot_set.all():
+                if bool(s.imagen):
+                    zip_objetcs.write(s.imagen.path, s.imagen.name)
 
         zip_objetcs.close()
         archivo = open(settings.BASE_DIR + "//evidencias.zip", 'rb')
