@@ -16,7 +16,16 @@
             return false;
         }
 
-
+        $(document).ready(function () {
+                $("#solicitud_VRT").change(function() {
+                  if ( document.form.solicitud_VRT.value == "" ) {
+                    $('#sensibilidad-required').hide();
+                  } else {
+                    $('#sensibilidad-required').show();
+                  }
+                });
+                $("#solicitud_VRT").trigger("change");
+             });
     </script>
 
 {% endblock head %}
