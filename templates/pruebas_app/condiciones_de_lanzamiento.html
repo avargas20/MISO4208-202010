@@ -20,7 +20,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control">
+                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control" onchange="activar_campo(this.value)">
                             <option value="" class="hidden" selected disabled>Seleccione la solicitud para VRT</option>
                             {% for s in solicitudes %}
                             <option value="{{ s.id }}">{{ s.id }}</option>
