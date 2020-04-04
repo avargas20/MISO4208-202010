@@ -131,7 +131,9 @@ def ejecutar_vrt(solicitud_posterior):
 
 
 # Este metodo busca recoger todos los screenshoots tomados por los scripts y guardarlos en la tabla ScreenShoot
-def recoger_screenshoots(resultado, ruta_a_recoger):
+def recoger_screenshoots(resultado):
+    # La ruta depende de la herramienta que ejecuto la prueba
+    ruta_a_recoger = determinar_ruta(resultado)
     # Se crea una expresion con *.png para que recoja esos tipos de archivos
     ruta_con_filtro = os.path.join(ruta_a_recoger, '*.png')
     imagenes = glob.glob(ruta_con_filtro)
@@ -158,6 +160,8 @@ def determinar_ruta(resultado):
         return settings.CYPRESS_PATH
     elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
         return settings.CALABASH_PATH
+    elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+        return settings.PUPPETEER_PATH
 
 
 # Este metodo inicia el emulador que tenga como nombre el parametro y espera a que este arranque

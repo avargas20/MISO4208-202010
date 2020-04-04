@@ -87,7 +87,9 @@ def guardar_prueba(request, estrategia_id):
             prueba = Prueba()
             prueba.estrategia = estrategia
             prueba.tipo = tipo
-            prueba.script = "Monkey.js"
+            if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
+                prueba.script = "Monkey.js"
+                prueba.herramienta = Herramienta.objects.get(nombre=settings.TIPOS_HERRAMIENTAS["cypress"])
             prueba.numero_eventos = request.POST['numero_eventos']
             prueba.save()
             print(prueba)
