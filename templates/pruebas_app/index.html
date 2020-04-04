@@ -35,12 +35,12 @@
                <td>{{ solicitud.estrategia.aplicacion.nombre }}</td>
                 <td class="text-center">{{ solicitud.version.numero }}</td>
                 <td>{{ solicitud.estrategia.nombre }}</td>
-                {% if solicitud.sensibilidad_VRT %}
+                {% if solicitud.sensibilidad_VRT >= 0 %}
                 <td>{{ solicitud.sensibilidad_VRT }}%</td>
                 {% else %}
                 <td class="text-center"></td>
                 {% endif %}
-                {% if solicitud.terminada and solicitud.sensibilidad_VRT %}
+                {% if solicitud.terminada and solicitud.sensibilidad_VRT >= 0 %}
                 <td>{{ solicitud.resultado_vrt }}</td>
                 {% else %}
                 <td class="text-center"></td>
