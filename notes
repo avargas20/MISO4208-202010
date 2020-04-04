@@ -51,7 +51,6 @@ Para el worker de puppeteer es necesario instalar puppeteer, jest cli y el repor
     npm i puppeteer
     npm install jest --global
     npm install jest-html-reporter --save-dev
-
 Para configurar el reporteador es necesario modificar el archivo jest.config.js en la ruta de puppeteer y agregar:
     reporters: [
         "default",
@@ -59,9 +58,6 @@ Para configurar el reporteador es necesario modificar el archivo jest.config.js 
             "pageTitle": "Test Report"
         }]
     ],
-
-    Además de modificar la url de la aplicación en globals
-
 Para referenciar la ruta de instalacion de puppeteer se debe agregar la variable de entorno:
     PA_PUPPETEER_PATH
 Para referenciar la cola de puppeteer se debe agregar la variable de entorno:
