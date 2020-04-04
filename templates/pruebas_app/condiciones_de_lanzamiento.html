@@ -20,7 +20,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control" onchange="activar_campo(this.value)">
+                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control"
+                                onchange="activar_campo(this.value)">
                             <option value="" class="hidden" selected disabled>Seleccione la solicitud para VRT</option>
                             {% for s in solicitudes %}
                             <option value="{{ s.id }}">{{ s.id }}</option>
@@ -28,16 +29,17 @@
                         </select>
                     </div>
                     {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                        <div class="form-group">
-                            <select name='dispositivo' class="form-control" required>
-                                <option value="" class="hidden" selected disabled>Seleccione el dispositivo donde quiere lanzar
-                                    la prueba
-                                </option>
-                                {% for d in dispositivos %}
-                                    <option value="{{ d.id }}">{{ d.device_definition }} API {{ d.api_level }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <select name='dispositivo' class="form-control" required>
+                            <option value="" class="hidden" selected disabled>Seleccione el dispositivo donde quiere
+                                lanzar
+                                la prueba
+                            </option>
+                            {% for d in dispositivos %}
+                            <option value="{{ d.id }}">{{ d.device_definition }} API {{ d.api_level }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     {% endif %}
                 </div>
                 <div id="sensibilidad-required" class="form-group">
