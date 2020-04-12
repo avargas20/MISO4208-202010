@@ -181,12 +181,12 @@ def eliminar_emulador():
     comando_devices = subprocess.run(['adb', 'devices'], shell=True, check=False, cwd=settings.ANDROID_SDK,
                                      stdout=subprocess.PIPE)
     salida = comando_devices.stdout.decode('utf-8')
-    print('devices: ', salida)
+    print('devices a eliminar: ', salida)
     # partir por saltos de lineas (splitlines()) y coger desde la segunda hasta la penultima ([1:-1])
     # y luego partir por \t y validar si la segunda posicion indica que el dispositivo esta prendido (== 'device')
     # en caso de estarlo tomar la primer posicion que indica el nombre del dispositivo
     devices = [linea.split('\t')[0] for linea in salida.splitlines()[1:-1] if linea.split('\t')[1] == 'device']
-    print('lineas', devices)
+    print('lineas a eliminar', devices)
     for d in devices:
         subprocess.call(d.join(['adb -s ', ' emu kill']).split(), shell=True,
                         cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
