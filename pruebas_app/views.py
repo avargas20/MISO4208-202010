@@ -89,7 +89,9 @@ def guardar_prueba(request, estrategia_id):
             prueba = Prueba()
             prueba.estrategia = estrategia
             prueba.tipo = tipo
-            prueba.script = "Monkey.js"
+            if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
+                prueba.script = "Monkey.js"
+                prueba.herramienta = Herramienta.objects.get(nombre=settings.TIPOS_HERRAMIENTAS["cypress"])
             prueba.numero_eventos = request.POST['numero_eventos']
             prueba.save()
             print(prueba)
@@ -128,9 +130,12 @@ def ejecutar_estrategia(request):
         solicitud = Solicitud()
         print('solicitud POST', request.POST)
         if 'solicitud_VRT' in request.POST:
-            id_solicitud_vrt = request.POST['solicitud_VRT']
-            solicitud_vrt = Solicitud.objects.get(id=id_solicitud_vrt)
-            solicitud.solicitud_VRT = solicitud_vrt
+            id_solicitud_VRT = request.POST['solicitud_VRT']
+            sensibilidad_VRT = request.POST['sensibilidad_VRT']
+            solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
+            solicitud.solicitud_VRT = solicitud_VRT
+            solicitud.sensibilidad_VRT = sensibilidad_VRT
+
         estrategia = Estrategia.objects.get(id=int(request.POST['estrategia']))
         if estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION['movil']:
             solicitud.dispositivo = Dispositivo.objects.get(id=int(request.POST['dispositivo']))

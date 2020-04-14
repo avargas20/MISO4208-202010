@@ -21,7 +21,6 @@ if __name__ == '__main__':
             if message.message_attributes is not None:
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
-
                 nuevo_archivo = util.copiar_contenido(resultado, settings.PUPPETEER_PATH, settings.RUTAS_INTERNAS['Puppeteer'], '.test.js')
 
                 comando = subprocess.run(['jest', nuevo_archivo], shell=True, stdout=subprocess.PIPE, cwd=settings.PUPPETEER_PATH)
@@ -34,11 +33,9 @@ if __name__ == '__main__':
                 resultado.save()
                 reporte.close()
                 os.remove(reporte.name)
-
-                #Se borra script anterior
-                script = open(settings.PUPPETEER_PATH + nuevo_archivo, 'rb')
-                os.remove(script.name)
-
+                #script = open(settings.PUPPETEER_PATH + nuevo_archivo, 'rb')
+                os.remove(settings.PUPPETEER_PATH + nuevo_archivo)
+                util.recoger_screenshoots(resultado)
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)
         time.sleep(settings.TIEMPO_ESPERA_WORKERS)

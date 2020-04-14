@@ -18,6 +18,8 @@
                 <th>Aplicación</th>
                 <th>Versión</th>
                 <th>Estrategia</th>
+                <th>Diferencia VRT</th>
+                <th>Respuesta VRT</th>
                 <th>Estado</th>
                 <th>Resultado</th>
 
@@ -30,10 +32,20 @@
             {% for solicitud in solicitudes %}
                 <tr>
                     <th scope="row" class="text-center">{{ solicitud.id }}</th>
-                    <td>{{ solicitud.estrategia.aplicacion.nombre }}</td>
+               <td class="text-center">{{ solicitud.estrategia.aplicacion.nombre }}</td>
                     <td class="text-center">{{ solicitud.version.numero }}</td>
-                    <td>{{ solicitud.estrategia.nombre }}</td>
-                    <td>{{ solicitud.estado }}</td>
+                <td class="text-center">{{ solicitud.estrategia.nombre }}</td>
+                {% if solicitud.sensibilidad_VRT >= 0 %}
+                <td class="text-center">{{ solicitud.sensibilidad_VRT }}%</td>
+                {% else %}
+                <td class="text-center"></td>
+                {% endif %}
+                {% if solicitud.terminada and solicitud.sensibilidad_VRT >= 0 %}
+                <td class="text-center">{{ solicitud.resultado_vrt }}</td>
+                {% else %}
+                <td class="text-center"></td>
+                {% endif %}
+                <td class="text-center">{{ solicitud.estado }}</td>
                     {% if solicitud.terminada %}
                         <td class="text-center">
                             <a href="{% url 'descargar_evidencias' solicitud.id %}"><i
