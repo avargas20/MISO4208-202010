@@ -57,10 +57,6 @@
                     <td>{{ e.aplicacion.nombre }}</td>
                     <td>
 
-                        <a class="btn btn-info text-right btn-sm" href="{% url 'ver_estrategia' %}">
-                            <i class="fas fa-eye"></i>
-                        </a>
-
                         <a class="btn btn-success text-right btn-sm" style="cursor: pointer"
                            onclick="return abrir_modal('{% url 'condiciones_de_lanzamiento' e.id %}')">
                             <i class="far fa-play-circle"></i>

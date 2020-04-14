@@ -11,7 +11,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt, xframe_o
 
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
-    Dispositivo
+    Dispositivo, ResultadoVRT
 
 # Create your views here.
 
@@ -298,6 +298,7 @@ def ver_resultados(request, solicitud_id):
     resultados = solicitud.resultado_set.all()
     videos = []
     logs = []
+    screen_shots = []
     for r in resultados:
         if r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cypress"]:
             videos.append(r)
@@ -305,4 +306,10 @@ def ver_resultados(request, solicitud_id):
         elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["calabash"] or r.prueba.tipo.nombre == \
                 settings.TIPOS_PRUEBAS['aleatorias']:
             logs.append(r)
-    return render(request, 'pruebas_app/ver_resultados.html', {'solicitud': solicitud, 'videos': videos, 'logs': logs})
+        if r.screenshot_set:
+            screen_shots.append({'filename': r.prueba.filename, 'imagenes': r.screenshot_set.all()})
+    imagenes_vrt = ResultadoVRT.objects.filter(solicitud=solicitud)
+
+    return render(request, 'pruebas_app/ver_resultados.html',
+                  {'solicitud': solicitud, 'videos': videos, 'logs': logs, 'imagenes_VRT': imagenes_vrt,
+                   'screen_shots': screen_shots})

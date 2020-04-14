@@ -1,3 +1,4 @@
+import os
 
 from django.db import models
 
@@ -90,6 +91,10 @@ class Prueba(models.Model):
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
     herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE, null=True)
     numero_eventos = models.BigIntegerField(blank=True, null=True)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.script.path)
 
     def __str__(self):
         return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
