@@ -149,6 +149,7 @@ class Resultado(models.Model):
     terminada = models.BooleanField(default=False)
     solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
     prueba = models.ForeignKey(Prueba, on_delete=models.CASCADE)
+    exitoso = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return '%s %s %s %s %s' % (self.resultado, self.log, self.terminada, self.solicitud, self.prueba)
