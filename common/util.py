@@ -56,6 +56,9 @@ def validar_ultimo(solicitud):
                 zip_objetcs.write(r.resultado.path, r.resultado.name)
             if bool(r.log):
                 zip_objetcs.write(r.log.path, r.log.name)
+            for s in r.screenshot_set.all():
+                if bool(s.imagen):
+                    zip_objetcs.write(s.imagen.path, s.imagen.name)
 
         zip_objetcs.close()
         archivo = open(settings.BASE_DIR + "//evidencias.zip", 'rb')
@@ -131,7 +134,9 @@ def ejecutar_vrt(solicitud_posterior):
 
 
 # Este metodo busca recoger todos los screenshoots tomados por los scripts y guardarlos en la tabla ScreenShoot
-def recoger_screenshoots(resultado, ruta_a_recoger):
+def recoger_screenshoots(resultado):
+    # La ruta depende de la herramienta que ejecuto la prueba
+    ruta_a_recoger = determinar_ruta(resultado)
     # Se crea una expresion con *.png para que recoja esos tipos de archivos
     ruta_con_filtro = os.path.join(ruta_a_recoger, '*.png')
     imagenes = glob.glob(ruta_con_filtro)
@@ -158,6 +163,8 @@ def determinar_ruta(resultado):
         return settings.CYPRESS_PATH
     elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
         return settings.CALABASH_PATH
+    elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+        return settings.PUPPETEER_PATH
 
 
 # Este metodo inicia el emulador que tenga como nombre el parametro y espera a que este arranque
@@ -174,12 +181,12 @@ def eliminar_emulador():
     comando_devices = subprocess.run(['adb', 'devices'], shell=True, check=False, cwd=settings.ANDROID_SDK,
                                      stdout=subprocess.PIPE)
     salida = comando_devices.stdout.decode('utf-8')
-    print('devices: ', salida)
+    print('devices a eliminar: ', salida)
     # partir por saltos de lineas (splitlines()) y coger desde la segunda hasta la penultima ([1:-1])
     # y luego partir por \t y validar si la segunda posicion indica que el dispositivo esta prendido (== 'device')
     # en caso de estarlo tomar la primer posicion que indica el nombre del dispositivo
     devices = [linea.split('\t')[0] for linea in salida.splitlines()[1:-1] if linea.split('\t')[1] == 'device']
-    print('lineas', devices)
+    print('lineas a eliminar', devices)
     for d in devices:
         subprocess.call(d.join(['adb -s ', ' emu kill']).split(), shell=True,
                         cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))

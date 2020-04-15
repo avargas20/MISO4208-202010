@@ -1,19 +1,3 @@
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $("#solicitud_VRT").change(function() {
-          if ( document.form.solicitud_VRT.value == "" ) {
-            $('#sensibilidad-required').hide();
-          } else {
-            $('#sensibilidad-required').show();
-          }
-        });
-        $("#solicitud_VRT").trigger("change");
-     });
-
-</script>
-
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
@@ -36,7 +20,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control">
+                        <select id="solicitud_VRT" name='solicitud_VRT' class="form-control"
+                                onchange="activar_campo(this.value)">
                             <option value="" class="hidden" selected disabled>Seleccione la solicitud para VRT</option>
                             {% for s in solicitudes %}
                             <option value="{{ s.id }}">{{ s.id }}</option>
@@ -44,16 +29,17 @@
                         </select>
                     </div>
                     {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                        <div class="form-group">
-                            <select name='dispositivo' class="form-control" required>
-                                <option value="" class="hidden" selected disabled>Seleccione el dispositivo donde quiere lanzar
-                                    la prueba
-                                </option>
-                                {% for d in dispositivos %}
-                                    <option value="{{ d.id }}">{{ d.device_definition }} API {{ d.api_level }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <select name='dispositivo' class="form-control" required>
+                            <option value="" class="hidden" selected disabled>Seleccione el dispositivo donde quiere
+                                lanzar
+                                la prueba
+                            </option>
+                            {% for d in dispositivos %}
+                            <option value="{{ d.id }}">{{ d.device_definition }} API {{ d.api_level }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     {% endif %}
                 </div>
                 <div id="sensibilidad-required" class="form-group">
@@ -66,7 +52,7 @@
             <div class="modal-footer">
                 <div class="col-lg-12 text-right">
                     <input type="submit" class="btn btn-success" name="submit" value="Ejecutar">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="return cerrar_modal()">Cancelar</button>
                 </div>
             </div>
         </form>
