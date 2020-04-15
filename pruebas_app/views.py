@@ -75,7 +75,6 @@ def guardar_prueba(request, estrategia_id):
         # Si el tipo es aleatorio no se necesita nada mas
         if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
             files = request.FILES.getlist('archivo')
-            print("Los archivos recibidos son:", files)
             for script in files:
                 prueba = Prueba()
                 prueba.estrategia = estrategia
@@ -84,7 +83,6 @@ def guardar_prueba(request, estrategia_id):
                 prueba.script = script
                 prueba.herramienta = herramienta
                 prueba.save()
-                print(prueba)
         if tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
             prueba = Prueba()
             prueba.estrategia = estrategia
@@ -92,9 +90,14 @@ def guardar_prueba(request, estrategia_id):
             if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
                 prueba.script = "Monkey.js"
                 prueba.herramienta = Herramienta.objects.get(nombre=settings.TIPOS_HERRAMIENTAS["cypress"])
+            if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION2.Movil.value:
+                # la variable creada retorna un boolean indicando si el valor fue creado o no
+                herramienta, creada = Herramienta.objects.get_or_create(nombre=settings.TIPOS_HERRAMIENTAS2.ADB.value,
+                                                                        defaults={
+                                                                            'descripcion': 'Pruebas aleatorias móviles'})
+                prueba.herramienta = herramienta
             prueba.numero_eventos = request.POST['numero_eventos']
             prueba.save()
-            print(prueba)
         return agregar_prueba(request, estrategia_id)
 
 

@@ -3,76 +3,86 @@
 
 <head>
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>{% block title %}Pruebas automatizadas{% endblock title %} </title>
+    <title>{% block title %}Pruebas automatizadas{% endblock title %} </title>
 
-  {# Cargamos la librería #}
-  {% load bootstrap4 %}
-  <script src="https://kit.fontawesome.com/266441d113.js" crossorigin="anonymous"></script>
-  {% load static %}
-  <script type="text/javascript" src="{% static 'js/validation-form.js' %}"></script>
-  {# CSS Bootstrap #}
-  {% bootstrap_css %}
+    {# Cargamos la librería #}
+    {% load bootstrap4 %}
+    <script src="https://kit.fontawesome.com/266441d113.js" crossorigin="anonymous"></script>
+    {% load static %}
+    <script type="text/javascript" src="{% static 'js/validation-form.js' %}"></script>
+    {# CSS Bootstrap #}
+    {% bootstrap_css %}
 
-  {% block head %}
-  {% endblock head %}
+    {% block head %}
+    {% endblock head %}
 
 </head>
 
 <body>
-  <header>
+<header>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-      <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">Pruebas automatizadas</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-          aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li>
-              <a class="nav-link" href="{% url 'home' %}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'agregar_estrategia' %}">Agregar estrategias</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'lanzar_estrategia' %}">Lanzar estrategia</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'nueva_aplicacion' %}">Aplicaciones</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contacto</a>
-            </li>
-          </ul>
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Pruebas automatizadas</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li>
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'agregar_estrategia' %}">Agregar estrategias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'lanzar_estrategia' %}">Lanzar estrategia</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'nueva_aplicacion' %}">Aplicaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contacto</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
-  </header>
-  <main>
+</header>
+<main>
     <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-8">
-          {% block subtitle %}
-          {% endblock %}
-          <hr class="mt-0 mb-4">
-          {% block content %}
-          {% endblock %}
+        <div class="row justify-content-center">
+            <div class="col-8">
+                {% block subtitle %}
+                {% endblock %}
+                <hr class="mt-0 mb-4">
+                {% block content %}
+                {% endblock %}
+            </div>
         </div>
-      </div>
     </div>
 
-  </main>
+</main>
 
-  {# JS y jQuery Bootstrap #}
-  {% bootstrap_javascript jquery='full' %}
+{# JS y jQuery Bootstrap #}
+{% bootstrap_javascript jquery='full' %}
 
 </body>
+<!-- Footer -->
+<footer class="page-footer font-small blue">
 
+    <!-- Copyright -->
+    <div class="footer-copyright text-center py-3">© 2020 Copyright
+
+    </div>
+    <!-- Copyright -->
+
+</footer>
+<!-- Footer -->
 </html>

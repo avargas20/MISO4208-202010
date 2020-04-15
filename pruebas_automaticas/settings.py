@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from common import enums
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -162,6 +164,12 @@ TIPOS_HERRAMIENTAS = {
     'calabash': 'Calabash',
     'puppeteer': 'Puppeteer',
 }
+
+# Como una mejor practica Se usan los enums para no usar diccionarios, aunque no se eliminan los primeros dado que
+# el cambio es muy grande
+TIPOS_HERRAMIENTAS2 = enums.Herramientas
+TIPOS_PRUEBAS2 = enums.TiposPruebas
+TIPOS_APLICACION2 = enums.TiposAplicacion
 
 SQS_PUPPETEER_NAME = os.environ.get("PA_SQS_PUPPETEER_NAME")
 SQS_CALABASH_NAME = os.environ.get("PA_SQS_CALABASH_NAME")
