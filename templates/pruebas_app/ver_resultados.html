@@ -53,18 +53,12 @@
             <div class="col-md-12">
                 <div class="row row-cols-1 row-cols-md-3">
                 {% for log in logs %}
-                    <!--<p class="h5 mb-4">Archivo: <span style="color:#e83e8c">{{log.log}}</span></p>
-                    <div class="row mb-4">
-                        <a href="{{log.log.url}}">No Support?</a>
-                        <object data="{{log.log.url}}" type="text/plain" width="500" style="height: 300px"></object>
-                    </div>
-                    --><div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="card mb-3" style="width: 18rem;">
                             <a href="{{ log.log.url }}" target="_blank">
                                 <i class="far fa-file-code card-img-top text-center"
                                    style="width:90%; font-size: 100px; color:#e83e8c"></i>
                             </a>
-
                             <div class="card-body">
                                 <h6 class="card-title" style="color:#e83e8c">{{ log.log }}</h6>
                             </div>
