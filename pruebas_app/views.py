@@ -28,6 +28,8 @@ def home(request):
     paginator = Paginator(solicitudes, 10)  # Show 10 solicitudes per page
     page = request.GET.get('page')
     solicitudes_out = paginator.get_page(page)
+    for s in solicitudes:
+        print(s.exitosa)
     return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes_out})
 
 
@@ -321,3 +323,18 @@ def ver_resultados(request, solicitud_id):
     return render(request, 'pruebas_app/ver_resultados.html',
                   {'solicitud': solicitud, 'videos': videos, 'logs': logs, 'imagenes_VRT': imagenes_vrt,
                    'screen_shots': screen_shots})
+
+
+def obtener_versiones_de_una_aplicacion(request):
+    aplicacion_id = int(request.GET['aplicacion_id'])
+    result_set = []
+    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+    versiones = Version.objects.filter(aplicacion=aplicacion)
+    for version in versiones:
+        result_set.append({'numero': version.numero, 'id': version.id})
+    return HttpResponse(json.dumps(result_set), content_type='application/json')
+
+
+def mutacion(request):
+    aplicaciones = Aplicacion.objects.all()
+    return render(request, 'pruebas_app/mutacion.html', {'aplicaciones': aplicaciones})

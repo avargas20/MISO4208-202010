@@ -70,7 +70,7 @@ class Dispositivo(models.Model):
     nombre_tecnico = models.CharField(max_length=50, blank=True)
 
     def save(self, *args, **kwargs):
-        self.nombre_tecnico = "@"+self.device_definition.replace(" ", "_")+"_API_"+self.api_level
+        self.nombre_tecnico = "@" + self.device_definition.replace(" ", "_") + "_API_" + self.api_level
         super(Dispositivo, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -137,6 +137,13 @@ class Solicitud(models.Model):
         return resultado
 
     resultado_vrt = property(_fallo_vrt_)
+
+    def _exitosa_(self):
+        # Una solicitud es exitosa si esta terminada y todos sus resultados son exitosos
+        return all(
+            Resultado.objects.values_list('exitoso', flat=True).filter(solicitud=self)) if self.terminada else None
+
+    exitosa = property(_exitosa_)
 
     def __str__(self):
         return 'Solicitud id numero: %s de la estrategia: %s estado: %s terminada %s' % (

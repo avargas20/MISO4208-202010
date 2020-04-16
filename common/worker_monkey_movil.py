@@ -39,12 +39,16 @@ if __name__ == '__main__':
                     stdout=subprocess.PIPE)
                 # matamos el emulador
                 util.eliminar_emulador()
+                # guardamos la salida del comando
+                log_proceso = salida.stdout.decode('utf-8')
+                # Determinamos si el monkey finalizo con exito
+                resultado.exitoso = log_proceso[-17:].strip() == 'Monkey finished'
                 archivo_log = open("log.txt", "w+")
-                archivo_log.write(salida.stdout.decode('utf-8'))
+                archivo_log.write(log_proceso)
 
                 # print('La salida es:', salida.stdout.decode('utf-8'))
 
-                resultado.log.save('log.txt', archivo_log, save=True)
+                resultado.log.save('log_monkey_android.txt', archivo_log, save=True)
                 resultado.terminada = True
                 resultado.save()
                 archivo_log.close()

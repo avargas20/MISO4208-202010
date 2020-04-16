@@ -1,0 +1,120 @@
+{% extends 'pruebas_app/layout.html' %}
+{% block head %}
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#aplicaciones').change(function () {
+
+                var optionSelected = $(this).find("option:selected");
+                var idAplicacion = optionSelected.val();
+                console.log('idAplicacion', idAplicacion);
+                data = {
+                    'aplicacion_id': idAplicacion
+                };
+
+                $.ajax({
+                    url: '/obtener_versiones_de_una_aplicacion',
+                    type: 'GET',
+                    data: data,
+                    success: function (results) {
+
+                        console.log(results);
+                        $("#versiones option").remove();
+                        for (var i = results.length - 1; i >= 0; i--) {
+                            $("#versiones").append('<option value="' + results[i].id + '">' + results[i].numero +
+                                '</option>');
+                        }
+                        ;
+                    }
+                });
+
+            });
+        });
+    </script>
+
+{% endblock head %}
+{% block subtitle %}<h1 class="mt-2">Mutaciones</h1>{% endblock subtitle %}
+{% block content %}
+    <div class="container-fluid">
+        <form action="{% url 'guardar_estrategia' %}" method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row register-form">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <select name='aplicaciones' id='aplicaciones' class="form-control" required>
+                            <option class="hidden" value="" selected disabled>Seleccione la aplicación</option>
+                            {% for a in aplicaciones %}
+                                <option value="{{ a.id }}">{{ a.nombre }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <select name='versiones' id='versiones' class="form-control" required>
+                            <option class="hidden" value="" selected disabled>Seleccione la versión</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row register-form">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="number" class="form-control" placeholder="Número de mutantes"
+                               name="numero_eventos" min="1" id="numero_eventos"/>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p class="font-weight-bold">Selecciones los operadores</p>
+                <ul class="list-group list-group-flush col-md-4">
+                    <li class="list-group-item">
+                        <!-- Default checked -->
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="check1" checked>
+                            <label class="custom-control-label" for="check1">Check me</label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <!-- Default checked -->
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="check2">
+                            <label class="custom-control-label" for="check2">Check me</label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <!-- Default checked -->
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="check3" checked>
+                            <label class="custom-control-label" for="check3">Check me</label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <!-- Default checked -->
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="check4" checked>
+                            <label class="custom-control-label" for="check4">Check me</label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <!-- Default checked -->
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="check5">
+                            <label class="custom-control-label" for="check5">Check me</label>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Crear mutaciones</button>
+            </div>
+
+        </form>
+
+
+    </div>
+{% endblock content %}

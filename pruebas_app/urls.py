@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     path('agregar_estrategia/', views.agregar_estrategia, name='agregar_estrategia'),
+    path('obtener_versiones_de_una_aplicacion/', views.obtener_versiones_de_una_aplicacion, name='obtener_versiones_de_una_aplicacion'),
     path('lanzar_estrategia/', views.lanzar_estrategia, name='lanzar_estrategia'),
     path('nueva_aplicacion/', views.nueva_aplicacion, name='nueva_aplicacion'),
     path('guardar_estrategia/', views.guardar_estrategia, name='guardar_estrategia'),
@@ -24,4 +25,5 @@ urlpatterns = [
     path('condiciones_de_lanzamiento/<int:estrategia_id>', views.condiciones_de_lanzamiento,
          name='condiciones_de_lanzamiento'),
     path('ver_resultados/<int:solicitud_id>', views.ver_resultados, name='ver_resultados'),
+    path('mutacion/', views.mutacion, name='mutacion'),
 ]

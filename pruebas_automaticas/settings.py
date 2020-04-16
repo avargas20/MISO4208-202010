@@ -135,6 +135,7 @@ PUPPETEER_PATH = os.environ["PA_PUPPETEER_PATH"]
 CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
 RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
 ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
+MUTAPK_PATH = os.environ.get("PA_MUTAPK_PATH")
 RUTAS_INTERNAS_SDK_ANDROID = {
     'platform-tools': 'platform-tools',
     'build-tools': os.path.join('build-tools', os.environ["PA_VERSION_ANDROID_STUDIO"])
