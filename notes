@@ -47,17 +47,10 @@ En la ruta de resemblejs es necesario seguir los siguientes pasos:
     Este archivo se usa asi: salida = subprocess.run(['node', 'index.js',imagen1_1, imagen2_2, imagen3], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
     recibe las dos imagenes a comparar y escribe en la tercera la diferencia, ademas con salida.stdout.decode('utf-8') se obtiene la diferencia que entrega resemblejs en JSON
 
-Para el worker de puppeteer es necesario instalar puppeteer, jest cli y el reporteador ejecutando:
+Para el worker de puppeteer es necesario instalar puppeteer y jest cli ejecutando:
     npm i puppeteer
     npm install jest --global
-    npm install jest-html-reporter --save-dev
-Para configurar el reporteador es necesario modificar el archivo jest.config.js en la ruta de puppeteer y agregar:
-    reporters: [
-        "default",
-        ["./node_modules/jest-html-reporter", {
-            "pageTitle": "Test Report"
-        }]
-    ],
+Para configurar el reporteador es necesario seguir las instrucciones de la siguiente página: https://www.npmjs.com/package/jest-html-reporters-diffimages
 Para referenciar la ruta de instalacion de puppeteer se debe agregar la variable de entorno:
     PA_PUPPETEER_PATH
 Para referenciar la cola de puppeteer se debe agregar la variable de entorno:

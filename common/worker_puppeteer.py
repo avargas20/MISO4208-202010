@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 comando = subprocess.run(['jest', nuevo_archivo], shell=True, stdout=subprocess.PIPE, cwd=settings.PUPPETEER_PATH)
                 print('Salida:', comando.stdout.decode('utf-8'))
 
-                reporte = open(settings.PUPPETEER_PATH + 'test-report.html', 'rb')
+                reporte = open(settings.PUPPETEER_PATH + 'report.html', 'rb')
                 archivo_reporte = File(reporte)
                 resultado.resultado.save('reporte_puppeteer.html', archivo_reporte, save=True)
                 resultado.terminada = True
