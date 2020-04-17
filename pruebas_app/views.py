@@ -314,7 +314,8 @@ def ver_resultados(request, solicitud_id):
         elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["calabash"] or r.prueba.tipo.nombre == \
                 settings.TIPOS_PRUEBAS['aleatorias']:
             logs.append(r)
-        if len(r.screenshot_set.all()) > 0:
+        #if len(r.screenshot_set.all()) > 0:
+        if r.screenshot_set.all():
             screen_shots.append({'filename': r.prueba.filename, 'imagenes': r.screenshot_set.all()})
     imagenes_vrt = ResultadoVRT.objects.filter(solicitud=solicitud)
 
