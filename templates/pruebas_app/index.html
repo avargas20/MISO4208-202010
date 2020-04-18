@@ -42,8 +42,8 @@
                     <td class="text-center">{{ solicitud.estado }}</td>
                     {% if solicitud.terminada %}
                         <td class="text-center">
-                            <a href="{% url 'ver_resultados' solicitud.id %}">
-                                <i class="far fa-eye"></i>
+                            <a href="{% url 'ver_resultados' solicitud.id %}" class="mr-3">
+                                <i class="fas fa-search-plus"></i>
                             </a>
                             <a href="{% url 'descargar_evidencias' solicitud.id %}">
                                 <i class="fas fa-download"></i>
