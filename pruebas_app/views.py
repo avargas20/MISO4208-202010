@@ -307,6 +307,7 @@ def ver_resultados(request, solicitud_id):
     videos = []
     logs = []
     screen_shots = []
+    pag_html = []
     for r in resultados:
         if r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cypress"]:
             videos.append(r)
@@ -314,11 +315,12 @@ def ver_resultados(request, solicitud_id):
         elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["calabash"] or r.prueba.tipo.nombre == \
                 settings.TIPOS_PRUEBAS['aleatorias']:
             logs.append(r)
-        #if len(r.screenshot_set.all()) > 0:
+        elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+            pag_html.append(r)
         if r.screenshot_set.all():
             screen_shots.append({'filename': r.prueba.filename, 'imagenes': r.screenshot_set.all()})
     imagenes_vrt = ResultadoVRT.objects.filter(solicitud=solicitud)
 
     return render(request, 'pruebas_app/ver_resultados.html',
                   {'solicitud': solicitud, 'videos': videos, 'logs': logs, 'imagenes_VRT': imagenes_vrt,
-                   'screen_shots': screen_shots})
+                   'screen_shots': screen_shots, 'pag_html': pag_html})
