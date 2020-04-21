@@ -127,7 +127,6 @@ def condiciones_de_lanzamiento(request, estrategia_id):
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
                   {'solicitudes': solicitudes, 'estrategia': estrategia, 'dispositivos': dispositivos})
 
-
 def ejecutar_estrategia(request):
     if request.method == 'POST':
         solicitud = Solicitud()
@@ -297,7 +296,7 @@ def eliminar_version(request, version_id):
     version.delete()
     return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
-
+@xframe_options_sameorigin
 def ver_resultados(request, solicitud_id):
     try:
         solicitud = Solicitud.objects.get(id=int(solicitud_id))

@@ -36,6 +36,7 @@ if __name__ == '__main__':
                                                   stdout=subprocess.PIPE)
                 # print('La salida firmado:', salida_firmado.stdout.decode('utf-8'))
                 # print('La salida ejecucion:', salida_ejecucion.stdout.decode('utf-8'))
+                resultado.exitoso = salida_ejecucion.returncode == 0
                 util.eliminar_emulador()
                 archivo_log = open(str(resultado.id) + "log.txt", "w+")
                 archivo_log.write(salida_ejecucion.stdout.decode('utf-8'))
