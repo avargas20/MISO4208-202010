@@ -3,6 +3,8 @@ import subprocess
 import boto3
 import django
 import time
+
+from bs4 import BeautifulSoup
 from django.core.files import File
 from common import util
 from pruebas_automaticas import settings
@@ -21,22 +23,30 @@ if __name__ == '__main__':
             if message.message_attributes is not None:
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
-                nuevo_archivo = util.copiar_contenido(resultado, settings.PUPPETEER_PATH, settings.RUTAS_INTERNAS['Puppeteer'], '.test.js')
+                nuevo_archivo = util.copiar_contenido(resultado, settings.PUPPETEER_PATH,
+                                                      settings.RUTAS_INTERNAS['Puppeteer'], '.test.js')
 
-                comando = subprocess.run(['jest', nuevo_archivo], shell=True, stdout=subprocess.PIPE, cwd=settings.PUPPETEER_PATH)
+                comando = subprocess.run(['jest', nuevo_archivo], shell=True, stdout=subprocess.PIPE,
+                                         cwd=settings.PUPPETEER_PATH)
                 print('Salida:', comando.stdout.decode('utf-8'))
 
                 reporte = open(settings.PUPPETEER_PATH + 'test-report.html', 'rb')
                 archivo_reporte = File(reporte)
+                parser = BeautifulSoup(reporte.read().decode('utf-8'), 'html.parser')
+                resumen = str(parser.find(id="summary"))
+                fallas = int(resumen.split("passed / ")[1].split(" failed")[0])
+                if fallas == 0:
+                    resultado.exitoso = True
+
+                print("Fallas en la suit: ", fallas)
+
                 resultado.resultado.save('reporte_puppeteer.html', archivo_reporte, save=True)
                 resultado.terminada = True
                 resultado.save()
                 reporte.close()
                 os.remove(reporte.name)
-                #script = open(settings.PUPPETEER_PATH + nuevo_archivo, 'rb')
                 os.remove(settings.PUPPETEER_PATH + nuevo_archivo)
                 util.recoger_screenshoots(resultado)
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)
         time.sleep(settings.TIEMPO_ESPERA_WORKERS)
-

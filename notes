@@ -55,7 +55,8 @@ Para configurar el reporteador es necesario modificar el archivo jest.config.js 
     reporters: [
         "default",
         ["./node_modules/jest-html-reporter", {
-            "pageTitle": "Test Report"
+            "pageTitle": "Test Report",
+            "includeFailureMsg": true
         }]
     ],
 Para referenciar la ruta de instalacion de puppeteer se debe agregar la variable de entorno:
