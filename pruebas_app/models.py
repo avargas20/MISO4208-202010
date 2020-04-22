@@ -64,22 +64,6 @@ class Tipo(models.Model):
         return '%s' % self.nombre
 
 
-class Dispositivo(models.Model):
-    device_definition = models.CharField(max_length=50)
-    api_level = models.CharField(max_length=3)
-    nombre_tecnico = models.CharField(max_length=50, blank=True)
-
-    def save(self, *args, **kwargs):
-        self.nombre_tecnico = "@" + self.device_definition.replace(" ", "_") + "_API_" + self.api_level
-        super(Dispositivo, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return '%s API %s' % (self.device_definition, self.api_level)
-
-
-# ------------------------------------------Segundo mundo----------------------------------------------------------#
-
-
 def directorio_script(instance, filename):
     # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
     return 'scripts/{0}_{1}'.format(instance.estrategia.id, filename)
@@ -100,6 +84,57 @@ class Prueba(models.Model):
         return 'Prueba id numero: %s de la estrategia: %s' % (self.id, self.estrategia.nombre)
 
 
+class Dispositivo(models.Model):
+    device_definition = models.CharField(max_length=50)
+    api_level = models.CharField(max_length=3)
+    nombre_tecnico = models.CharField(max_length=50, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.nombre_tecnico = "@" + self.device_definition.replace(" ", "_") + "_API_" + self.api_level
+        super(Dispositivo, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return '%s API %s' % (self.device_definition, self.api_level)
+
+
+class Mutacion(models.Model):
+    fecha_creacion = models.DateField(auto_now_add=True)
+    numero_mutantes = models.IntegerField()
+    operadores = models.ManyToManyField('Operador')
+
+    def __str__(self):
+        return 'Creada: %s' % self.fecha_creacion
+
+
+class Operador(models.Model):
+    numero = models.IntegerField()
+    nombre = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return '%s  =   %s' % (self.numero, self.nombre)
+
+
+def directorio_apk_mutante(instance, filename):
+    return 'apk/mutante/{0}_{1}_{2}'.format(instance.aplicacion.nombre, instance.numero, filename)
+
+
+class Mutante(models.Model):
+    mutacion = models.ForeignKey(Mutacion, on_delete=models.CASCADE)
+    operador = models.ForeignKey(Operador, on_delete=models.CASCADE)
+    apk = models.FileField(upload_to=directorio_apk_mutante, null=True)
+
+    def __str__(self):
+        return 'Mutante: %s' % self.apk.name
+
+    def _killer_requests(self):
+        return Solicitud.objects.filter(mutante=self, exitosa=True)
+
+    asesinado_por = property(_killer_requests)
+
+# ------------------------------------------Segundo mundo----------------------------------------------------------#
+
+
 def directorio_evidencia(instance, filename):
     # El script de la prueba sera subido a la carpeta archivos/scripts/(id de la estrategia)_(nombre del archivo)
     return 'evidencias/{0}_{1}'.format(instance.id, filename)
@@ -111,7 +146,8 @@ class Solicitud(models.Model):
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
     sensibilidad_VRT = models.DecimalField(null=True, max_digits=3, decimal_places=2)
     solicitud_VRT = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
-    version = models.ForeignKey(Version, on_delete=models.CASCADE)
+    version = models.ForeignKey(Version, on_delete=models.CASCADE, null=True)
+    mutante = models.ForeignKey(Mutante, on_delete=models.CASCADE, null=True)
     dispositivo = models.ForeignKey(Dispositivo, on_delete=models.CASCADE, null=True)
 
     def _pruebas_ejecutadas_(self):
@@ -140,8 +176,8 @@ class Solicitud(models.Model):
 
     def _exitosa_(self):
         # Una solicitud es exitosa si esta terminada y todos sus resultados son exitosos
-        return all(
-            Resultado.objects.values_list('exitoso', flat=True).filter(solicitud=self)) if self.terminada else None
+        return \
+            all(Resultado.objects.values_list('exitoso', flat=True).filter(solicitud=self)) if self.terminada else None
 
     exitosa = property(_exitosa_)
 

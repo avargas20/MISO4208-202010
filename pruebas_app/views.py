@@ -24,12 +24,10 @@ COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NA
 
 
 def home(request):
-    solicitudes = Solicitud.objects.all().order_by('-id')
+    solicitudes = Solicitud.objects.filter(mutante=None).order_by('-id')
     paginator = Paginator(solicitudes, 10)  # Show 10 solicitudes per page
     page = request.GET.get('page')
     solicitudes_out = paginator.get_page(page)
-    for s in solicitudes:
-        print(s.exitosa)
     return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes_out})
 
 
