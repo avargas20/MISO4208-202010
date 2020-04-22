@@ -11,7 +11,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt, xframe_o
 
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
-    Dispositivo, ResultadoVRT
+    Dispositivo, ResultadoVRT, Operador, Mutacion
 
 # Create your views here.
 
@@ -21,6 +21,7 @@ COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
 COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
 COLA_PUPPETEER = SQS.get_queue_by_name(QueueName=settings.SQS_PUPPETEER_NAME)
 COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NAME)
+COLA_MUTACION = SQS.get_queue_by_name(QueueName=settings.SQS_MUTACION_NAME)
 
 
 def home(request):
@@ -126,6 +127,7 @@ def condiciones_de_lanzamiento(request, estrategia_id):
 
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
                   {'solicitudes': solicitudes, 'estrategia': estrategia, 'dispositivos': dispositivos})
+
 
 def ejecutar_estrategia(request):
     if request.method == 'POST':
@@ -337,4 +339,24 @@ def obtener_versiones_de_una_aplicacion(request):
 
 def mutacion(request):
     aplicaciones = Aplicacion.objects.all()
-    return render(request, 'pruebas_app/mutacion.html', {'aplicaciones': aplicaciones})
+    operadores = Operador.objects.all()
+    return render(request, 'pruebas_app/mutacion.html', {'aplicaciones': aplicaciones, 'operadores': operadores})
+
+
+def guardar_mutacion(request):
+    if request.method == 'POST':
+        numero_mutantes = request.POST['numero_mutantes']
+        version = Version.objects.get(id=int(request.POST['version']))
+        mutacion = Mutacion(version=version, numero_mutantes=numero_mutantes)
+        mutacion.save()
+        ids_operadores = request.POST.getlist('operadores')
+        for id in ids_operadores:
+            mutacion.operadores.add(Operador.objects.get(id=id))
+        COLA_MUTACION.send_message(MessageBody='Id de la mutacion a procesar',
+                                    MessageAttributes={
+                                        'Id': {
+                                            'StringValue': str(mutacion.id),
+                                            'DataType': 'Number'
+                                        }
+                                    })
+        return HttpResponseRedirect(reverse('mutacion'))

@@ -38,12 +38,12 @@
 {% block subtitle %}<h1 class="mt-2">Mutaciones</h1>{% endblock subtitle %}
 {% block content %}
     <div class="container-fluid">
-        <form action="{% url 'guardar_estrategia' %}" method="post" class="needs-validation" novalidate>
+        <form action="{% url 'guardar_mutacion' %}" method="post" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row register-form">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <select name='aplicaciones' id='aplicaciones' class="form-control" required>
+                        <select name='aplicacion' id='aplicaciones' class="form-control" required>
                             <option class="hidden" value="" selected disabled>Seleccione la aplicación</option>
                             {% for a in aplicaciones %}
                                 <option value="{{ a.id }}">{{ a.nombre }}</option>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <select name='versiones' id='versiones' class="form-control" required>
+                        <select name='version' id='versiones' class="form-control" required>
                             <option class="hidden" value="" selected disabled>Seleccione la versión</option>
 
                         </select>
@@ -65,50 +65,74 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <input type="number" class="form-control" placeholder="Número de mutantes"
-                               name="numero_eventos" min="1" id="numero_eventos"/>
+                               name="numero_mutantes" min="1"/>
                     </div>
                 </div>
             </div>
-            <div>
-                <p class="font-weight-bold">Selecciones los operadores</p>
-                <ul class="list-group list-group-flush col-md-4">
-                    <li class="list-group-item">
-                        <!-- Default checked -->
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check1" checked>
-                            <label class="custom-control-label" for="check1">Check me</label>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <!-- Default checked -->
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check2">
-                            <label class="custom-control-label" for="check2">Check me</label>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <!-- Default checked -->
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check3" checked>
-                            <label class="custom-control-label" for="check3">Check me</label>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <!-- Default checked -->
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check4" checked>
-                            <label class="custom-control-label" for="check4">Check me</label>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <!-- Default checked -->
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="check5">
-                            <label class="custom-control-label" for="check5">Check me</label>
-                        </div>
-                    </li>
-                </ul>
+            <div class="row">
+                <div class=" col-md-4">
+                    <table class="table table-bordered">
+
+                        <tbody>
+                        {% for o in operadores|slice:"12" %}
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="{{ o.id }}" id="{{ o.id }}"
+                                               name="operadores" checked>
+                                        <label class="custom-control-label" for="{{ o.id }}">{{ o.numero }}
+                                            = {{ o.nombre }}</label>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class=" col-md-4">
+                    <table class="table table-bordered">
+
+                        <tbody>
+                        {% for o in operadores|slice:"12:24" %}
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="{{ o.id }}" id="{{ o.id }}"
+                                               name="operadores" checked>
+                                        <label class="custom-control-label" for="{{ o.id }}">{{ o.numero }}
+                                            = {{ o.nombre }}</label>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class=" col-md-4">
+                    <table class="table table-bordered">
+
+                        <tbody>
+                        {% for o in operadores|slice:"24:" %}
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" value="{{ o.id }}" id="{{ o.id }}"
+                                               name="operadores" checked>
+                                        <label class="custom-control-label" for="{{ o.id }}">{{ o.numero }}
+                                            = {{ o.nombre }}</label>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
+
             <div>
                 <button type="submit" class="btn btn-primary">Crear mutaciones</button>
             </div>

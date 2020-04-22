@@ -98,6 +98,7 @@ class Dispositivo(models.Model):
 
 
 class Mutacion(models.Model):
+    version = models.ForeignKey(Version, on_delete=models.CASCADE)
     fecha_creacion = models.DateField(auto_now_add=True)
     numero_mutantes = models.IntegerField()
     operadores = models.ManyToManyField('Operador')
