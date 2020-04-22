@@ -80,3 +80,8 @@ emulator-5554 es el nombre del dispositivo que esta corriendo, para obtener los 
         List of devices attached
         emulator-5554	device
         emulator-5556	device
+
+Se agrega funcionalidad de importar/exportar datos para facilitar la insercion de los operadores,
+    seguir esta guia: https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
+    importar el archivo que se encuentra en common\datos\Operador-2020-04-21.json por el admin en la nueva opcion
+        que se creo llamada import
