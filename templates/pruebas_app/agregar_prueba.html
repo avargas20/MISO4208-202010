@@ -12,6 +12,7 @@
       } else if ( $("#tipo option:selected").html() != "E2E") {
         $("#random-required").show();
         $("#numero_eventos").attr("required", true);
+        $("#semilla").attr("required", true);
         $('#e2e-required').hide();
         $("#customFileLang").attr("required", false);
         $("#herramienta").attr("required", false);
@@ -21,6 +22,7 @@
         $("#herramienta").attr("required", true);
         $("#random-required").hide();
         $("#numero_eventos").attr("required", false);
+        $("#semilla").attr("required", false);
       }
     });
     $("#tipo").trigger("change");
@@ -91,6 +93,11 @@
                            value="{{p.numero_eventos}}"
                     />
                 </div>
+                 <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Semilla" disabled
+                           value="{{p.semilla}}"
+                    />
+                </div>
             </div>
             {% endif %}
             {% if p.tipo.nombre == 'E2E' %}
@@ -136,10 +143,16 @@
                         </select>
                     </div>
                 </div>
-                <div id="random-required" class="row col-6">
+                <div id="random-required" class="row col-8">
                     <div class="form-group">
                         <input type="number" class="form-control" placeholder="Número de eventos"
                                name="numero_eventos" min="1" id="numero_eventos"/>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Semilla"
+                                   name="semilla" id="semilla"/>
+                        </div>
                     </div>
                 </div>
                 <div id="e2e-required" class="row col-8">
