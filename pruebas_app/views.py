@@ -338,7 +338,7 @@ def obtener_versiones_de_una_aplicacion(request):
 
 
 def mutacion(request):
-    aplicaciones = Aplicacion.objects.all()
+    aplicaciones = Aplicacion.objects.filter(tipo__tipo=settings.TIPOS_APLICACION2.Movil.value)
     operadores = Operador.objects.all()
     return render(request, 'pruebas_app/mutacion.html', {'aplicaciones': aplicaciones, 'operadores': operadores})
 

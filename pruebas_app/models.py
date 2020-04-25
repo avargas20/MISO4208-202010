@@ -97,10 +97,19 @@ class Dispositivo(models.Model):
         return '%s API %s' % (self.device_definition, self.api_level)
 
 
+def directorio_mutacion_reporte(instance, filename):
+    return 'mutacion/{0}/{1}/{2}/{3}'.format(instance.version.aplicacion.nombre,
+                                             instance.version.numero,
+                                             instance.fecha_creacion.strftime('%d-%m-%Y_%H-%M-%S'), filename)
+
+
 class Mutacion(models.Model):
     version = models.ForeignKey(Version, on_delete=models.CASCADE)
-    fecha_creacion = models.DateField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
     numero_mutantes = models.IntegerField()
+    reporte_json = models.FileField(upload_to=directorio_mutacion_reporte, null=True)
+    reporte_log = models.FileField(upload_to=directorio_mutacion_reporte, null=True)
+    reporte_csv = models.FileField(upload_to=directorio_mutacion_reporte, null=True)
     operadores = models.ManyToManyField('Operador')
 
     def __str__(self):
@@ -117,13 +126,18 @@ class Operador(models.Model):
 
 
 def directorio_apk_mutante(instance, filename):
-    return 'apk/mutante/{0}_{1}_{2}'.format(instance.aplicacion.nombre, instance.numero, filename)
+    return 'mutacion/{0}/{1}/{2}/{3}/{4}'.format(instance.mutacion.version.aplicacion.nombre,
+                                                 instance.mutacion.version.numero,
+                                                 instance.mutacion.fecha_creacion.strftime('%d-%m-%Y_%H-%M-%S'),
+                                                 instance.id, filename)
 
 
 class Mutante(models.Model):
     mutacion = models.ForeignKey(Mutacion, on_delete=models.CASCADE)
     operador = models.ForeignKey(Operador, on_delete=models.CASCADE)
     apk = models.FileField(upload_to=directorio_apk_mutante, null=True)
+    apk_firmado = models.FileField(upload_to=directorio_apk_mutante, null=True)
+    manifest = models.FileField(upload_to=directorio_apk_mutante, null=True)
 
     def __str__(self):
         return 'Mutante: %s' % self.apk.name

@@ -7,6 +7,7 @@ import django
 import glob
 import subprocess
 from django.conf import settings
+from django.core.files.base import ContentFile
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
@@ -190,3 +191,29 @@ def eliminar_emulador():
     for d in devices:
         subprocess.call(d.join(['adb -s ', ' emu kill']).split(), shell=True,
                         cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
+
+
+def configurar_archivo_operadores(mutacion):
+    with open(os.path.join(settings.MUTAPK_PATH, 'operators.properties'), "w+") as file:
+        for o in mutacion.operadores.all():
+            print(o)
+            # Escribir en el archivo con el formato necesario numero tab igual tab nombre
+            file.write('{0}\t=\t{1}\n'.format(o.numero, o.nombre))
+
+
+def recoger_reportes_mutacion(mutacion):
+    # Creo una expersion que entregue los archivos JSON para la ruta de MuteAPK, mutants y solo debe haber 1
+    reporte_json = glob.glob(os.path.join(settings.MUTAPK_PATH, 'mutants', '*.json'))[0]
+    with open(reporte_json, 'r') as file_json:
+        with ContentFile(file_json.read()) as file_json_content:
+            mutacion.reporte_json.save(reporte_json.split("\\")[-1], file_json_content, save=True)
+
+    reporte_log = glob.glob(os.path.join(settings.MUTAPK_PATH, 'mutants', '*.log'))[0]
+    with open(reporte_log, 'r') as file_log:
+        with ContentFile(file_log.read()) as file_log_content:
+            mutacion.reporte_log.save(reporte_log.split("\\")[-1], file_log_content, save=True)
+
+    reporte_csv = glob.glob(os.path.join(settings.MUTAPK_PATH, 'mutants', '*.csv'))[0]
+    with open(reporte_csv, 'r') as file_csv:
+        with ContentFile(file_csv.read()) as file_csv_content:
+            mutacion.reporte_csv.save(reporte_csv.split("\\")[-1], file_csv_content, save=True)
