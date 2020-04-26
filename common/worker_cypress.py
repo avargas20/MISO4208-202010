@@ -32,6 +32,15 @@ if __name__ == '__main__':
 
                 print('La salida es:', salida)
 
+                if (salida == 0):
+                    print("--------------------Prueba exitosa--------------------")
+                    # Proceso a seguir cuando es exitosa
+                    resultado.exitoso = True
+                elif (salida == 1):
+                    print("--------------------Prueba Fallida--------------------")
+                    # Proceso a seguir cuando falla
+                    resultado.exitoso = False
+
                 video = open(settings.CYPRESS_PATH + '//cypress//videos//' + str(resultado.id) + '.js.mp4', 'rb')
                 archivo_video = File(video)
                 resultado.resultado.save('cypress.mp4', archivo_video, save=True)
