@@ -35,7 +35,7 @@ if __name__ == '__main__':
                 # Ahora ejecutar el monkey
                 if semilla:
                     salida = subprocess.run(
-                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-v', numero_eventos, '-s', semilla],
+                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-s', semilla, '-v', numero_eventos],
                         shell=True,
                         check=False,
                         cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
