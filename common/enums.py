@@ -23,5 +23,3 @@ class RutasInternas(Enum):
     Calabash = 'features'
     Puppeteer = 'src/test'
     Mutacion = 'mutants'
-
-

@@ -6,58 +6,64 @@
 {% block content %}
 
 
-<nav>
-  <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    {% if videos %}
-        <a class="nav-item nav-link text-info active" id="nav-video-tab" data-toggle="tab" href="#nav-video" role="tab" aria-controls="nav-video" aria-selected="true">Videos</a>
-    {% endif %}
-    {% if logs %}
-        <a class="nav-item nav-link text-info {% if videos is None %} active {% endif %}" id="nav-log-tab" data-toggle="tab" href="#nav-log" role="tab" aria-controls="nav-log" aria-selected="false">Logs</a>
-    {% endif %}
-    {% if screen_shots %}
-        <a class="nav-item nav-link text-info" id="nav-screenshots-tab" data-toggle="tab" href="#nav-screenshots" role="tab" aria-controls="nav-screenshots" aria-selected="false">Screenshots</a>
-    {% endif %}
-    {% if imagenes_VRT %}
-        <a class="nav-item nav-link text-info" id="nav-vrt-tab" data-toggle="tab" href="#nav-vrt" role="tab" aria-controls="nav-vrt" aria-selected="false">Imágenes VRT</a>
-    {% endif %}
-    {% if pag_html %}
-        <a class="nav-item nav-link text-info" id="nav-paghtml-tab" data-toggle="tab" href="#nav-paghtml" role="tab" aria-controls="nav-paghtml" aria-selected="false">Reporte HTML</a>
-    {% endif %}
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            {% if videos %}
+                <a class="nav-item nav-link text-info active" id="nav-video-tab" data-toggle="tab" href="#nav-video"
+                   role="tab" aria-controls="nav-video" aria-selected="true">Videos</a>
+            {% endif %}
+            {% if logs %}
+                <a class="nav-item nav-link text-info {% if videos is None %} active {% endif %}" id="nav-log-tab"
+                   data-toggle="tab" href="#nav-log" role="tab" aria-controls="nav-log" aria-selected="false">Logs</a>
+            {% endif %}
+            {% if screen_shots %}
+                <a class="nav-item nav-link text-info" id="nav-screenshots-tab" data-toggle="tab"
+                   href="#nav-screenshots" role="tab" aria-controls="nav-screenshots"
+                   aria-selected="false">Screenshots</a>
+            {% endif %}
+            {% if imagenes_VRT %}
+                <a class="nav-item nav-link text-info" id="nav-vrt-tab" data-toggle="tab" href="#nav-vrt" role="tab"
+                   aria-controls="nav-vrt" aria-selected="false">Imágenes VRT</a>
+            {% endif %}
+            {% if pag_html %}
+                <a class="nav-item nav-link text-info" id="nav-paghtml-tab" data-toggle="tab" href="#nav-paghtml"
+                   role="tab" aria-controls="nav-paghtml" aria-selected="false">Reporte HTML</a>
+            {% endif %}
 
-  </div>
-</nav>
-<div class="tab-content" id="nav-tabContent">
-  {% if videos %}
-      <div class="tab-pane fade show active" id="nav-video" role="tabpanel" aria-labelledby="nav-video-tab">
-          <div class="row mt-3">
-            <div class="col-md-12">
-
-                {% for v in videos %}
-
-                    <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ v.prueba.script.name }}</span></p>
-                    <div class="row d-flex justify-content-center mb-4">
-                        <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
-                            <video width='700' controls class="embed-responsive-item">
-                                <source src="{{ v.resultado.url }}" type='video/mp4'>
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    </div>
-
-                 {% endfor %}
-
-
-            </div>
         </div>
-      </div>
-  {% endif %}
-  {% if logs %}
-      <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
-          <div class="row mt-3">
-            <div class="col-md-12">
-<!--                <div class="row row-cols-1 row-cols-md-3">-->
-                {% for log in logs %}
-                   <!-- <div class="col-md-4">
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        {% if videos %}
+            <div class="tab-pane fade show active" id="nav-video" role="tabpanel" aria-labelledby="nav-video-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+
+                        {% for v in videos %}
+
+                            <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ v.prueba.script.name }}</span></p>
+                            <div class="row d-flex justify-content-center mb-4">
+                                <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
+                                    <video width='700' controls class="embed-responsive-item">
+                                        <source src="{{ v.resultado.url }}" type='video/mp4'>
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if logs %}
+            <div class="tab-pane fade" id="nav-log" role="tabpanel" aria-labelledby="nav-log-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <!--                <div class="row row-cols-1 row-cols-md-3">-->
+                        {% for log in logs %}
+                            <!-- <div class="col-md-4">
                         <div class="card mb-3" style="width: 18rem;">
                             <a href="{{ log.log.url }}" target="_blank">
                                 <i class="far fa-file-code card-img-top text-center"
@@ -68,118 +74,120 @@
                             </div>
                         </div>
                      </div>-->
-                     <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ log.log }}</span></p>
-                     <div class="row d-flex justify-content-center mb-4">
-                         <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
-                               <iframe src="{{ log.log.url }}"></iframe>
-                         </div>
-                     </div>
-                {% endfor %}
-<!--                </div>-->
-            </div>
-          </div>
-      </div>
-  {% endif %}
-  {% if screen_shots %}
-      <div class="tab-pane fade" id="nav-screenshots" role="tabpanel" aria-labelledby="nav-screenshots-tab">
-          <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="row">
-                    {% for s in screen_shots %}
-                        <div class="col-md-12">
-                            <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ s.filename }}</span></p>
-                        </div>
-                        <div class="row row-cols-1 row-cols-md-3">
-                        {% for i in s.imagenes %}
-                            <div class="col-md-4">
-
-                                <div class="card mb-3" style="width: 18rem;">
-                                    <a href="{{ i.imagen.url }}" target="_blank">
-                                        <img src="{{ i.imagen.url }}" alt="Lights"
-                                             style="width:100%" class="card-img-top">
-                                    </a>
-                                  <div class="card-body">
-                                    <h6 class="card-title">{{ i.nombre }}</h6>
-
-                                  </div>
+                            <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ log.log }}</span></p>
+                            <div class="row d-flex justify-content-center mb-4">
+                                <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
+                                    <iframe src="{{ log.log.url }}"></iframe>
                                 </div>
                             </div>
                         {% endfor %}
-                        </div>
-                    {% endfor %}
+                        <!--                </div>-->
+                    </div>
                 </div>
             </div>
-        </div>
-      </div>
-  {% endif %}
-  {% if imagenes_VRT %}
-      <div class="tab-pane fade" id="nav-vrt" role="tabpanel" aria-labelledby="nav-vrt-tab">
-          <div class="row mt-3">
-            <div class="col-md-12">
-                {% for i in imagenes_VRT %}
+        {% endif %}
+        {% if screen_shots %}
+            <div class="tab-pane fade" id="nav-screenshots" role="tabpanel" aria-labelledby="nav-screenshots-tab">
+                <div class="row mt-3">
                     <div class="col-md-12">
-                        <p class="h5 mb-4">Solicitud Baseline: <span style="color:#e83e8c">{{ i.solicitud.solicitud_VRT_id }}</span></p>
-                    </div>
-                    <div class="row row-cols-1 row-cols-md-3">
-                        <div class="col-md-4">
-                           <div class="card mb-3" style="width: 18rem;">
-                                    <a href="{{ i.screenshoot_previo.url }}" target="_blank">
-                                        <img src="{{ i.screenshoot_previo.url }}" alt="Lights"
-                                             style="width:100%" class="card-img-top">
-                                    </a>
-                                  <div class="card-body">
-                                    <h6 class="card-title">Screenshot previo</h6>
-
-                                  </div>
+                        <div class="row">
+                            {% for s in screen_shots %}
+                                <div class="col-md-12">
+                                    <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ s.filename }}</span></p>
                                 </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-3" style="width: 18rem;">
-                                    <a href="{{ i.screenshoot_posterior.url }}" target="_blank">
-                                        <img src="{{ i.screenshoot_posterior.url }}" alt="Lights"
-                                             style="width:100%" class="card-img-top">
-                                    </a>
-                                  <div class="card-body">
-                                    <h6 class="card-title">Screenshot posterior</h6>
+                                <div class="row row-cols-1 row-cols-md-3">
+                                    {% for i in s.imagenes %}
+                                        <div class="col-md-4">
 
-                                  </div>
-                                </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-3" style="width: 18rem;">
-                                    <a href="{{ i.imagen_diferencias.url }}" target="_blank">
-                                        <img src="{{ i.imagen_diferencias.url }}" alt="Lights"
-                                             style="width:100%" class="card-img-top">
-                                    </a>
-                                  <div class="card-body">
-                                    <h6 class="card-title">Imagen diferencias</h6>
+                                            <div class="card mb-3" style="width: 18rem;">
+                                                <a href="{{ i.imagen.url }}" target="_blank">
+                                                    <img src="{{ i.imagen.url }}" alt="Lights"
+                                                         style="width:100%" class="card-img-top">
+                                                </a>
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ i.nombre }}</h6>
 
-                                  </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
                                 </div>
+                            {% endfor %}
                         </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        </div>
-      </div>
-  {% endif %}
-  {% if pag_html %}
-      <div class="tab-pane fade" id="nav-paghtml" role="tabpanel" aria-labelledby="nav-paghtml-tab">
-          <div class="row mt-3">
-            <div class="col-md-12">
-                {% for pag in pag_html %}
-                    <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ pag.prueba.script.name }}</span></p>
-                    <div class="row d-flex justify-content-center mb-4">
-                        <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
-                           <iframe src="{{ pag.resultado.url }}"></iframe>
-                        </div>
-                    </div>
+        {% endif %}
+        {% if imagenes_VRT %}
+            <div class="tab-pane fade" id="nav-vrt" role="tabpanel" aria-labelledby="nav-vrt-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        {% for i in imagenes_VRT %}
+                            <div class="col-md-12">
+                                <p class="h5 mb-4">Solicitud Baseline: <span
+                                        style="color:#e83e8c">{{ i.solicitud.solicitud_VRT_id }}</span></p>
+                            </div>
+                            <div class="row row-cols-1 row-cols-md-3">
+                                <div class="col-md-4">
+                                    <div class="card mb-3" style="width: 18rem;">
+                                        <a href="{{ i.screenshoot_previo.url }}" target="_blank">
+                                            <img src="{{ i.screenshoot_previo.url }}" alt="Lights"
+                                                 style="width:100%" class="card-img-top">
+                                        </a>
+                                        <div class="card-body">
+                                            <h6 class="card-title">Screenshot previo</h6>
 
-                 {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3" style="width: 18rem;">
+                                        <a href="{{ i.screenshoot_posterior.url }}" target="_blank">
+                                            <img src="{{ i.screenshoot_posterior.url }}" alt="Lights"
+                                                 style="width:100%" class="card-img-top">
+                                        </a>
+                                        <div class="card-body">
+                                            <h6 class="card-title">Screenshot posterior</h6>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3" style="width: 18rem;">
+                                        <a href="{{ i.imagen_diferencias.url }}" target="_blank">
+                                            <img src="{{ i.imagen_diferencias.url }}" alt="Lights"
+                                                 style="width:100%" class="card-img-top">
+                                        </a>
+                                        <div class="card-body">
+                                            <h6 class="card-title">Imagen diferencias</h6>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-        </div>
-      </div>
-  {% endif %}
-</div>
+        {% endif %}
+        {% if pag_html %}
+            <div class="tab-pane fade" id="nav-paghtml" role="tabpanel" aria-labelledby="nav-paghtml-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        {% for pag in pag_html %}
+                            <p class="h5 mb-4">Prueba: <span style="color:#e83e8c">{{ pag.prueba.script.name }}</span>
+                            </p>
+                            <div class="row d-flex justify-content-center mb-4">
+                                <div class="embed-responsive embed-responsive-16by9 z-depth-1-half border border-dark rounded">
+                                    <iframe src="{{ pag.resultado.url }}"></iframe>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock content %}

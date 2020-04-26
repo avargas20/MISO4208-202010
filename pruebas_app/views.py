@@ -1,13 +1,14 @@
 import json
-import os
 import logging
+import os
 import subprocess
+
 import boto3
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.clickjacking import xframe_options_exempt, xframe_options_sameorigin
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from pruebas_automaticas import settings
 from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
@@ -299,6 +300,7 @@ def eliminar_version(request, version_id):
     version.delete()
     return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
+
 @xframe_options_sameorigin
 def ver_resultados(request, solicitud_id):
     try:
@@ -354,10 +356,10 @@ def guardar_mutacion(request):
         for id in ids_operadores:
             mutacion.operadores.add(Operador.objects.get(id=id))
         COLA_MUTACION.send_message(MessageBody='Id de la mutacion a procesar',
-                                    MessageAttributes={
-                                        'Id': {
-                                            'StringValue': str(mutacion.id),
-                                            'DataType': 'Number'
-                                        }
-                                    })
+                                   MessageAttributes={
+                                       'Id': {
+                                           'StringValue': str(mutacion.id),
+                                           'DataType': 'Number'
+                                       }
+                                   })
         return HttpResponseRedirect(reverse('mutacion'))

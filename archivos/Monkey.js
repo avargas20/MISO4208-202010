@@ -1,5 +1,5 @@
-describe('Your WebApp under monkeys', function() {
-    it('visits your WebApp and survives monkeys', function() {
+describe('Your WebApp under monkeys', function () {
+    it('visits your WebApp and survives monkeys', function () {
         cy.visit('-urlToken-');
         randomEvent('-randomToken-');
     })
@@ -49,7 +49,7 @@ function clickRandomLink(monkeysLeft) {
             cy.get('a').then($links => {
                 var randomLink = $links.get(getRandomInt(0, $links.length));
                 if (!Cypress.dom.isHidden(randomLink)) {
-                    cy.wrap(randomLink).click({ force: true });
+                    cy.wrap(randomLink).click({force: true});
                     cy.wait(1000);
                     randomEvent(monkeysLeft);
                 } else {
@@ -70,7 +70,7 @@ function fillRandomField(monkeysLeft) {
             cy.get('input').then($inputs => {
                 var randomInput = $inputs.get(getRandomInt(0, $inputs.length));
                 if (!Cypress.dom.isHidden(randomInput)) {
-                    cy.get(randomInput).type("text testing", { force: true });
+                    cy.get(randomInput).type("text testing", {force: true});
                     cy.wait(1000);
                     randomEvent(monkeysLeft);
                 } else {
@@ -124,7 +124,7 @@ function clickRandomButton(monkeysLeft) {
             cy.get('button').then($button => {
                 var randomButton = $button.get(getRandomInt(0, $button.length));
                 if (!Cypress.dom.isHidden(randomButton)) {
-                    cy.wrap(randomButton).click({ force: true });
+                    cy.wrap(randomButton).click({force: true});
                     cy.wait(1000);
                     randomEvent(monkeysLeft);
                 } else {

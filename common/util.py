@@ -1,13 +1,14 @@
+import glob
 import json
 import os
 import shutil
+import subprocess
 from decimal import Decimal
 from zipfile import ZipFile
-from django.core.files import File
+
 import django
-import glob
-import subprocess
 from django.conf import settings
+from django.core.files import File
 from django.core.files.base import ContentFile
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")

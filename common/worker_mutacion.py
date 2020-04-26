@@ -1,13 +1,14 @@
 import os
 import subprocess
+import time
+from shutil import copyfile
+
 import boto3
 import django
-import time
-from django.core.files import File
+
 from common import util
+from pruebas_app.models import Mutacion
 from pruebas_automaticas import settings
-from pruebas_app.models import Mutacion, Mutante, Operador
-from shutil import copyfile, copy
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()
