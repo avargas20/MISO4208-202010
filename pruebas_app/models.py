@@ -143,7 +143,7 @@ class Mutante(models.Model):
         return 'Mutante: %s' % self.apk.name
 
     def _killer_requests(self):
-        return Solicitud.objects.filter(mutante=self, exitosa=True)
+        return Solicitud.objects.filter(mutante=self, exitosa=False)
 
     asesinado_por = property(_killer_requests)
 
