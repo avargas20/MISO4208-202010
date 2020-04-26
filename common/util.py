@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from decimal import Decimal
 from zipfile import ZipFile
 from django.core.files import File
@@ -12,10 +13,11 @@ from django.core.files.base import ContentFile
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
 
-from pruebas_app.models import ScreenShot, ResultadoVRT
+from pruebas_app.models import ScreenShot, ResultadoVRT, Mutante, Mutacion, Operador
 
 
-# Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese script para poder correr la prueba
+# Este metodo se encarga de copiar el codigo del script de la prueba en la ruta donde la herramienta necesite ese
+# script para poder correr la prueba
 def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archivo):
     print("En el resultado:", resultado)
     prueba = resultado.prueba
@@ -40,9 +42,10 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
     return nuevo_archivo
 
 
-# Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y guardarlos como evidencias, todos los workers lo deben llamar
+# Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y
+# guardarlos como evidencias, todos los workers lo deben llamar
 def validar_ultimo(solicitud):
-    if (solicitud.terminada):
+    if solicitud.terminada:
         zip_objetcs = ZipFile(settings.BASE_DIR + '//evidencias.zip', 'w')
 
         if bool(solicitud.solicitud_VRT):
@@ -78,8 +81,8 @@ def validar_resultado_vrt(informacion, sensibilidad_VRT):
     return fallida
 
 
-# Este metodo se ejecuta cuando una solicitud tiene VRT y lo que hace es recorrer todos los resultados de ambas solicitudes y todos sus screenshoots y a cada screensoot reciproco
-# le ejecuta VRT
+# Este metodo se ejecuta cuando una solicitud tiene VRT y lo que hace es recorrer todos los resultados de ambas
+# solicitudes y todos sus screenshoots y a cada screensoot reciproco le ejecuta VRT
 def ejecutar_vrt(solicitud_posterior):
     # Se sacan los resultados de ambas solicitudes
     resultados_posteriores = solicitud_posterior.resultado_set.all()
@@ -87,7 +90,7 @@ def ejecutar_vrt(solicitud_posterior):
     resultados_anteriores = solicitud_posterior.solicitud_VRT.resultado_set.all()
     print('anteriores:', resultados_anteriores)
 
-    # Se recorren los resultados, note que para que funcione deben tener la misma cantidad de resultados y haberse ejecutado en el mismo orden
+    # Se recorren los resultados
     for i in range(resultados_anteriores.count()):
         # de cada resultado de cada solicitud se sacan los screenshots
         screenshots_posteriores = resultados_posteriores[i].screenshot_set.all()
@@ -102,13 +105,14 @@ def ejecutar_vrt(solicitud_posterior):
             imagen_anterior = screenshots_anteriores[j].imagen
 
             # para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
-            imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(solicitud_posterior.id) + 'diferencia.png'
+            imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(
+                solicitud_posterior.id) + 'diferencia.png '
 
             comando = subprocess.run(
                 ['node', 'index.js', imagen_anterior.path, imagen_posterior.path,
                  imagen_diferencias], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
 
-            #Se guarda en informacion el json generado por resemble
+            # Se guarda en informacion el json generado por resemble
             informacion = comando.stdout.decode('utf-8')
             print("la salida es:", informacion)
 
@@ -117,8 +121,8 @@ def ejecutar_vrt(solicitud_posterior):
             diferencia_real = json_content.split("'")[1].split("'")[-1]
             validacion = validar_resultado_vrt(Decimal(diferencia_real), solicitud_posterior.sensibilidad_VRT)
 
-            #Solo se guarda la imagen cuando se encuentran diferencias
-            if validacion == True:
+            # Solo se guarda la imagen cuando se encuentran diferencias
+            if validacion:
                 resultado_vrt = ResultadoVRT()
                 resultado_vrt.screenshoot_previo = imagen_anterior
                 resultado_vrt.screenshoot_posterior = imagen_posterior
@@ -194,18 +198,20 @@ def eliminar_emulador():
 
 
 def configurar_archivo_operadores(mutacion):
-    with open(os.path.join(settings.MUTAPK_PATH, 'operators.properties'), "w+") as file:
+    with open(os.path.join(settings.MUTAPK_PATH, 'properties', 'operators.properties'), "w+") as file:
         for o in mutacion.operadores.all():
             print(o)
             # Escribir en el archivo con el formato necesario numero tab igual tab nombre
             file.write('{0}\t=\t{1}\n'.format(o.numero, o.nombre))
 
 
+# este metodo busca recoger los reportes que genera muteAPK con la informacion de los mutantes a generar
 def recoger_reportes_mutacion(mutacion):
-    # Creo una expersion que entregue los archivos JSON para la ruta de MuteAPK, mutants y solo debe haber 1
+    # Creo una expersion que entregue los archivos JSON en la ruta de MuteAPK, mutants y solo debe haber 1
     reporte_json = glob.glob(os.path.join(settings.MUTAPK_PATH, 'mutants', '*.json'))[0]
     with open(reporte_json, 'r') as file_json:
         with ContentFile(file_json.read()) as file_json_content:
+            # Saco el nombre y la extension del archivo para guardarlo asi mismo
             mutacion.reporte_json.save(reporte_json.split("\\")[-1], file_json_content, save=True)
 
     reporte_log = glob.glob(os.path.join(settings.MUTAPK_PATH, 'mutants', '*.log'))[0]
@@ -217,3 +223,62 @@ def recoger_reportes_mutacion(mutacion):
     with open(reporte_csv, 'r') as file_csv:
         with ContentFile(file_csv.read()) as file_csv_content:
             mutacion.reporte_csv.save(reporte_csv.split("\\")[-1], file_csv_content, save=True)
+
+
+def recoger_mutantes(mutacion):
+    ruta_mutantes = os.path.join(settings.MUTAPK_PATH, settings.RUTAS_INTERNAS2.Mutacion.value)
+    # se recorren todos los folders de la ruta de muteAPK/mutants
+    for folder_mutante in os.listdir(ruta_mutantes):
+        if os.path.isdir(os.path.join(ruta_mutantes, folder_mutante)):
+            # el numero del mutante lo saque del ultimo digito de la carpeta
+            numero_mutante = int(folder_mutante[-1])
+            numero_operador = obtener_numero_operador(numero_mutante, mutacion)
+            operador = Operador.objects.get(numero=numero_operador)
+            mutante = Mutante(mutacion=mutacion, operador=operador)
+            mutante.save()
+            # obtener el manifest del mutante, no todos los mutantes lo generan
+            if os.path.isfile(os.path.join(ruta_mutantes, folder_mutante, 'AndroidManifest.xml')):
+                with open(os.path.join(ruta_mutantes, folder_mutante, 'AndroidManifest.xml')) as file_manifest:
+                    with ContentFile(file_manifest.read()) as file_manifest_content:
+                        mutante.manifest.save('AndroidManifest.xml', file_manifest_content, save=True)
+            else:
+                mutante.manifest = None
+            # obtener el apk del mutante, este se genera con el mismo nombre del que tenga la version, este tiene la
+            # forma apk/nombre.apk
+            nombre_apk = mutacion.version.apk.name.split('/')[1]
+            with open(os.path.join(ruta_mutantes, folder_mutante, nombre_apk), 'rb') as file_apk:
+                with ContentFile(file_apk.read()) as file_apk_content:
+                    mutante.apk.save(nombre_apk, file_apk_content, save=True)
+            # obtener el apk firmado que tambien genera muteAPK con el mismo nombre del apk original mas el nombre
+            # -aligned-debugSigned.apk para eso le quito la ultima parte con [:-4]
+            nombre_apk_firmado = nombre_apk[:-4] + '-aligned-debugSigned.apk'
+            with open(os.path.join(ruta_mutantes, folder_mutante, nombre_apk_firmado), 'rb') as file_apk_firmado:
+                with ContentFile(file_apk_firmado.read()) as file_apk_firmado_content:
+                    mutante.apk_firmado.save(nombre_apk_firmado, file_apk_firmado_content, save=True)
+
+
+# metodo para obtener el numero del operador, lo hago buscando en las lineas del .csv en la posicion: numero del mutante
+# el .csv genera dos lineas por cada mutante que se logro generar, esa linea tiene los datos separados por ; y el
+# segundo tiene el numero del operador
+def obtener_numero_operador(numero_mutante, mutacion):
+    with open(mutacion.reporte_csv.path, 'r') as file:
+        lineas = file.readlines()
+        return lineas[numero_mutante].split(';')[1]
+
+
+# recibe un folder y elimina de forma segura todos los archivos y las carpetas con las subcarpetas
+def limpiar_folder(folder):
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
+if __name__ == '__main__':
+    mutacion = Mutacion.objects.get(id=6)
+    recoger_mutantes(mutacion)

@@ -23,6 +23,7 @@ if __name__ == '__main__':
                 mutacion_id = message.message_attributes.get('Id').get('StringValue')
                 mutacion = Mutacion.objects.get(id=int(mutacion_id))
                 util.configurar_archivo_operadores(mutacion)
+                util.limpiar_folder(os.path.join(settings.MUTAPK_PATH, settings.RUTAS_INTERNAS2.Mutacion.value))
                 # Copio el archivo apk de la version a la ruta de MutAPK para que la tome desde alli el comando
                 copyfile(mutacion.version.apk.path, os.path.join(settings.MUTAPK_PATH, mutacion.version.apk.name))
                 # La propiedad name del filefield tiene apk/nombre.apk, tuve que cambiar el / por \\ para que el
@@ -33,6 +34,7 @@ if __name__ == '__main__':
                 salida = subprocess.call(comando, shell=True, cwd=settings.MUTAPK_PATH)
                 print('La salida es:', salida)
                 util.recoger_reportes_mutacion(mutacion)
+                util.recoger_mutantes(mutacion)
                 message.delete()
 
         time.sleep(settings.TIEMPO_ESPERA_WORKERS)

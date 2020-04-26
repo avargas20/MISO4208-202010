@@ -147,6 +147,7 @@ class Mutante(models.Model):
 
     asesinado_por = property(_killer_requests)
 
+
 # ------------------------------------------Segundo mundo----------------------------------------------------------#
 
 

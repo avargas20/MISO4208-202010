@@ -17,3 +17,11 @@ class TiposPruebas(Enum):
     E2E = 'E2E'
     Aleatorias = 'Aleatorias'
 
+
+class RutasInternas(Enum):
+    Cypress = 'cypress/integration'
+    Calabash = 'features'
+    Puppeteer = 'src/test'
+    Mutacion = 'mutants'
+
+

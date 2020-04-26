@@ -111,13 +111,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -172,6 +172,7 @@ TIPOS_HERRAMIENTAS = {
 TIPOS_HERRAMIENTAS2 = enums.Herramientas
 TIPOS_PRUEBAS2 = enums.TiposPruebas
 TIPOS_APLICACION2 = enums.TiposAplicacion
+RUTAS_INTERNAS2 = enums.RutasInternas
 
 SQS_PUPPETEER_NAME = os.environ.get("PA_SQS_PUPPETEER_NAME")
 SQS_CALABASH_NAME = os.environ.get("PA_SQS_CALABASH_NAME")

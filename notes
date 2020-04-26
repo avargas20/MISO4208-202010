@@ -83,5 +83,12 @@ emulator-5554 es el nombre del dispositivo que esta corriendo, para obtener los 
 
 Se agrega funcionalidad de importar/exportar datos para facilitar la insercion de los operadores,
     seguir esta guia: https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
-    importar el archivo que se encuentra en common\datos\Operador-2020-04-21.json por el admin en la nueva opcion
-        que se creo llamada import
+    importar el archivo que se encuentra en common\datos\Operador-2020-04-21.json por el admin en la nueva opcion que se creo llamada import
+
+
+Se agrega funcionalidad para mutacion
+    referenciar en la variable de entorno MUTAPK_PATH la ruta de instalacion de muteAPK
+        dentro de esta crear a mano las carpetas mutants, apk y properties
+        mutants: aqui van a quedar todos los mutantes de manera temporal, en cada ciclo lo primero que se hace es borrarlos
+        apk: se copian temporalmente el apk que se va a mutar
+        properties: se crea siempre un archivo de operators.properties con los operadores seleccionados para la mutacion siguiendo el estandar
