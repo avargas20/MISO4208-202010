@@ -24,6 +24,7 @@ if __name__ == '__main__':
                 resultado = Resultado.objects.get(id=int(resultado_id))
                 nombre_paquete = resultado.solicitud.version.nombre_paquete
                 numero_eventos = str(resultado.prueba.numero_eventos)
+                semilla = resultado.prueba.semilla
                 # iniciamos el emulador y esperamos a que este listo (el metodo lo hace)
                 util.iniciar_emulador(resultado.solicitud.dispositivo.nombre_tecnico)
                 # primero desinstalamos la aplicación y luego la volvemos a instalar para limpiar cualquier estado
@@ -32,11 +33,20 @@ if __name__ == '__main__':
                 subprocess.call(['adb', 'install', resultado.solicitud.version.apk.path], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 # Ahora ejecutar el monkey
-                salida = subprocess.run(
-                    ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-v', numero_eventos], shell=True,
-                    check=False,
-                    cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
-                    stdout=subprocess.PIPE)
+                if semilla:
+                    salida = subprocess.run(
+                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-s', semilla, '-v', numero_eventos],
+                        shell=True,
+                        check=False,
+                        cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
+                        stdout=subprocess.PIPE)
+                else:
+                    salida = subprocess.run(
+                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-v', numero_eventos],
+                        shell=True,
+                        check=False,
+                        cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),
+                        stdout=subprocess.PIPE)
                 # matamos el emulador
                 util.eliminar_emulador()
                 # guardamos la salida del comando

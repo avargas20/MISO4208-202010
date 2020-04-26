@@ -115,6 +115,7 @@ class Mutacion(models.Model):
     def __str__(self):
         return 'Creada: %s' % self.fecha_creacion
 
+    semilla = models.CharField(max_length=30, blank=True, null=True)
 
 class Operador(models.Model):
     numero = models.IntegerField()

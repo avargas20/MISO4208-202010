@@ -98,6 +98,7 @@ def guardar_prueba(request, estrategia_id):
                                                                             'descripcion': 'Pruebas aleatorias móviles'})
                 prueba.herramienta = herramienta
             prueba.numero_eventos = request.POST['numero_eventos']
+            prueba.semilla = request.POST['semilla']
             prueba.save()
         return agregar_prueba(request, estrategia_id)
 
