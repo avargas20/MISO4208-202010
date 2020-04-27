@@ -1,13 +1,13 @@
-import signal
-
-import boto3
 import os
 import subprocess
-import django
 import time
+
+import boto3
+import django
+
 from common import util
-from pruebas_automaticas import settings
 from pruebas_app.models import Resultado
+from pruebas_automaticas import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()
@@ -35,7 +35,8 @@ if __name__ == '__main__':
                 # Ahora ejecutar el monkey
                 if semilla:
                     salida = subprocess.run(
-                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-s', semilla, '-v', numero_eventos],
+                        ['adb', 'shell', 'monkey', '-p', nombre_paquete, '--pct-syskeys', '0', '-s', semilla, '-v',
+                         numero_eventos],
                         shell=True,
                         check=False,
                         cwd=os.path.join(settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']),

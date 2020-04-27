@@ -1,33 +1,34 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-        <form role="form" id="form-version" action="{% url 'guardar_version' aplicacion.id %}" method="post" enctype="multipart/form-data" class="needs-validation">
+        <form role="form" id="form-version" action="{% url 'guardar_version' aplicacion.id %}" method="post"
+              enctype="multipart/form-data" class="needs-validation">
             {% csrf_token %}
             <div class="modal-header">
-                <h3>Nueva versión de {{aplicacion.nombre}}</h3>
+                <h3>Nueva versión de {{ aplicacion.nombre }}</h3>
                 <button type="button" class="close" data-dismiss="modal">x</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Número de versión" value=""
-                        name="numero_version" required />
+                           name="numero_version" required/>
                 </div>
                 <div class="form-group">
                     <textarea class="form-control" placeholder="Descripción de la versión" value=""
-                        name="descripcion_version" required></textarea>
+                              name="descripcion_version" required></textarea>
                 </div>
                 {% if aplicacion.tipo.tipo == 'Web' %}
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="URL" value=""
-                        name="url_version" required/>
-                </div>
-                {% elif aplicacion.tipo.tipo == 'Móvil'%}
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFile" name="apk_version" required>
-                    <label class="custom-file-label" for="customFile">Seleccionar APK</label>
-                </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="URL" value=""
+                               name="url_version" required/>
+                    </div>
+                {% elif aplicacion.tipo.tipo == 'Móvil' %}
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="apk_version" required>
+                        <label class="custom-file-label" for="customFile">Seleccionar APK</label>
+                    </div>
                 {% else %}
-                El tipo de aplicacion no se encuentra registrado
+                    El tipo de aplicacion no se encuentra registrado
                 {% endif %}
                 <br><br>
                 <!--Table-->
@@ -35,38 +36,38 @@
 
                     <!--Table head-->
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Número</th>
-                            {% if aplicacion.tipo.tipo == 'Web' %}
-                                <th>URL</th>
-                            {% else %}
-                                <th>APK</th>
-                            {% endif %}
-                            <th></th>
-                        </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Número</th>
+                        {% if aplicacion.tipo.tipo == 'Web' %}
+                            <th>URL</th>
+                        {% else %}
+                            <th>APK</th>
+                        {% endif %}
+                        <th></th>
+                    </tr>
                     </thead>
                     <!--Table head-->
 
                     <!--Table body-->
                     <tbody>
-                        {% for version in versiones %}
+                    {% for version in versiones %}
                         <tr>
                             <th scope="row" class="text-center">{{ version.id }}</th>
                             <td>{{ version.numero }}</td>
                             {% if aplicacion.tipo.tipo == 'Web' %}
-                                <td>{{ version.url}}</td>
+                                <td>{{ version.url }}</td>
                             {% else %}
-                                <td>{{ version.apk}}</td>
+                                <td>{{ version.apk }}</td>
                             {% endif %}
                             <td>
                                 <a class="btn btn-danger text-right btn-sm"
-                                    href="{% url 'eliminar_version' version.id %}">
+                                   href="{% url 'eliminar_version' version.id %}">
                                     <i class="far fa-trash-alt"></i>
                                 </a>
                             </td>
                         </tr>
-                        {% endfor %}
+                    {% endfor %}
                     </tbody>
                     <!--Table body-->
 
@@ -87,11 +88,11 @@
 </body>
 
 <script>
-// Add the following code if you want the name of the file appear on select
-$(".custom-file-input").on("change", function() {
-  var fileName = $(this).val().split("\\").pop();
-  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-});
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
 </script>
 
 

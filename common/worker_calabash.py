@@ -1,12 +1,13 @@
 import os
-import signal
 import subprocess
-import django
-import boto3
 import time
+
+import boto3
+import django
+
 from common import util
-from pruebas_automaticas import settings
 from pruebas_app.models import Resultado
+from pruebas_automaticas import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()

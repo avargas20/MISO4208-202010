@@ -117,6 +117,7 @@ class Mutacion(models.Model):
 
     semilla = models.CharField(max_length=30, blank=True, null=True)
 
+
 class Operador(models.Model):
     numero = models.IntegerField()
     nombre = models.CharField(max_length=50)
