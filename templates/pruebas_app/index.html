@@ -20,6 +20,7 @@
                 <th>Estrategia</th>
                 <th>Tiene VRT</th>
                 <th>Estado</th>
+                <th>Exitosa</th>
                 <th>Resultado</th>
 
             </tr>
@@ -34,12 +35,9 @@
                     <td class="text-center">{{ solicitud.estrategia.aplicacion.nombre }}</td>
                     <td class="text-center">{{ solicitud.version.numero }}</td>
                     <td class="text-center">{{ solicitud.estrategia.nombre }}</td>
-                    {% if solicitud.solicitud_VRT %}
-                        <td class="text-center">Sí</td>
-                    {% else %}
-                        <td class="text-center">No</td>
-                    {% endif %}
+                    <td class="text-center">{% if solicitud.solicitud_VRT %} Sí {% else %} No {% endif %}</td>
                     <td class="text-center">{{ solicitud.estado }}</td>
+                    <td class="text-center">{% if solicitud.exitosa %} Sí {% else %} No {% endif %}</td>
                     {% if solicitud.terminada %}
                         <td class="text-center">
                             <a href="{% url 'ver_resultados' solicitud.id %}" class="mr-3">
