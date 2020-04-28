@@ -255,3 +255,14 @@ def guardar_mutacion(request):
                                        }
                                    })
         return HttpResponseRedirect(reverse('mutacion'))
+
+
+def info_mutacion(request):
+    result_set = []
+    mutaciones = Mutacion.objects.all()
+    for mutacion in mutaciones:
+        result_set.append({'mutacion': mutacion.pk, 'fecha_creacion': str(mutacion.fecha_creacion),
+                           'version': mutacion.version.numero, 'aplicacion': mutacion.version.aplicacion.nombre,
+                           'numero_mutantes': mutacion.numero_mutantes,
+                           'operadores': [x.nombre for x in mutacion.operadores.all()]})
+    return HttpResponse(json.dumps(result_set), content_type='application/json')
