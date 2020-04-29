@@ -27,4 +27,5 @@ urlpatterns = [
     path('ver_resultados/<int:solicitud_id>', views.ver_resultados, name='ver_resultados'),
     path('mutacion/', views.mutacion, name='mutacion'),
     path('guardar_mutacion/', views.guardar_mutacion, name='guardar_mutacion'),
+    path('ver_mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
 ]

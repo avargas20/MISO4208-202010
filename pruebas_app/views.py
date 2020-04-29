@@ -361,3 +361,10 @@ def guardar_mutacion(request):
                                         }
                                     })
         return HttpResponseRedirect(reverse('mutacion'))
+
+def ver_mutaciones(request):
+    mutaciones = Mutacion.objects.all().order_by('-id')
+    paginator = Paginator(mutaciones, 10)  # Show 10 mutaciones per page
+    page = request.GET.get('page')
+    mutaciones_out = paginator.get_page(page)
+    return render(request, 'pruebas_app/ver_mutaciones.html', {'mutaciones': mutaciones_out})
