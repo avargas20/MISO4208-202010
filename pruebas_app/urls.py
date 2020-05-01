@@ -1,12 +1,13 @@
 from django.conf.urls import url
 from django.urls import path
 
-from . import views
+from pruebas_app import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     path('agregar_estrategia/', views.agregar_estrategia, name='agregar_estrategia'),
-    path('obtener_versiones_de_una_aplicacion/', views.obtener_versiones_de_una_aplicacion, name='obtener_versiones_de_una_aplicacion'),
+    path('obtener_versiones_de_una_aplicacion/', views.obtener_versiones_de_una_aplicacion,
+         name='obtener_versiones_de_una_aplicacion'),
     path('lanzar_estrategia/', views.lanzar_estrategia, name='lanzar_estrategia'),
     path('nueva_aplicacion/', views.nueva_aplicacion, name='nueva_aplicacion'),
     path('guardar_estrategia/', views.guardar_estrategia, name='guardar_estrategia'),

@@ -17,7 +17,6 @@ from common import enums
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'v4#(8o-ng&6k(s2_scbsdbh(6bsjoo(kvqk70)qw)rpt!&i2&s'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -74,7 +72,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pruebas_automaticas.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -84,8 +81,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -105,7 +100,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -118,7 +112,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -136,6 +129,7 @@ PUPPETEER_PATH = os.environ["PA_PUPPETEER_PATH"]
 CALABASH_PATH = os.environ["PA_CALABASH_PATH"]
 RESEMBLE_PATH = os.environ["PA_RESEMBLE_PATH"]
 ANDROID_SDK = os.environ["PA_ANDROID_SDK"]
+CUCUMBER_PATH = os.environ["PA_CUCUMBER_PATH"]
 MUTAPK_PATH = os.environ.get("PA_MUTAPK_PATH")
 RUTAS_INTERNAS_SDK_ANDROID = {
     'platform-tools': 'platform-tools',
@@ -146,6 +140,9 @@ RUTAS_INTERNAS = {
     'Cypress': 'cypress/integration/',
     'Calabash': 'features/',
     'Puppeteer': 'src/test/',
+    'CucumberFeatures': 'features/',
+    'CucumberSteps': 'features/step-definitions/',
+    'CucumberReporte': '/.tmp/report/',
 }
 
 # Asi deberiamos agregar los tipos de aplicacion, asi se validan en la pagina agregar_version.html
@@ -165,6 +162,7 @@ TIPOS_HERRAMIENTAS = {
     'cypress': 'Cypress',
     'calabash': 'Calabash',
     'puppeteer': 'Puppeteer',
+    'cucumber': 'Cucumber',
 }
 
 # Como una mejor practica Se usan los enums para no usar diccionarios, aunque no se eliminan los primeros dado que
@@ -179,6 +177,7 @@ SQS_CALABASH_NAME = os.environ.get("PA_SQS_CALABASH_NAME")
 SQS_CYPRESS_NAME = os.environ.get("PA_SQS_CYPRESS_NAME")
 SQS_MONKEY_MOVIL_NAME = os.environ.get("PA_SQS_MONKEY_MOVIL_NAME")
 SQS_MUTACION_NAME = os.environ.get("PA_SQS_MUTACION_NAME")
+SQS_CUCUMBER_NAME = os.environ.get("PA_SQS_CUCUMBER_NAME")
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")

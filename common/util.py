@@ -1,13 +1,14 @@
+import glob
 import json
 import os
 import shutil
+import subprocess
 from decimal import Decimal
 from zipfile import ZipFile
-from django.core.files import File
+
 import django
-import glob
-import subprocess
 from django.conf import settings
+from django.core.files import File
 from django.core.files.base import ContentFile
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
@@ -170,6 +171,8 @@ def determinar_ruta(resultado):
         return settings.CALABASH_PATH
     elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
         return settings.PUPPETEER_PATH
+    elif nombre_herramienta == settings.TIPOS_HERRAMIENTAS["cucumber"]:
+        return settings.CUCUMBER_PATH
 
 
 # Este metodo inicia el emulador que tenga como nombre el parametro y espera a que este arranque
@@ -277,6 +280,16 @@ def limpiar_folder(folder):
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
+# Guarda los archivos .steps
+def guardar_steps(steps):
+    archivo = steps.open('r')
+    contenido = archivo.read()
+    nuevo_archivo = settings.RUTAS_INTERNAS["CucumberSteps"] + archivo.__str__()
+    ruta_nuevo_steps = os.path.join(settings.CUCUMBER_PATH, nuevo_archivo)
+    with open(ruta_nuevo_steps, "wb") as file:
+        file.write(contenido)
 
 
 if __name__ == '__main__':

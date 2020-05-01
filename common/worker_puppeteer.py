@@ -1,14 +1,15 @@
 import os
 import subprocess
-import boto3
-import django
 import time
 
+import boto3
+import django
 from bs4 import BeautifulSoup
 from django.core.files import File
+
 from common import util
-from pruebas_automaticas import settings
 from pruebas_app.models import Resultado
+from pruebas_automaticas import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_app.settings")
 django.setup()

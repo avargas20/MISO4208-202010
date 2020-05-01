@@ -1,26 +1,24 @@
 import json
-import os
 import logging
+import os
 import subprocess
+import zipfile
+
 import boto3
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.clickjacking import xframe_options_exempt, xframe_options_sameorigin
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
-from pruebas_automaticas import settings
-from .models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, Resultado, TipoAplicacion, \
+from pruebas_app.models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, TipoAplicacion, \
     Dispositivo, ResultadoVRT, Operador, Mutacion
+from pruebas_automaticas import settings
 
 # Create your views here.
 
 LOGGER = logging.getLogger(__name__)
 SQS = boto3.resource('sqs', region_name='us-east-1')
-COLA_CALABASH = SQS.get_queue_by_name(QueueName=settings.SQS_CALABASH_NAME)
-COLA_CYPRESS = SQS.get_queue_by_name(QueueName=settings.SQS_CYPRESS_NAME)
-COLA_PUPPETEER = SQS.get_queue_by_name(QueueName=settings.SQS_PUPPETEER_NAME)
-COLA_MONKEY_MOVIL = SQS.get_queue_by_name(QueueName=settings.SQS_MONKEY_MOVIL_NAME)
 COLA_MUTACION = SQS.get_queue_by_name(QueueName=settings.SQS_MUTACION_NAME)
 
 
@@ -68,41 +66,6 @@ def agregar_prueba(request, estrategia_id):
                    'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
 
 
-def guardar_prueba(request, estrategia_id):
-    if request.method == 'POST':
-        tipo = Tipo.objects.get(id=request.POST['tipo'])
-        estrategia = Estrategia.objects.get(id=estrategia_id)
-        # Si el tipo es E2E necesitamos el script y la herramienta
-        # Si el tipo es aleatorio no se necesita nada mas
-        if tipo.nombre == settings.TIPOS_PRUEBAS["e2e"]:
-            files = request.FILES.getlist('archivo')
-            for script in files:
-                prueba = Prueba()
-                prueba.estrategia = estrategia
-                prueba.tipo = tipo
-                herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
-                prueba.script = script
-                prueba.herramienta = herramienta
-                prueba.save()
-        if tipo.nombre == settings.TIPOS_PRUEBAS["aleatorias"]:
-            prueba = Prueba()
-            prueba.estrategia = estrategia
-            prueba.tipo = tipo
-            if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION["web"]:
-                prueba.script = "Monkey.js"
-                prueba.herramienta = Herramienta.objects.get(nombre=settings.TIPOS_HERRAMIENTAS["cypress"])
-            if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION2.Movil.value:
-                # la variable creada retorna un boolean indicando si el valor fue creado o no
-                herramienta, creada = Herramienta.objects.get_or_create(nombre=settings.TIPOS_HERRAMIENTAS2.ADB.value,
-                                                                        defaults={
-                                                                            'descripcion': 'Pruebas aleatorias móviles'})
-                prueba.herramienta = herramienta
-            prueba.numero_eventos = request.POST['numero_eventos']
-            prueba.semilla = request.POST['semilla']
-            prueba.save()
-        return agregar_prueba(request, estrategia_id)
-
-
 def eliminar_prueba(request, prueba_id):
     prueba = Prueba.objects.get(id=prueba_id)
     estrategia_id = prueba.estrategia.id
@@ -128,82 +91,6 @@ def condiciones_de_lanzamiento(request, estrategia_id):
 
     return render(request, 'pruebas_app/condiciones_de_lanzamiento.html',
                   {'solicitudes': solicitudes, 'estrategia': estrategia, 'dispositivos': dispositivos})
-
-
-def ejecutar_estrategia(request):
-    if request.method == 'POST':
-        solicitud = Solicitud()
-        print('solicitud POST', request.POST)
-        if 'solicitud_VRT' in request.POST:
-            id_solicitud_VRT = request.POST['solicitud_VRT']
-            sensibilidad_VRT = request.POST['sensibilidad_VRT']
-            solicitud_VRT = Solicitud.objects.get(id=id_solicitud_VRT)
-            solicitud.solicitud_VRT = solicitud_VRT
-            solicitud.sensibilidad_VRT = sensibilidad_VRT
-
-        estrategia = Estrategia.objects.get(id=int(request.POST['estrategia']))
-        if estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION['movil']:
-            solicitud.dispositivo = Dispositivo.objects.get(id=int(request.POST['dispositivo']))
-        solicitud.estrategia = estrategia
-        solicitud.version = Version.objects.get(id=int(request.POST['version']))
-        solicitud.save()
-        tipo_aplicacion = estrategia.aplicacion.tipo.tipo
-
-        for prueba in estrategia.prueba_set.all():
-            tipo_prueba = prueba.tipo.nombre
-            resultado = Resultado()
-            resultado.solicitud = solicitud
-            resultado.prueba = prueba
-            resultado.save()
-            if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-                herramienta = prueba.herramienta.nombre
-                # Aquí se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
-                if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
-                    COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para cypress',
-                                              MessageAttributes={
-                                                  'Id': {
-                                                      'StringValue': str(resultado.id),
-                                                      'DataType': 'Number'
-                                                  }
-                                              })
-                elif herramienta == 'Protractor':
-                    pass
-                elif herramienta == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
-                    COLA_PUPPETEER.send_message(MessageBody='Id del resultado a procesar para puppeteer',
-                                                MessageAttributes={
-                                                    'Id': {
-                                                        'StringValue': str(resultado.id),
-                                                        'DataType': 'Number'
-                                                    }
-                                                })
-                elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                    COLA_CALABASH.send_message(MessageBody='Id del resultado a procesar para calabash',
-                                               MessageAttributes={
-                                                   'Id': {
-                                                       'StringValue': str(resultado.id),
-                                                       'DataType': 'Number'
-                                                   }
-                                               })
-
-            elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
-                if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                    COLA_MONKEY_MOVIL.send_message(
-                        MessageBody='Id del resultado a procesar para monkey movil',
-                        MessageAttributes={
-                            'Id': {
-                                'StringValue': str(resultado.id),
-                                'DataType': 'Number'
-                            }
-                        })
-                elif tipo_aplicacion == settings.TIPOS_APLICACION['web']:
-                    COLA_CYPRESS.send_message(MessageBody='Id del resultado a procesar para monkey web',
-                                              MessageAttributes={
-                                                  'Id': {
-                                                      'StringValue': str(resultado.id),
-                                                      'DataType': 'Number'
-                                                  }
-                                              })
-    return HttpResponseRedirect(reverse('home'))
 
 
 def descargar_evidencias(request, solicitud_id):
@@ -299,6 +186,7 @@ def eliminar_version(request, version_id):
     version.delete()
     return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
+
 @xframe_options_sameorigin
 def ver_resultados(request, solicitud_id):
     try:
@@ -318,6 +206,12 @@ def ver_resultados(request, solicitud_id):
                 settings.TIPOS_PRUEBAS['aleatorias']:
             logs.append(r)
         elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
+            pag_html.append(r)
+        elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"]:
+            print("El resultado es:", r.resultado.path)
+            with zipfile.ZipFile(r.resultado.path, 'r') as zip_ref:
+                zip_ref.extractall('archivos/resultados/extract/' + r.resultado.__str__())
+            r.resultado = 'resultados/extract/' + r.resultado.__str__() + '/index.html'
             pag_html.append(r)
         if r.screenshot_set.all():
             screen_shots.append({'filename': r.prueba.filename, 'imagenes': r.screenshot_set.all()})
@@ -348,18 +242,18 @@ def guardar_mutacion(request):
     if request.method == 'POST':
         numero_mutantes = request.POST['numero_mutantes']
         version = Version.objects.get(id=int(request.POST['version']))
-        mutacion = Mutacion(version=version, numero_mutantes=numero_mutantes)
-        mutacion.save()
+        mutacion_version = Mutacion(version=version, numero_mutantes=numero_mutantes)
+        mutacion_version.save()
         ids_operadores = request.POST.getlist('operadores')
-        for id in ids_operadores:
-            mutacion.operadores.add(Operador.objects.get(id=id))
+        for id_operador in ids_operadores:
+            mutacion_version.operadores.add(Operador.objects.get(id=id_operador))
         COLA_MUTACION.send_message(MessageBody='Id de la mutacion a procesar',
-                                    MessageAttributes={
-                                        'Id': {
-                                            'StringValue': str(mutacion.id),
-                                            'DataType': 'Number'
-                                        }
-                                    })
+                                   MessageAttributes={
+                                       'Id': {
+                                           'StringValue': str(mutacion_version.id),
+                                           'DataType': 'Number'
+                                       }
+                                   })
         return HttpResponseRedirect(reverse('ver_mutaciones'))
 
 def ver_mutaciones(request):

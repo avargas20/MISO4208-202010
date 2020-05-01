@@ -20,6 +20,6 @@ from django.urls import path, include
 from pruebas_automaticas import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('pruebas_app.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  path('admin/', admin.site.urls),
+                  path('', include('pruebas_app.urls')),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
