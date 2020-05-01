@@ -10,6 +10,7 @@ import django
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from faker import Faker
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
@@ -290,6 +291,27 @@ def guardar_steps(steps):
     ruta_nuevo_steps = os.path.join(settings.CUCUMBER_PATH, nuevo_archivo)
     with open(ruta_nuevo_steps, "wb") as file:
         file.write(contenido)
+
+
+def generar_tabla(script, cantidad, valores):
+    archivo = script.open('r')
+    contenido = archivo.read()
+    nuevo_archivo = settings.RUTAS_INTERNAS["CucumberSteps"] + archivo.__str__()
+    ruta_nuevo_steps = os.path.join(settings.CUCUMBER_PATH, nuevo_archivo)
+    with open(ruta_nuevo_steps, "wb") as file:
+        file.write(contenido)
+    for x in cantidad:
+        for llave in valores.keys:
+            valor_generado = generar_aleatorio(valores.get(llave))
+            with open(ruta_nuevo_steps, "wb") as file:
+                file.write("|")
+                file.write(valor_generado)
+        with open(ruta_nuevo_steps, "wb") as file:
+            file.write("|")
+
+
+def generar_aleatorio(llave):
+    return Faker.pystr()
 
 
 if __name__ == '__main__':

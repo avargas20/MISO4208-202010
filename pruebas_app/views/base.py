@@ -13,6 +13,7 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from pruebas_app.models import Aplicacion, Prueba, Version, Herramienta, Tipo, Estrategia, Solicitud, TipoAplicacion, \
     Dispositivo, ResultadoVRT, Operador, Mutacion
+from pruebas_app.views import guardar_prueba
 from pruebas_automaticas import settings
 
 # Create your views here.
@@ -192,7 +193,7 @@ def configurar_cucumber(request, estrategia_id):
                   {'estrategia': estrategia})
 
 def guardar_configuracion_cucumber(request, estrategia_id):
-    print("Revirtiendo a estrategia", estrategia_id)
+    guardar_prueba(request, estrategia_id);
     return HttpResponseRedirect(reverse('agregar_prueba', args=[estrategia_id]))
 
 

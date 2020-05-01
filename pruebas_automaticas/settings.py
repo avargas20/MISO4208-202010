@@ -163,6 +163,7 @@ TIPOS_HERRAMIENTAS = {
     'calabash': 'Calabash',
     'puppeteer': 'Puppeteer',
     'cucumber': 'Cucumber',
+    'generacion': 'Generacion',
 }
 
 # Como una mejor practica Se usan los enums para no usar diccionarios, aunque no se eliminan los primeros dado que

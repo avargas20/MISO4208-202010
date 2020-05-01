@@ -34,6 +34,15 @@ def guardar_e2e(estrategia, request, tipo):
                 util.guardar_steps(script)
             else:
                 crear_prueba_para_script(estrategia, herramienta, script, tipo)
+    elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
+        valores = {'nombre': 'name'}  # request.FILES.getlist('valores')
+        cantidad = 10  # request.FILES.getlist('cantidad')
+        for script in files:
+            if os.path.splitext(script.name)[1] != '.feature':
+                print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
+                util.generar_tabla(script, cantidad, valores)
+            else:
+                crear_prueba_para_script(estrategia, herramienta, script, tipo)
     else:
         for script in files:
             crear_prueba_para_script(estrategia, herramienta, script, tipo)
