@@ -5,6 +5,7 @@
     <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
     <script>
         $(document).ready(function () {
+            $(':input[type="submit"]').prop('disabled', true);
             $('#aplicaciones').change(function () {
 
                 var optionSelected = $(this).find("option:selected");
@@ -30,6 +31,39 @@
                     }
                 });
 
+            });
+
+            $("#myInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function() {
+                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            $("#numero_mutantes").on("change", function() {
+                var checkedBoxes = $('input[name=operadores]:checked').length;
+                var mutantes = $('#numero_mutantes').val();
+                console.log(mutantes)
+                if (!(mutantes === "") && parseInt(mutantes) >= checkedBoxes) {
+                    $("#btn_submit").removeClass( "disabled" )
+                    $(':input[type="submit"]').prop('disabled', false);
+                } else {
+                     $("#btn_submit").addClass( "disabled" )
+                     $(':input[type="submit"]').prop('disabled', true);
+                }
+            });
+
+            $(".checkbox_pa").on("click", function() {
+                var checkedBoxes = $('input[name=operadores]:checked').length;
+                var mutantes = $('#numero_mutantes').val();
+                console.log(mutantes)
+                if (!(mutantes === "") && parseInt(mutantes) >= checkedBoxes) {
+                    $("#btn_submit").removeClass( "disabled" )
+                    $(':input[type="submit"]').prop('disabled', false);
+                } else {
+                     $("#btn_submit").addClass( "disabled" )
+                     $(':input[type="submit"]').prop('disabled', true);
+                }
             });
         });
     </script>
@@ -60,38 +94,64 @@
                         </select>
                     </div>
                 </div>
-            </div>
-            <div class="row register-form">
                 <div class="col-md-4">
                     <div class="form-group">
                         <input type="number" class="form-control" placeholder="Número de mutantes"
-                               name="numero_mutantes" min="1"/>
+                               name="numero_mutantes"  id="numero_mutantes" min="1" required/>
                     </div>
                 </div>
             </div>
+            <div class="row register-form">
+                <div class=" col-md-3"></div>
+                <!--<div class="col-md-6">
+                    <div class="form-group">
+                        <input class="form-control col-md-12" id="myInput" type="text" placeholder="Search..">
+                    </div>
+                </div>-->
+                <div class="input-group mb-6 col-md-6">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+                  </div>
+                  <input class="form-control" id="myInput" type="text" placeholder="Buscar.." aria-label="Buscar" aria-describedby="basic-addon1">
+                </div>
+                <div class=" col-md-3"></div>
+            </div>
             <div class="row">
-                <div class=" col-md-4">
-                    <table class="table table-bordered">
-
-                        <tbody>
-                        {% for o in operadores|slice:"12" %}
+                <div class=" col-md-3"></div>
+                <div class=" col-md-6">
+                    <table class="table table-sm table-bordered">
+                        <!--Table head-->
+                        <thead>
+                        <tr class="text-center">
+                            <th></th>
+                            <th>Operador</th>
+                        </tr>
+                        </thead>
+                        <!--Table head-->
+                        <!--Table body-->
+                        <tbody id="myTable">
+                        {% for o in operadores %}
                             <tr>
                                 <td>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" value="{{ o.id }}"
+                                        <input type="checkbox" class="custom-control-input checkbox_pa" value="{{ o.id }}"
                                                id="{{ o.id }}"
                                                name="operadores">
-                                        <label class="custom-control-label" for="{{ o.id }}">{{ o.numero }}
-                                            = {{ o.nombre }}</label>
+                                        <label class="custom-control-label" for="{{ o.id }}"></label>
                                     </div>
+                                </td>
+                                <td>
+                                    {{ o.numero }} <i class="fas fa-caret-right"></i> {{ o.nombre }}
                                 </td>
 
                             </tr>
                         {% endfor %}
                         </tbody>
+                        <!--Table body-->
                     </table>
                 </div>
-                <div class=" col-md-4">
+                <div class=" col-md-3"></div>
+                <!--<div class=" col-md-4">
                     <table class="table table-bordered">
 
                         <tbody>
@@ -132,12 +192,12 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                </div>
+                </div>-->
 
             </div>
 
-            <div>
-                <button type="submit" class="btn btn-primary">Crear mutaciones</button>
+            <div class="text-center">
+                <button type="submit" id="btn_submit" class="btn btn-primary disabled">Crear mutaciones</button>
             </div>
 
         </form>
