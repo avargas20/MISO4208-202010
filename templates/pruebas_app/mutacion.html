@@ -5,6 +5,7 @@
     <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
     <script>
         $(document).ready(function () {
+            $(':input[type="submit"]').prop('disabled', true);
             $('#aplicaciones').change(function () {
 
                 var optionSelected = $(this).find("option:selected");
@@ -38,6 +39,32 @@
                   $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+
+            $("#numero_mutantes").on("change", function() {
+                var checkedBoxes = $('input[name=operadores]:checked').length;
+                var mutantes = $('#numero_mutantes').val();
+                console.log(mutantes)
+                if (!(mutantes === "") && parseInt(mutantes) >= checkedBoxes) {
+                    $("#btn_submit").removeClass( "disabled" )
+                    $(':input[type="submit"]').prop('disabled', false);
+                } else {
+                     $("#btn_submit").addClass( "disabled" )
+                     $(':input[type="submit"]').prop('disabled', true);
+                }
+            });
+
+            $(".checkbox_pa").on("click", function() {
+                var checkedBoxes = $('input[name=operadores]:checked').length;
+                var mutantes = $('#numero_mutantes').val();
+                console.log(mutantes)
+                if (!(mutantes === "") && parseInt(mutantes) >= checkedBoxes) {
+                    $("#btn_submit").removeClass( "disabled" )
+                    $(':input[type="submit"]').prop('disabled', false);
+                } else {
+                     $("#btn_submit").addClass( "disabled" )
+                     $(':input[type="submit"]').prop('disabled', true);
+                }
+            });
         });
     </script>
 
@@ -70,7 +97,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <input type="number" class="form-control" placeholder="Número de mutantes"
-                               name="numero_mutantes" min="1"/>
+                               name="numero_mutantes"  id="numero_mutantes" min="1" required/>
                     </div>
                 </div>
             </div>
@@ -107,7 +134,7 @@
                             <tr>
                                 <td>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" value="{{ o.id }}"
+                                        <input type="checkbox" class="custom-control-input checkbox_pa" value="{{ o.id }}"
                                                id="{{ o.id }}"
                                                name="operadores">
                                         <label class="custom-control-label" for="{{ o.id }}"></label>
@@ -170,7 +197,7 @@
             </div>
 
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">Crear mutaciones</button>
+                <button type="submit" id="btn_submit" class="btn btn-primary disabled">Crear mutaciones</button>
             </div>
 
         </form>
