@@ -143,6 +143,7 @@ RUTAS_INTERNAS = {
     'CucumberFeatures': 'features/',
     'CucumberSteps': 'features/step-definitions/',
     'CucumberReporte': '/.tmp/report/',
+    'GeneracionTemporal': '.tmp/',
 }
 
 # Asi deberiamos agregar los tipos de aplicacion, asi se validan en la pagina agregar_version.html
@@ -163,6 +164,7 @@ TIPOS_HERRAMIENTAS = {
     'calabash': 'Calabash',
     'puppeteer': 'Puppeteer',
     'cucumber': 'Cucumber',
+    'generacion': 'Generacion',
 }
 
 # Como una mejor practica Se usan los enums para no usar diccionarios, aunque no se eliminan los primeros dado que

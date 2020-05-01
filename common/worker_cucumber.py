@@ -45,7 +45,6 @@ if __name__ == '__main__':
                 os.remove(reporte.name)
                 script_path = settings.CUCUMBER_PATH + "/" + nuevo_feature
                 os.remove(script_path)
-                util.recoger_screenshoots(resultado)
                 message.delete()
                 util.validar_ultimo(resultado.solicitud)
         time.sleep(settings.TIEMPO_ESPERA_WORKERS)

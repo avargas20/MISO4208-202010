@@ -10,6 +10,7 @@ import django
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from faker import Faker
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pruebas_automaticas.settings")
 django.setup()
@@ -290,6 +291,54 @@ def guardar_steps(steps):
     ruta_nuevo_steps = os.path.join(settings.CUCUMBER_PATH, nuevo_archivo)
     with open(ruta_nuevo_steps, "wb") as file:
         file.write(contenido)
+
+
+def generar_tabla(script, cantidad, valores):
+    archivo = script[0].open('r')
+    contenido = archivo.read()
+    nuevo_archivo = settings.RUTAS_INTERNAS["GeneracionTemporal"] + archivo.__str__()
+    ruta_nuevo_steps = os.path.join(settings.MEDIA_ROOT, nuevo_archivo)
+    with open(ruta_nuevo_steps, "wb") as file:
+        file.write(contenido)
+
+    with open(ruta_nuevo_steps, "a") as file:
+        file.write("\n\n")
+        file.write("\t\t")
+        file.write("Examples:")
+        file.write("\n\n")
+        file.write("\t\t")
+    for llave in valores:
+        with open(ruta_nuevo_steps, "a") as file:
+            file.write("|")
+            file.write(llave)
+    with open(ruta_nuevo_steps, "a") as file:
+        file.write("|")
+    y = 0
+    while y < int(cantidad):
+        with open(ruta_nuevo_steps, "a") as file:
+            file.write("\n")
+            file.write("\t\t")
+        for llave in valores:
+            valor_generado = generar_aleatorio(valores.get(llave))
+            with open(ruta_nuevo_steps, "a") as file:
+                file.write("|")
+                file.write(valor_generado)
+        with open(ruta_nuevo_steps, "a") as file:
+            file.write("|")
+        y += 1
+
+    return ruta_nuevo_steps
+
+
+fake = Faker()
+
+
+def generar_aleatorio(llave):
+    print("La llave o tipo de dato es:", llave)
+    if llave == 'TEXTO':
+        return fake.pystr()
+    if llave == 'EMAIL':
+        return fake.ascii_company_email()
 
 
 if __name__ == '__main__':
