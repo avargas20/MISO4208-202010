@@ -186,6 +186,15 @@ def eliminar_version(request, version_id):
     version.delete()
     return HttpResponseRedirect(reverse('nueva_aplicacion'))
 
+def configurar_cucumber(request, estrategia_id):
+    estrategia = Estrategia.objects.get(id=estrategia_id)
+    return render(request, 'pruebas_app/configurar_cucumber.html',
+                  {'estrategia': estrategia})
+
+def guardar_configuracion_cucumber(request, estrategia_id):
+    print("Revirtiendo a estrategia", estrategia_id)
+    return HttpResponseRedirect(reverse('agregar_prueba', args=[estrategia_id]))
+
 
 @xframe_options_sameorigin
 def ver_resultados(request, solicitud_id):

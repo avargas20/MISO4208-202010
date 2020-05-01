@@ -21,6 +21,8 @@ urlpatterns = [
     path('guardar_aplicacion/', views.guardar_aplicacion, name='guardar_aplicacion'),
     path('eliminar_aplicacion/<int:aplicacion_id>', views.eliminar_aplicacion, name='eliminar_aplicacion'),
     path('agregar_version/<int:aplicacion_id>', views.agregar_version, name='agregar_version'),
+    path('configurar_cucumber/<int:estrategia_id>', views.configurar_cucumber, name='configurar_cucumber'),
+    path('guardar_configuracion_cucumber/<int:estrategia_id>', views.guardar_configuracion_cucumber, name='guardar_configuracion_cucumber'),
     path('guardar_version/<int:aplicacion_id>', views.guardar_version, name='guardar_version'),
     path('eliminar_version/<int:version_id>', views.eliminar_version, name='eliminar_version'),
     path('condiciones_de_lanzamiento/<int:estrategia_id>', views.condiciones_de_lanzamiento,

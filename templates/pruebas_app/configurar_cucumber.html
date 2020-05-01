@@ -1,0 +1,59 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <form role="form" id="form-version" action="{% url 'guardar_configuracion_cucumber' estrategia.id %}"
+              method="post"
+              enctype="multipart/form-data" class="needs-validation">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3>Configurar Cucumber para {{ estrategia }}</h3>
+                <button type="button" class="close" data-dismiss="modal">x</button>
+            </div>
+            <div class="modal-body">
+
+                <div class=" col-8 input-group mb-3">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFileLang" lang="es"
+                               name="archivo" multiple="multiple">
+                        <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar
+                            Archivo</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="number" class="form-control" placeholder="Número de datos generados"
+                           name="numero_eventos" min="1" id="numero_eventos"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Token" value=""
+                           name="nombre_aplicacion" required/>
+                </div>
+
+                <div class="form-group">
+                    <select name='tipo' id='tipo' class="form-control" required>
+                        <option class="hidden" value="" selected disabled>Seleccione el tipo de dato</option>
+                        <option value="{{ tipo.id }}">{{ tipo.tipo }}</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-lg-12 text-right">
+                    <input type="submit" class="btn btn-primary" name="submit" value="Guardar">
+                    <button type="button" class="btn btn-danger" onclick="return cerrar_modal()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+
+<script>
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+
+
