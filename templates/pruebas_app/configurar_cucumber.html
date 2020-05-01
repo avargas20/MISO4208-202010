@@ -10,6 +10,18 @@
                 <button type="button" class="close" data-dismiss="modal">x</button>
             </div>
             <div class="modal-body">
+                 <div class="col-3">
+                <div class="form-group">
+                    <input type="hidden" name="tipo" id="tipo" class="form-control" required readonly>
+                    </input>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <input type="hidden" name="herramienta" id="herramienta" class="form-control"required readonly>
+                    </input>
+                </div>
+            </div>
                 <div class="input-group mb-3">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="customFileLang" lang="es"
@@ -44,6 +56,7 @@
                                 <select name='tipo_dato1' id='tipo_dato1' class="form-control" required>
                                     <option class="hidden" value="" selected disabled>Tipo de dato</option>
                                     <option value="TEXTO">TEXTO</option>
+                                    <option value="EMAIL">EMAIL</option>
                                 </select>
                             </div>
                         </th>

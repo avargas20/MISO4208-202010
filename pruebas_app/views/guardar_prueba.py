@@ -28,14 +28,14 @@ def guardar_e2e(estrategia, request, tipo):
         print("Los archivos recibidos son:", files)
         herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
         print("La herramienta es", herramienta)
-        if herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["cucumber"]:
+        if herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"]:
             for script in files:
                 if os.path.splitext(script.name)[1] != '.feature':
                     print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
                     util.guardar_steps(script)
                 else:
                     crear_prueba_para_script(estrategia, herramienta, script, tipo)
-        elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
+        elif herramienta.nombre == settings.TIPOS_HERRAMIENTAS["generacion"]:
             for script in files:
                 if os.path.splitext(script.name)[1] != '.feature':
                     print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
