@@ -294,24 +294,45 @@ def guardar_steps(steps):
 
 
 def generar_tabla(script, cantidad, valores):
-    archivo = script.open('r')
+    archivo = script[0].open('r')
     contenido = archivo.read()
-    nuevo_archivo = settings.RUTAS_INTERNAS["CucumberSteps"] + archivo.__str__()
-    ruta_nuevo_steps = os.path.join(settings.CUCUMBER_PATH, nuevo_archivo)
+    nuevo_archivo = settings.MEDIA_URL + archivo.__str__()
+    ruta_nuevo_steps = os.path.join(settings.MEDIA_URL, nuevo_archivo)
     with open(ruta_nuevo_steps, "wb") as file:
         file.write(contenido)
-    for x in cantidad:
-        for llave in valores.keys:
+
+    with open(ruta_nuevo_steps, "a") as file:
+        file.write("\n\n")
+        file.write("\t\t")
+        file.write("Examples:")
+        file.write("\n\n")
+        file.write("\t\t")
+    for llave in valores:
+        with open(ruta_nuevo_steps, "a") as file:
+                file.write("|")
+                file.write(llave)
+    with open(ruta_nuevo_steps, "a") as file:
+        file.write("|")
+    y = 0
+    while y < int(cantidad):
+        with open(ruta_nuevo_steps, "a") as file:
+            file.write("\n")
+            file.write("\t\t")
+        for llave in valores:
             valor_generado = generar_aleatorio(valores.get(llave))
-            with open(ruta_nuevo_steps, "wb") as file:
+            with open(ruta_nuevo_steps, "a") as file:
                 file.write("|")
                 file.write(valor_generado)
-        with open(ruta_nuevo_steps, "wb") as file:
+        with open(ruta_nuevo_steps, "a") as file:
             file.write("|")
+        y += 1
+
+    return ruta_nuevo_steps
 
 
 def generar_aleatorio(llave):
-    return Faker.pystr()
+    fake = Faker()
+    return fake.pystr()
 
 
 if __name__ == '__main__':

@@ -36,7 +36,13 @@ def guardar_e2e(estrategia, request, tipo):
                 else:
                     crear_prueba_para_script(estrategia, herramienta, script, tipo)
         elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
-            crear_prueba_sin_script(herramienta, estrategia, tipo)
+            valores = {"email":"string", "password":"string", "error":"string"}
+            #{request.POST['nombre_encabezado']: request.POST['tipo_dato']}
+            cantidad = request.POST['numero_eventos']
+            print("iniciando proceso de generación de datos con valores:", valores)
+            print("y cantidad:", cantidad)
+            archivo_generado = util.generar_tabla(files, cantidad, valores)
+            crear_prueba_para_script(estrategia, herramienta, archivo_generado, tipo)
         else:
             for script in files:
                 crear_prueba_para_script(estrategia, herramienta, script, tipo)
