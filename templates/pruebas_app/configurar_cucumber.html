@@ -1,5 +1,6 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
+
         <form role="form" id="form-version" action="{% url 'guardar_configuracion_cucumber' estrategia.id %}"
               method="post"
               enctype="multipart/form-data" class="needs-validation">
@@ -9,51 +10,108 @@
                 <button type="button" class="close" data-dismiss="modal">x</button>
             </div>
             <div class="modal-body">
-                <div class="col-3">
-                    <div class="form-group">
-                        <input type="hidden" name="tipo" id="tipo" class="form-control" required readonly>
-                        </input>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="form-group">
-                        <input type="hidden" name="herramienta" id="herramienta" class="form-control" required readonly>
-                        </input>
-                    </div>
-                </div>
-                <div class=" col-8 input-group mb-3">
+                <div class="input-group mb-3">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="customFileLang" lang="es"
-                               name="archivo" multiple="multiple">
+                               name="archivo" required>
                         <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar
                             Archivo</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <input type="number" class="form-control" placeholder="Número de datos generados"
-                           name="numero_eventos" min="1" id="numero_eventos"/>
+                    <input type="number" class="form-control" placeholder="Cuántos datos desea generar"
+                           name="numero_datos" min="1" id="numero_datos" required/>
                 </div>
+
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Token" value=""
-                           name="nombre_encabezado" required/>
+                    <h5 class="mt-2">Ingrese la información para la tabla de ejemplos</h5>
                 </div>
-                <div class="form-group">
-                    <select name='tipo_dato' id='tipo_dato' class="form-control" required>
-                        <option class="hidden" value="" selected disabled>Seleccione el tipo de dato</option>
-                        <option value="TEXTO">TEXTO</option>
-                    </select>
-                </div>
+
+                <!--Table-->
+                <table class="table table-hover table-fixed">
+
+                    <!--Table body-->
+                    <tbody>
+                    <tr>
+                        <th>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Encabezado 1" value=""
+                                       name="nombre_encabezado1" required/>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="form-group">
+                                <select name='tipo_dato1' id='tipo_dato1' class="form-control" required>
+                                    <option class="hidden" value="" selected disabled>Tipo de dato</option>
+                                    <option value="TEXTO">TEXTO</option>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Encabezado 2" value=""
+                                       name="nombre_encabezado2" id="nombre_encabezado2"/>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="form-group">
+                                <select name='tipo_dato2' id='tipo_dato2' class="form-control">
+                                    <option class="hidden" value="" selected disabled>Tipo de dato</option>
+                                    <option value="TEXTO">TEXTO</option>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Encabezado 3" value=""
+                                       name="nombre_encabezado3" id="nombre_encabezado3"/>
+                            </div>
+                        </th>
+
+                        <th>
+                            <div class="form-group">
+                                <select name='tipo_dato3' id='tipo_dato3' class="form-control">
+                                    <option class="hidden" value="" selected disabled>Tipo de dato</option>
+                                    <option value="TEXTO">TEXTO</option>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Encabezado 4" value=""
+                                       name="nombre_encabezado4" id="nombre_encabezado4"/>
+                            </div>
+                        </th>
+
+
+                        <th>
+                            <div class="form-group">
+                                <select name='tipo_dato4' id='tipo_dato4' class="form-control">
+                                    <option class="hidden" value="" selected disabled>Tipo de dato</option>
+                                    <option value="TEXTO">TEXTO</option>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                    </tbody>
+                </table>
+
             </div>
             <div class="modal-footer">
                 <div class="col-lg-12 text-right">
-                    <input type="submit" class="btn btn-primary" name="submit" value="Guardar">
+                    <input onclick="validar();" type="submit" class="btn btn-primary" name="submit" value="Guardar">
                     <button type="button" class="btn btn-danger" onclick="return cerrar_modal()">Cancelar</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-</body>
 
 <script>
     // Add the following code if you want the name of the file appear on select
@@ -61,6 +119,33 @@
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
+
+    function validar() {
+      if ($("#nombre_encabezado2").val().length != 0 &&  $("#tipo_dato2").val() == null) {
+        $("#tipo_dato2").attr("required", true);
+        return false;
+      }
+      if ($("#nombre_encabezado3").val().length != 0 &&  $("#tipo_dato3").val() == null) {
+        $("#tipo_dato3").attr("required", true);
+        return false;
+      }
+      if ($("#nombre_encabezado4").val().length != 0 &&  $("#tipo_dato4").val() == null) {
+        $("#tipo_dato4").attr("required", true);
+        return false;
+      }
+      if ($("#tipo_dato2").val() != null && $("#nombre_encabezado2").val().length == 0) {
+        $("#nombre_encabezado2").attr("required", true);
+        return false;
+      }
+      if ($("#tipo_dato3").val() != null && $("#nombre_encabezado3").val().length == 0) {
+        $("#nombre_encabezado3").attr("required", true);
+        return false;
+      }
+      if ($("#tipo_dato4").val() != null && $("#nombre_encabezado4").val().length == 0) {
+        $("#nombre_encabezado4").attr("required", true);
+        return false;
+      }
+    }
 </script>
 
 

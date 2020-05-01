@@ -296,8 +296,8 @@ def guardar_steps(steps):
 def generar_tabla(script, cantidad, valores):
     archivo = script[0].open('r')
     contenido = archivo.read()
-    nuevo_archivo = settings.MEDIA_URL + archivo.__str__()
-    ruta_nuevo_steps = os.path.join(settings.MEDIA_URL, nuevo_archivo)
+    nuevo_archivo = settings.RUTAS_INTERNAS["GeneracionTemporal"] + archivo.__str__()
+    ruta_nuevo_steps = os.path.join(settings.MEDIA_ROOT, nuevo_archivo)
     with open(ruta_nuevo_steps, "wb") as file:
         file.write(contenido)
 
@@ -309,8 +309,8 @@ def generar_tabla(script, cantidad, valores):
         file.write("\t\t")
     for llave in valores:
         with open(ruta_nuevo_steps, "a") as file:
-                file.write("|")
-                file.write(llave)
+            file.write("|")
+            file.write(llave)
     with open(ruta_nuevo_steps, "a") as file:
         file.write("|")
     y = 0
@@ -330,9 +330,15 @@ def generar_tabla(script, cantidad, valores):
     return ruta_nuevo_steps
 
 
+fake = Faker()
+
+
 def generar_aleatorio(llave):
-    fake = Faker()
-    return fake.pystr()
+    print("La llave o tipo de dato es:", llave)
+    if llave == 'TEXTO':
+        return fake.pystr()
+    if llave == 'EMAIL':
+        return fake.ascii_company_email()
 
 
 if __name__ == '__main__':

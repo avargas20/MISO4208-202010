@@ -143,6 +143,7 @@ RUTAS_INTERNAS = {
     'CucumberFeatures': 'features/',
     'CucumberSteps': 'features/step-definitions/',
     'CucumberReporte': '/.tmp/report/',
+    'GeneracionTemporal': '.tmp/',
 }
 
 # Asi deberiamos agregar los tipos de aplicacion, asi se validan en la pagina agregar_version.html

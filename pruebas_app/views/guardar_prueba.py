@@ -36,13 +36,26 @@ def guardar_e2e(estrategia, request, tipo):
                 else:
                     crear_prueba_para_script(estrategia, herramienta, script, tipo)
         elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
-            valores = {"email":"string", "password":"string", "error":"string"}
-            #{request.POST['nombre_encabezado']: request.POST['tipo_dato']}
-            cantidad = request.POST['numero_eventos']
-            print("iniciando proceso de generación de datos con valores:", valores)
-            print("y cantidad:", cantidad)
-            archivo_generado = util.generar_tabla(files, cantidad, valores)
-            crear_prueba_para_script(estrategia, herramienta, archivo_generado, tipo)
+            for script in files:
+                if os.path.splitext(script.name)[1] != '.feature':
+                    print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
+                    util.guardar_steps(script)
+                else:
+                    valores = {}
+                    print("Request con valores:", request)
+                    if (request.POST['nombre_encabezado1'] and request.POST['tipo_dato1']):
+                        valores[request.POST['nombre_encabezado1']] = request.POST['tipo_dato1']
+                    if (request.POST['nombre_encabezado2'] and request.POST['tipo_dato2']):
+                        valores[request.POST['nombre_encabezado2']] = request.POST['tipo_dato2']
+                    if (request.POST['nombre_encabezado3'] and request.POST['tipo_dato3']):
+                        valores[request.POST['nombre_encabezado3']] = request.POST['tipo_dato3']
+                    if (request.POST['nombre_encabezado4'] and request.POST['tipo_dato4']):
+                        valores[request.POST['nombre_encabezado4']] = request.POST['tipo_dato4']
+                    print("iniciando proceso de generación de datos con valores:", valores)
+                    cantidad = request.POST['numero_datos']
+                    print("y cantidad:", cantidad)
+                    archivo_generado = util.generar_tabla(files, cantidad, valores)
+                    crear_prueba_para_script(estrategia, herramienta, archivo_generado, tipo)
         else:
             for script in files:
                 crear_prueba_para_script(estrategia, herramienta, script, tipo)

@@ -7,11 +7,12 @@
         $(document).ready(function () {
             $("#tipo").change(function () {
                 if ($("#tipo option:selected").html() == "Tipo") {
-                    $('e2e-required').hide();
+                    $('#e2e-required').hide();
                     $("#random-required").hide();
                     $("#botonAgregar").hide();
                 } else if ($("#tipo option:selected").html() == "E2E") {
-                    $("#botonAgregar").show();
+                    $('#e2e-required').show();
+                    $("#botonAgregar").hide();
                     $("#herramienta").show();
                     $("#customFileLang").attr("required", true);
                     $("#herramienta").attr("required", true);
@@ -19,7 +20,9 @@
                     $("#random-required").hide();
                     $("#numero_eventos").attr("required", false);
                     $("#semilla").attr("required", false);
+                    $("#cucumberConfig").hide();
                 } else if ($("#tipo option:selected").html() == "Aleatorias") {
+                    $('#e2e-required').hide();
                     $("#botonAgregar").show();
                     $("#random-required").show();
                     $("#numero_eventos").attr("required", true);
@@ -41,10 +44,12 @@
                     $('.custom-file').hide();
                     $("#cucumberConfig").show();
                     $("#customFileLang").attr("required", false);
+                    $("#botonAgregar").hide();
                 } else {
                     $('.custom-file').show();
                     $("#cucumberConfig").hide();
                     $("#customFileLang").attr("required", true);
+                    $("#botonAgregar").show();
                 }
             });
             $("#herramienta").trigger("change");
@@ -227,9 +232,9 @@
                         </button>
                     </div>
                 </div>
-                <div id="popup" class="modal fade" role="dialog">
-                </div>
             </form>
+            <div id="popup" class="modal fade" role="dialog">
+            </div>
         </div>
     </div>
 {% endblock content %}
