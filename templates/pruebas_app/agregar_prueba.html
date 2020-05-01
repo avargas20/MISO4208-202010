@@ -206,9 +206,15 @@
                             <div class="form-group">
                                 <select name="herramienta" id="herramienta" class="form-control custom-select">
                                     <option class="hidden" value="" selected disabled>Herramienta</option>
-                                    {% for h in herramientas %}
-                                        <option value="{{ h.id }}">{{ h.nombre }}</option>
-                                    {% endfor %}
+                                    {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                                        {% for h in estrategia.aplicacion.tipo.herramientas.all %}
+                                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                        {% endfor %}
+                                    {% elif estrategia.aplicacion.tipo.tipo == 'Web' %}
+                                        {% for h in estrategia.aplicacion.tipo.herramientas.all %}
+                                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                        {% endfor %}
+                                    {% endif %}
                                 </select>
                             </div>
                         </div>
