@@ -30,17 +30,14 @@ if __name__ == '__main__':
                 comando = subprocess.run(['jest', nuevo_archivo], shell=True, stdout=subprocess.PIPE,
                                          cwd=settings.PUPPETEER_PATH)
                 print('Salida:', comando.stdout.decode('utf-8'))
-
+                print('returnCode', comando.returncode)
                 reporte = open(settings.PUPPETEER_PATH + 'test-report.html', 'rb')
                 archivo_reporte = File(reporte)
-                parser = BeautifulSoup(reporte.read().decode('utf-8'), 'html.parser')
-                resumen = str(parser.find(id="summary"))
-                fallas = int(resumen.split("passed / ")[1].split(" failed")[0])
-                if fallas == 0:
+                # Si el returnCode es 0 es porque la prueba es exitosa
+                if int(comando.returncode):
+                    resultado.exitoso = False
+                else:
                     resultado.exitoso = True
-
-                print("Fallas en la suit: ", fallas)
-
                 resultado.resultado.save('reporte_puppeteer.html', archivo_reporte, save=True)
                 resultado.terminada = True
                 resultado.save()

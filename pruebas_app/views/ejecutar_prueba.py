@@ -35,8 +35,8 @@ def ejecutar_estrategia(request):
             resultado.solicitud = solicitud
             resultado.prueba = prueba
             resultado.save()
+            herramienta = prueba.herramienta.nombre
             if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-                herramienta = prueba.herramienta.nombre
                 # Aquí se debe mandar el mensaje a la cola respectiva (por ahora voy a lanzar el proceso manual)
                 if herramienta == settings.TIPOS_HERRAMIENTAS["cypress"]:
                     enviar_mensaje_cola(COLA_CYPRESS, herramienta, resultado)
