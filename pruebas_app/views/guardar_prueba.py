@@ -23,29 +23,23 @@ def guardar_prueba(request, estrategia_id):
 
 
 def guardar_e2e(estrategia, request, tipo):
-    files = request.FILES.getlist('archivo')
-    print("Los archivos recibidos son:", files)
-    herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
-    print("La herramienta es", herramienta)
-    if herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["cucumber"]:
-        for script in files:
-            if os.path.splitext(script.name)[1] != '.feature':
-                print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
-                util.guardar_steps(script)
-            else:
+    if request.FILES.getlist('archivo'):
+        files = request.FILES.getlist('archivo')
+        print("Los archivos recibidos son:", files)
+        herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
+        print("La herramienta es", herramienta)
+        if herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["cucumber"]:
+            for script in files:
+                if os.path.splitext(script.name)[1] != '.feature':
+                    print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
+                    util.guardar_steps(script)
+                else:
+                    crear_prueba_para_script(estrategia, herramienta, script, tipo)
+        elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
+            crear_prueba_sin_script(herramienta, estrategia, tipo)
+        else:
+            for script in files:
                 crear_prueba_para_script(estrategia, herramienta, script, tipo)
-    elif herramienta.__str__() == settings.TIPOS_HERRAMIENTAS["generacion"]:
-        valores = {'nombre': 'name'}  # request.FILES.getlist('valores')
-        cantidad = 10  # request.FILES.getlist('cantidad')
-        for script in files:
-            if os.path.splitext(script.name)[1] != '.feature':
-                print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
-                util.generar_tabla(script, cantidad, valores)
-            else:
-                crear_prueba_para_script(estrategia, herramienta, script, tipo)
-    else:
-        for script in files:
-            crear_prueba_para_script(estrategia, herramienta, script, tipo)
 
 
 def crear_prueba_para_script(estrategia, herramienta, script, tipo):
