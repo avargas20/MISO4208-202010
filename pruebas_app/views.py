@@ -360,7 +360,7 @@ def guardar_mutacion(request):
                                             'DataType': 'Number'
                                         }
                                     })
-        return HttpResponseRedirect(reverse('mutacion'))
+        return HttpResponseRedirect(reverse('ver_mutaciones'))
 
 def ver_mutaciones(request):
     mutaciones = Mutacion.objects.all().order_by('-id')

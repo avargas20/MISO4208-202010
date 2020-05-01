@@ -21,6 +21,7 @@
                 <th>Versión</th>
                 <th># Mutantes</th>
                 <th>Operadores</th>
+                <th>Estado</th>
             </tr>
             </thead>
             <!--Table head-->
@@ -41,6 +42,7 @@
                     {% endfor %}
                     </ul>
                 </td>
+                <td class="text-center">{% if mutacion.reporte_json %} Finalizado {% else %} Pendiente {% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
