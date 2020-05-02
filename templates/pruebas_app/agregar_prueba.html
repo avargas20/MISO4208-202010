@@ -11,6 +11,7 @@
                     $("#random-required").hide();
                     $("#botonAgregar").hide();
                 } else if ($("#tipo option:selected").html() == "E2E") {
+                    $("#checkCucumber").hide();
                     $('#e2e-required').show();
                     $("#botonAgregar").hide();
                     $("#herramienta").show();
@@ -36,18 +37,18 @@
 
             $("#herramienta").change(function () {
                 if ($("#herramienta option:selected").html() == "Herramienta") {
-                    $('#herramienta').hide();
                     $('.custom-file').hide();
                     $("#cucumberConfig").hide();
                     $("#customFileLang").attr("required", false);
-                } else if ($("#herramienta option:selected").html() == "Generacion") {
-                    $('.custom-file').hide();
-                    $("#cucumberConfig").show();
-                    $("#customFileLang").attr("required", false);
-                    $("#botonAgregar").hide();
-                } else {
+                } else if ($("#herramienta option:selected").html() == "Cucumber") {
+                    $("#checkCucumber").show();
                     $('.custom-file').show();
+                    $("#customFileLang").attr("required", true);
+                    $("#botonAgregar").show();
+                } else {
                     $("#cucumberConfig").hide();
+                    $('.custom-file').show();
+                    $("#checkCucumber").hide();
                     $("#customFileLang").attr("required", true);
                     $("#botonAgregar").show();
                 }
@@ -61,11 +62,12 @@
             });
         });
 
-        function abrir_modal(url, tipo, herramienta) {
+        function abrir_modal(url, tipo, herramienta, esGeneracion) {
             $('#popup').load(url, function () {
                 $(this).modal('show');
                 $(".modal-body #tipo").val(tipo.children("option:selected").val());
                 $(".modal-body #herramienta").val(herramienta.children("option:selected").val());
+                $(".modal-body #checkboxCucumber").val(esGeneracion.prop("checked"));
             });
             return false;
         }
@@ -73,6 +75,20 @@
         function cerrar_modal() {
             $('#popup').modal('hide');
             return false;
+        }
+
+        function toggleCucumber() {
+            if ($('#checkboxCucumber').prop("checked") == true) {
+                $("#cucumberConfig").show();
+                $('.custom-file').hide();
+                $("#customFileLang").attr("required", false);
+                $("#botonAgregar").hide();
+            } else {
+                $("#cucumberConfig").hide();
+                $('.custom-file').show();
+                $("#customFileLang").attr("required", true);
+                $("#botonAgregar").show();
+            }
         }
     </script>
 
@@ -153,11 +169,11 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class=" col-8 input-group mb-3">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="customFileLang">
-                                    <label class="custom-file-label" for="customFileLang"
-                                           aria-describedby="customFileLang">{{ p.script }}</label>
+                            <div class=" col-6 input-group mb-3">
+                                <div class="custom-file2">
+                                    <input type="file" class="custom-file-input" id="customFileLang2">
+                                    <label class="custom-file-label" for="customFileLang2"
+                                           aria-describedby="customFileLang2" >{{ p.script }}</label>
                                 </div>
                             </div>
                         </div>
@@ -193,12 +209,12 @@
                                    name="numero_eventos" min="1" id="numero_eventos"/>
                         </div>
                         {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                        <div class="col-6">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Semilla"
-                                       name="semilla" id="semilla"/>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Semilla"
+                                           name="semilla" id="semilla"/>
+                                </div>
                             </div>
-                        </div>
                         {% endif %}
                     </div>
                     <div id="e2e-required" class="row col-8">
@@ -208,17 +224,21 @@
                                     <option class="hidden" value="" selected disabled>Herramienta</option>
                                     {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
                                         {% for h in estrategia.aplicacion.tipo.herramientas.all %}
-                                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                            <option value="{{ h.id }}">{{ h.nombre }}</option>
                                         {% endfor %}
                                     {% elif estrategia.aplicacion.tipo.tipo == 'Web' %}
                                         {% for h in estrategia.aplicacion.tipo.herramientas.all %}
-                                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                            <option value="{{ h.id }}">{{ h.nombre }}</option>
                                         {% endfor %}
                                     {% endif %}
                                 </select>
                             </div>
                         </div>
-                        <div class=" col-8 input-group mb-3">
+                        <div id="checkCucumber" class="col-2" >
+                            Data Gen
+                            <input type="checkbox" name ="checkboxCucumber" id="checkboxCucumber" value="false" onclick="toggleCucumber()">
+                        </div>
+                        <div class=" col-6 input-group mb-3">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="customFileLang" lang="es"
                                        name="archivo" multiple="multiple">
@@ -228,7 +248,7 @@
                             <div class="cucumber-config">
                                 <a class="btn btn-warning" id="cucumberConfig"
                                    name="cucumberConfig"
-                                   onclick="return abrir_modal('{% url 'configurar_cucumber' estrategia.id %}', $('#tipo'), $('#herramienta'))">
+                                   onclick="return abrir_modal('{% url 'configurar_cucumber' estrategia.id %}', $('#tipo'), $('#herramienta'), $('#checkboxCucumber'))">
                                     Configurar Cucumber
                                 </a>
                             </div>

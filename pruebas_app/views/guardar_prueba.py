@@ -23,19 +23,20 @@ def guardar_prueba(request, estrategia_id):
 
 
 def guardar_e2e(estrategia, request, tipo):
+    print("El request a guardar es:", request.POST)
     if request.FILES.getlist('archivo'):
         files = request.FILES.getlist('archivo')
         print("Los archivos recibidos son:", files)
         herramienta = Herramienta.objects.get(id=request.POST['herramienta'])
         print("La herramienta es", herramienta)
-        if herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"]:
+        if herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"] and request.POST.get('checkboxCucumber', False) is False:
             for script in files:
                 if os.path.splitext(script.name)[1] != '.feature':
                     print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")
                     util.guardar_steps(script)
                 else:
                     crear_prueba_para_script(estrategia, herramienta, script, tipo)
-        elif herramienta.nombre == settings.TIPOS_HERRAMIENTAS["generacion"]:
+        elif herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"] and request.POST['checkboxCucumber']:
             for script in files:
                 if os.path.splitext(script.name)[1] != '.feature':
                     print("Uno de los archivos cargados no es .feature, se copiará al destino adecuado.")

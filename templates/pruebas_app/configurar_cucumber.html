@@ -10,18 +10,25 @@
                 <button type="button" class="close" data-dismiss="modal">x</button>
             </div>
             <div class="modal-body">
-                 <div class="col-3">
-                <div class="form-group">
-                    <input type="hidden" name="tipo" id="tipo" class="form-control" required readonly>
-                    </input>
+                <div>
+                    <div class="form-group">
+                        <input type="hidden" name="tipo" id="tipo" class="form-control" required readonly>
+                        </input>
+                    </div>
                 </div>
-            </div>
-            <div class="col-4">
-                <div class="form-group">
-                    <input type="hidden" name="herramienta" id="herramienta" class="form-control"required readonly>
-                    </input>
+                <div>
+                    <div class="form-group">
+                        <input type="hidden" name="herramienta" id="herramienta" class="form-control" required readonly>
+                        </input>
+                    </div>
                 </div>
-            </div>
+                <div>
+                    <div class="form-group">
+                        <input type="hidden" name="checkboxCucumber" id="checkboxCucumber" class="form-control" required
+                               readonly>
+                        </input>
+                    </div>
+                </div>
                 <div class="input-group mb-3">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="customFileLang" lang="es"
@@ -134,30 +141,30 @@
     });
 
     function validar() {
-      if ($("#nombre_encabezado2").val().length != 0 &&  $("#tipo_dato2").val() == null) {
-        $("#tipo_dato2").attr("required", true);
-        return false;
-      }
-      if ($("#nombre_encabezado3").val().length != 0 &&  $("#tipo_dato3").val() == null) {
-        $("#tipo_dato3").attr("required", true);
-        return false;
-      }
-      if ($("#nombre_encabezado4").val().length != 0 &&  $("#tipo_dato4").val() == null) {
-        $("#tipo_dato4").attr("required", true);
-        return false;
-      }
-      if ($("#tipo_dato2").val() != null && $("#nombre_encabezado2").val().length == 0) {
-        $("#nombre_encabezado2").attr("required", true);
-        return false;
-      }
-      if ($("#tipo_dato3").val() != null && $("#nombre_encabezado3").val().length == 0) {
-        $("#nombre_encabezado3").attr("required", true);
-        return false;
-      }
-      if ($("#tipo_dato4").val() != null && $("#nombre_encabezado4").val().length == 0) {
-        $("#nombre_encabezado4").attr("required", true);
-        return false;
-      }
+        if ($("#nombre_encabezado2").val().length != 0 && $("#tipo_dato2").val() == null) {
+            $("#tipo_dato2").attr("required", true);
+            return false;
+        }
+        if ($("#nombre_encabezado3").val().length != 0 && $("#tipo_dato3").val() == null) {
+            $("#tipo_dato3").attr("required", true);
+            return false;
+        }
+        if ($("#nombre_encabezado4").val().length != 0 && $("#tipo_dato4").val() == null) {
+            $("#tipo_dato4").attr("required", true);
+            return false;
+        }
+        if ($("#tipo_dato2").val() != null && $("#nombre_encabezado2").val().length == 0) {
+            $("#nombre_encabezado2").attr("required", true);
+            return false;
+        }
+        if ($("#tipo_dato3").val() != null && $("#nombre_encabezado3").val().length == 0) {
+            $("#nombre_encabezado3").attr("required", true);
+            return false;
+        }
+        if ($("#tipo_dato4").val() != null && $("#nombre_encabezado4").val().length == 0) {
+            $("#nombre_encabezado4").attr("required", true);
+            return false;
+        }
     }
 </script>
 
