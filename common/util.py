@@ -76,7 +76,7 @@ def validar_ultimo(solicitud):
 
 # Este metodo valida si la prueba de VRT reporta cambios segun el % proporcionado al momento de la ejecucion
 def validar_resultado_vrt(informacion, sensibilidad_VRT):
-    if informacion > sensibilidad_VRT:
+    if informacion >= sensibilidad_VRT:
         fallida = True
     else:
         fallida = False
@@ -108,12 +108,12 @@ def ejecutar_vrt(solicitud_posterior):
 
             # para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
             imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(
-                solicitud_posterior.id) + 'diferencia.png '
+                solicitud_posterior.id) + 'diferencia.png'
 
             comando = subprocess.run(
                 ['node', 'index.js', imagen_anterior.path, imagen_posterior.path,
                  imagen_diferencias], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
-
+            print('returnCodeVRT:', comando.returncode)
             # Se guarda en informacion el json generado por resemble
             informacion = comando.stdout.decode('utf-8')
             print("la salida es:", informacion)
@@ -122,7 +122,7 @@ def ejecutar_vrt(solicitud_posterior):
             json_content = json.dumps(informacion)
             diferencia_real = json_content.split("'")[1].split("'")[-1]
             validacion = validar_resultado_vrt(Decimal(diferencia_real), solicitud_posterior.sensibilidad_VRT)
-
+            print('validacion', validacion)
             # Solo se guarda la imagen cuando se encuentran diferencias
             if validacion:
                 resultado_vrt = ResultadoVRT()
@@ -136,7 +136,6 @@ def ejecutar_vrt(solicitud_posterior):
                 resultado_vrt.imagen_diferencias.save('diferencia.png', File(imagen_diff), save=True)
                 imagen_diff.close()
                 resultado_vrt.save()
-
             os.remove(imagen_diferencias)
 
 

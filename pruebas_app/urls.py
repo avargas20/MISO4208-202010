@@ -29,7 +29,7 @@ urlpatterns = [
     path('condiciones_de_lanzamiento/<int:estrategia_id>', views.condiciones_de_lanzamiento,
          name='condiciones_de_lanzamiento'),
     path('ver_resultados/<int:solicitud_id>', views.ver_resultados, name='ver_resultados'),
-    path('mutacion/', views.mutacion, name='mutacion'),
+    path('mutacion/', views.crear_mutacion, name='mutacion'),
     path('guardar_mutacion/', views.guardar_mutacion, name='guardar_mutacion'),
     path('ver_mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
     path('ver_resultados_mutacion/<int:mutacion_id>', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),

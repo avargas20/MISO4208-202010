@@ -162,7 +162,7 @@ class Solicitud(models.Model):
     evidencia = models.FileField(upload_to=directorio_evidencia, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
     estrategia = models.ForeignKey(Estrategia, on_delete=models.CASCADE)
-    sensibilidad_VRT = models.DecimalField(null=True, max_digits=3, decimal_places=2)
+    sensibilidad_VRT = models.DecimalField(null=True, max_digits=4, decimal_places=2)
     solicitud_VRT = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     version = models.ForeignKey(Version, on_delete=models.CASCADE, null=True)
     mutante = models.ForeignKey(Mutante, on_delete=models.CASCADE, null=True)

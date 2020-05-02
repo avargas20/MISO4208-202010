@@ -18,7 +18,7 @@
                 <th>Aplicación</th>
                 <th>Versión</th>
                 <th>Estrategia</th>
-                <th>Tiene VRT</th>
+                <th>Tiene VRT - Baseline</th>
                 <th>Estado</th>
                 <th>Exitosa</th>
                 <th>Resultado</th>
@@ -35,7 +35,7 @@
                     <td class="text-center">{{ solicitud.estrategia.aplicacion.nombre }}</td>
                     <td class="text-center">{{ solicitud.version.numero }}</td>
                     <td class="text-center">{{ solicitud.estrategia.nombre }}</td>
-                    <td class="text-center">{% if solicitud.solicitud_VRT %} Sí {% else %} No {% endif %}</td>
+                    <td class="text-center">{% if solicitud.solicitud_VRT %} Sí - Solicitud {{ solicitud.solicitud_VRT.id }} {% else %} No {% endif %}</td>
                     <td class="text-center">{{ solicitud.estado }}</td>
                     <td class="text-center">{% if solicitud.exitosa %} Sí {% else %} No {% endif %}</td>
                     {% if solicitud.terminada %}
