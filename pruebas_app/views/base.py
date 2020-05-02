@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 import zipfile
+from io import BytesIO
 
 import boto3
 from django.core.paginator import Paginator
@@ -97,6 +98,7 @@ def descargar_evidencias(request, solicitud_id):
     solicitud = Solicitud.objects.get(id=solicitud_id)
     file_path = solicitud.evidencia.path
     print("ruta buscada", file_path)
+
     if os.path.exists(file_path):
         with open(file_path, 'rb') as file:
             response = HttpResponse(file.read(), content_type="application/")
@@ -104,7 +106,6 @@ def descargar_evidencias(request, solicitud_id):
                                               os.path.basename(file_path)
             return response
     raise Http404
-
 
 def nueva_aplicacion(request):
     aplicaciones = Aplicacion.objects.all()
@@ -263,3 +264,31 @@ def ver_mutaciones(request):
     page = request.GET.get('page')
     mutaciones_out = paginator.get_page(page)
     return render(request, 'pruebas_app/ver_mutaciones.html', {'mutaciones': mutaciones_out})
+
+def descargar_evidencias_mutacion(request, mutacion_id):
+    mutacion = Mutacion.objects.get(id=mutacion_id)
+
+    # Files (local path) to put in the .zip
+    filenames = [mutacion.reporte_json, mutacion.reporte_csv, mutacion.reporte_log]
+
+    stream = BytesIO()
+    temp_zip_file = zipfile.ZipFile(stream, 'w')
+
+    for f in filenames:
+        temp_zip_file.write(f.path, f.name)
+
+    temp_zip_file.close()
+
+    response = HttpResponse(stream.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s' % '{0}_result_mutation.zip'.format(mutacion_id)
+
+    return response
+
+
+def ver_resultados_mutacion(request, mutacion_id):
+    try:
+        mutacion = Mutacion.objects.get(id=int(mutacion_id))
+    except Mutacion.DoesNotExist:
+        raise Http404("Mutación no encontrada")
+
+    return render(request, 'pruebas_app/ver_resultados_mutacion.html', {'mutacion': mutacion})

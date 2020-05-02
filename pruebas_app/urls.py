@@ -32,4 +32,6 @@ urlpatterns = [
     path('mutacion/', views.mutacion, name='mutacion'),
     path('guardar_mutacion/', views.guardar_mutacion, name='guardar_mutacion'),
     path('ver_mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
+    path('ver_resultados_mutacion/<int:mutacion_id>', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),
+    path('descargar_evidencias_mutacion/<int:mutacion_id>', views.descargar_evidencias_mutacion, name='descargar_evidencias_mutacion'),
 ]

@@ -6,90 +6,103 @@
 {% block subtitle %}<h1 class="mt-2">Mutaciones</h1>{% endblock subtitle %}
 
 {% block content %}
-    <h6 class="m-5">A continuación observe un resumen de las mutaciones lanzadas </h6>
-    <div class="table-responsive col-12 ">
-        <!-- Page Content -->
-        <!--Table-->
-        <table class="table table-hover table-fixed">
+<h6 class="m-5">A continuación observe un resumen de las mutaciones lanzadas </h6>
+<div class="table-responsive col-12 ">
+    <!-- Page Content -->
+    <!--Table-->
+    <table class="table table-hover table-fixed">
 
-            <!--Table head-->
-            <thead>
-            <tr class="text-center">
-                <th># ID</th>
-                <th>Fecha creación</th>
-                <th>Aplicación</th>
-                <th>Versión</th>
-                <th># Mutantes</th>
-                <th>Operadores</th>
-                <th>Estado</th>
-            </tr>
-            </thead>
-            <!--Table head-->
+        <!--Table head-->
+        <thead>
+        <tr class="text-center">
+            <th># ID</th>
+            <th>Fecha creación</th>
+            <th>Aplicación</th>
+            <th>Versión</th>
+            <th># Mutantes</th>
+            <th>Operadores</th>
+            <th>Estado</th>
+        </tr>
+        </thead>
+        <!--Table head-->
 
-            <!--Table body-->
-            <tbody>
-            {% for mutacion in mutaciones %}
-            <tr>
-                <th scope="row" class="text-center">{{ mutacion.id }}</th>
-                <td class="text-center">{{ mutacion.fecha_creacion |date:"d F Y" }} - {{ mutacion.fecha_creacion |time:"h:i a" }}</td>
-                <td class="text-center">{{ mutacion.version.aplicacion.nombre }}</td>
-                <td class="text-center">{{ mutacion.version.numero }}</td>
-                <td class="text-center">{{ mutacion.numero_mutantes }}</td>
-                <td>
-                    <ul>
+        <!--Table body-->
+        <tbody>
+        {% for mutacion in mutaciones %}
+        <tr>
+            <th scope="row" class="text-center">{{ mutacion.id }}</th>
+            <td class="text-center">{{ mutacion.fecha_creacion |date:"d F Y" }} - {{ mutacion.fecha_creacion |time:"h:i a" }}
+            </td>
+            <td class="text-center">{{ mutacion.version.aplicacion.nombre }}</td>
+            <td class="text-center">{{ mutacion.version.numero }}</td>
+            <td class="text-center">{{ mutacion.numero_mutantes }}</td>
+            <td>
+                <ul>
                     {% for operador in mutacion.operadores.all %}
-                        <li>{{ operador.nombre }}</li>
+                    <li>{{ operador.nombre }}</li>
                     {% endfor %}
-                    </ul>
-                </td>
-                <td class="text-center">{% if mutacion.reporte_json %} Finalizado {% else %} Pendiente {% endif %}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-            <!--Table body-->
-
-        </table>
-        <!--Table-->
-        <!-- Paginator -->
-        <div class="row justify-content-center">
-            <nav aria-label="Page navigation example">
-                {% if mutaciones.has_other_pages %}
-                <ul class="pagination justify-content-center">
-                    {% if mutaciones.has_previous %}
-                    <li class="page-item"><a class="page-link"
-                                             href="?page={{ mutaciones.previous_page_number }}"><span
-                            aria-hidden="true">&laquo;</span></a></li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
-                                aria-hidden="true">&laquo;</span></a>
-                    </li>
-                    {% endif %}
-                    {% for i in mutaciones.paginator.page_range %}
-                    {% if mutaciones.number == i %}
-                    <li class="page-item active"><a class="page-link"
-                                                    href="?page={{ i }}"><span>{{ i }} <span
-                            class="sr-only">(current)</span></span></a></li>
-                    {% else %}
-                    <li class="page-item"><a class="page-link"
-                                             href="?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                    {% endfor %}
-                    {% if mutaciones.has_next %}
-                    <li class="page-item"><a class="page-link"
-                                             href="?page={{ mutaciones.next_page_number }}"><span
-                            aria-hidden="true">&raquo;</span></a></li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
-                                aria-hidden="true">&raquo;</span></a>
-                    </li>
-
-                    {% endif %}
                 </ul>
+            </td>
+            {% if mutacion.reporte_json %}
+            <td class="text-center">
+                <a href="{% url 'ver_resultados_mutacion' mutacion.id %}" class="mr-3">
+                    <i class="fas fa-search-plus"></i>
+                </a>
+                <a href="{% url 'descargar_evidencias_mutacion' mutacion.id %}">
+                    <i class="fas fa-download"></i>
+                </a>
+
+            </td>
+            {% else %}
+            <td class="text-center">Pendiente</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+        <!--Table body-->
+
+    </table>
+    <!--Table-->
+    <!-- Paginator -->
+    <div class="row justify-content-center">
+        <nav aria-label="Page navigation example">
+            {% if mutaciones.has_other_pages %}
+            <ul class="pagination justify-content-center">
+                {% if mutaciones.has_previous %}
+                <li class="page-item"><a class="page-link"
+                                         href="?page={{ mutaciones.previous_page_number }}"><span
+                        aria-hidden="true">&laquo;</span></a></li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
+                            aria-hidden="true">&laquo;</span></a>
+                </li>
                 {% endif %}
-            </nav>
-        </div>
-        <!-- Paginator -->
+                {% for i in mutaciones.paginator.page_range %}
+                {% if mutaciones.number == i %}
+                <li class="page-item active"><a class="page-link"
+                                                href="?page={{ i }}"><span>{{ i }} <span
+                        class="sr-only">(current)</span></span></a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link"
+                                         href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if mutaciones.has_next %}
+                <li class="page-item"><a class="page-link"
+                                         href="?page={{ mutaciones.next_page_number }}"><span
+                        aria-hidden="true">&raquo;</span></a></li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span
+                            aria-hidden="true">&raquo;</span></a>
+                </li>
+
+                {% endif %}
+            </ul>
+            {% endif %}
+        </nav>
     </div>
+    <!-- Paginator -->
+</div>
 {% endblock content %}
