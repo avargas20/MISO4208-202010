@@ -81,10 +81,10 @@ def guardar_aleatorias(estrategia, request, tipo):
         prueba.herramienta = Herramienta.objects.get(nombre=settings.TIPOS_HERRAMIENTAS["cypress"])
     if prueba.estrategia.aplicacion.tipo.tipo == settings.TIPOS_APLICACION2.Movil.value:
         # la variable creada retorna un boolean indicando si el valor fue creado o no
+        prueba.semilla = request.POST['semilla']
         herramienta, creada = Herramienta.objects.get_or_create(nombre=settings.TIPOS_HERRAMIENTAS2.ADB.value,
                                                                 defaults={
                                                                     'descripcion': 'Pruebas aleatorias móviles'})
         prueba.herramienta = herramienta
     prueba.numero_eventos = request.POST['numero_eventos']
-    prueba.semilla = request.POST['semilla']
     prueba.save()
