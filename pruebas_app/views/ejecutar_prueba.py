@@ -46,8 +46,7 @@ def ejecutar_estrategia(request):
                     enviar_mensaje_cola(COLA_PUPPETEER, herramienta, resultado)
                 elif herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
                     enviar_mensaje_cola(COLA_CALABASH, herramienta, resultado)
-                elif (herramienta == settings.TIPOS_HERRAMIENTAS["cucumber"]) or (
-                        herramienta == settings.TIPOS_HERRAMIENTAS["generacion"]):
+                elif (herramienta == settings.TIPOS_HERRAMIENTAS["cucumber"]) :
                     enviar_mensaje_cola(COLA_CUCUMBER, herramienta, resultado)
             elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
                 if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
