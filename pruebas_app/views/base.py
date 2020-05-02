@@ -207,8 +207,7 @@ def ver_resultados(request, solicitud_id):
             logs.append(r)
         elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["puppeteer"]:
             pag_html.append(r)
-        elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"] or r.prueba.herramienta.nombre == \
-                settings.TIPOS_HERRAMIENTAS["generacion"]:
+        elif r.prueba.herramienta.nombre == settings.TIPOS_HERRAMIENTAS["cucumber"]:
             print("El resultado es:", r.resultado.path)
             with zipfile.ZipFile(r.resultado.path, 'r') as zip_ref:
                 zip_ref.extractall('archivos/resultados/extract/' + r.resultado.__str__())
