@@ -148,15 +148,18 @@
                                        value="{{ p.numero_eventos }}"
                                 />
                             </div>
-                            {% if p.semilla != '' %}
-                                <div class="col-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Semilla" disabled
-                                               value="{{ p.semilla }}"
-                                        />
+                            {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                                {% if p.semilla %}
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Semilla" disabled
+                                                   value="{{ p.semilla }}"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             {% endif %}
+
                         </div>
                     {% endif %}
                     {% if p.tipo.nombre == 'E2E' %}
@@ -173,7 +176,7 @@
                                 <div class="custom-file2">
                                     <input type="file" class="custom-file-input" id="customFileLang2">
                                     <label class="custom-file-label" for="customFileLang2"
-                                           aria-describedby="customFileLang2" >{{ p.script }}</label>
+                                           aria-describedby="customFileLang2">{{ p.script }}</label>
                                 </div>
                             </div>
                         </div>
@@ -234,9 +237,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div id="checkCucumber" class="col-2" >
+                        <div id="checkCucumber" class="col-2">
                             Data Gen
-                            <input type="checkbox" name ="checkboxCucumber" id="checkboxCucumber" value="false" onclick="toggleCucumber()">
+                            <input type="checkbox" name="checkboxCucumber" id="checkboxCucumber" value="false"
+                                   onclick="toggleCucumber()">
                         </div>
                         <div class=" col-6 input-group mb-3">
                             <div class="custom-file">
