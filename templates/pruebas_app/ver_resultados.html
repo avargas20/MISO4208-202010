@@ -110,8 +110,20 @@
             <div class="col-md-12">
                 {% for i in imagenes_VRT %}
                 <div class="col-md-12">
-                    <p class="h5 mb-4">Solicitud Baseline: <span
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="h5 mb-4">Solicitud Baseline: <span
                             style="color:#e83e8c">{{ i.solicitud.solicitud_VRT_id }}</span></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="h5 mb-4">Porcentaje ingresado: <span
+                            style="color:#e83e8c">{{ i.solicitud.sensibilidad_VRT }} % </span></p>
+                        </div>
+                         <div class="col-md-4">
+                            <p class="h5 mb-4">Porcentaje obtenido: <span
+                            style="color:#e83e8c">{{ i.porcentaje }} % </span></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-3">
                     <div class="col-md-4">
@@ -121,7 +133,7 @@
                                      style="width:100%" class="card-img-top">
                             </a>
                             <div class="card-body">
-                                <h6 class="card-title">Screenshot previo</h6>
+                                <h6 class="card-title">Screenshot baseline</h6>
 
                             </div>
                         </div>
@@ -133,7 +145,7 @@
                                      style="width:100%" class="card-img-top">
                             </a>
                             <div class="card-body">
-                                <h6 class="card-title">Screenshot posterior</h6>
+                                <h6 class="card-title">Screenshot actual</h6>
 
                             </div>
                         </div>

@@ -246,3 +246,4 @@ class ResultadoVRT(models.Model):
     imagen_diferencias = models.ImageField(upload_to=directorio_vrt, null=True)
     fallida = models.BooleanField(default=False)
     informacion = models.CharField(max_length=200, null=True)
+    porcentaje = models.CharField(max_length=10, null=True)

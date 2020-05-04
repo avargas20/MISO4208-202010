@@ -131,6 +131,7 @@ def ejecutar_vrt(solicitud_posterior):
                 resultado_vrt.informacion = informacion
                 resultado_vrt.solicitud = solicitud_posterior
                 resultado_vrt.fallida = validacion
+                resultado_vrt.porcentaje = diferencia_real
 
                 imagen_diff = open(imagen_diferencias, 'rb')
                 resultado_vrt.imagen_diferencias.save('diferencia.png', File(imagen_diff), save=True)
