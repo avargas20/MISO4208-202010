@@ -4,7 +4,7 @@ from io import BytesIO
 import boto3
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from pruebas_app.models import Aplicacion, Version, Operador, Mutacion
@@ -15,13 +15,12 @@ COLA_MUTACION = SQS.get_queue_by_name(QueueName=settings.SQS_MUTACION_NAME)
 
 
 def crear_mutacion(request):
-    aplicaciones = Aplicacion.objects.filter(tipo__tipo=settings.TIPOS_APLICACION2.Movil.value)
-    operadores = Operador.objects.all()
-    return render(request, 'pruebas_app/crear_mutacion.html', {'aplicaciones': aplicaciones, 'operadores': operadores})
-
-
-def guardar_mutacion(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
+        aplicaciones = Aplicacion.objects.filter(tipo__tipo=settings.TIPOS_APLICACION2.Movil.value)
+        operadores = Operador.objects.all()
+        return render(request, 'pruebas_app/crear_mutacion.html',
+                      {'aplicaciones': aplicaciones, 'operadores': operadores})
+    elif request.method == 'POST':
         numero_mutantes = request.POST['numero_mutantes']
         version = Version.objects.get(id=int(request.POST['version']))
         mutacion_version = Mutacion(version=version, numero_mutantes=numero_mutantes)
@@ -47,7 +46,7 @@ def ver_mutaciones(request):
     return render(request, 'pruebas_app/ver_mutaciones.html', {'mutaciones': mutaciones_out})
 
 
-def descargar_evidencias_mutacion(mutacion_id):
+def descargar_evidencias_mutacion(request, mutacion_id):
     mutacion = Mutacion.objects.get(id=mutacion_id)
 
     # Files (local path) to put in the .zip
@@ -74,3 +73,11 @@ def ver_resultados_mutacion(request, mutacion_id):
         raise Http404("Mutación no encontrada")
 
     return render(request, 'pruebas_app/ver_resultados_mutacion.html', {'mutacion': mutacion})
+
+
+def mutacion_mutantes(request, mutacion_id):
+    if request.method == 'GET':
+        mutacion = get_object_or_404(Mutacion, pk=mutacion_id)
+        print(mutacion)
+        return render(request, 'pruebas_app/mutacion_mutantes.html',
+                      {'mutacion': mutacion, 'mutantes': mutacion.mutante_set.all()})

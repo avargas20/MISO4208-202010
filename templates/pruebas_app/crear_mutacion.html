@@ -72,7 +72,7 @@
 {% block subtitle %}<h1 class="mt-2">Mutaciones</h1>{% endblock subtitle %}
 {% block content %}
     <div class="container-fluid">
-        <form action="{% url 'guardar_mutacion' %}" method="post" class="needs-validation" novalidate>
+        <form action="{% url 'mutacion' %}" method="post" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row register-form">
                 <div class="col-md-4">
