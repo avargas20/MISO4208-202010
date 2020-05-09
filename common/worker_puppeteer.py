@@ -46,5 +46,5 @@ if __name__ == '__main__':
                 os.remove(settings.PUPPETEER_PATH + nuevo_archivo)
                 util.recoger_screenshoots(resultado)
                 message.delete()
-                util.validar_ultimo(resultado.solicitud)
+                util.validar_ultimo(resultado)
         time.sleep(settings.TIEMPO_ESPERA_WORKERS)

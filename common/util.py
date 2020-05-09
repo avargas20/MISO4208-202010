@@ -46,18 +46,18 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
 
 # Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y
 # guardarlos como evidencias, todos los workers lo deben llamar
-def validar_ultimo(solicitud):
-    if solicitud.terminada:
+def validar_ultimo(resultado):
+    if resultado.solicitud.terminada:
         zip_objetcs = ZipFile(settings.BASE_DIR + '//evidencias.zip', 'w')
 
-        if bool(solicitud.solicitud_VRT):
-            ejecutar_vrt(solicitud)
+        if bool(resultado.solicitud.solicitud_VRT) and resultado.exitoso:
+            ejecutar_vrt(resultado.solicitud)
 
-        for a in solicitud.resultadovrt_set.all():
+        for a in resultado.solicitud.resultadovrt_set.all():
             if bool(a.imagen_diferencias):
                 zip_objetcs.write(a.imagen_diferencias.path, a.imagen_diferencias.name)
 
-        for r in solicitud.resultado_set.all():
+        for r in resultado.solicitud.resultado_set.all():
             if bool(r.resultado):
                 zip_objetcs.write(r.resultado.path, r.resultado.name)
             if bool(r.log):
@@ -69,7 +69,7 @@ def validar_ultimo(solicitud):
         zip_objetcs.close()
         archivo = open(settings.BASE_DIR + "//evidencias.zip", 'rb')
         archivo_zip = File(archivo)
-        solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
+        resultado.solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
         archivo_zip.close()
         os.remove(settings.BASE_DIR + "//evidencias.zip")
 
