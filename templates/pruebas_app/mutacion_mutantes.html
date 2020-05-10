@@ -1,16 +1,109 @@
 {% extends 'pruebas_app/layout.html' %}
 {% block head %}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 {% endblock head %}
 {% block subtitle %}<h1 class="mt-2">Estado de la mutación: {{ mutacion.id }}</h1>{% endblock subtitle %}
 
 {% block content %}
     <h2>Detalles de la mutación</h2>
-    <div>Identificador:</div>
-    <div>Fecha:</div>
-    <div>Mutantes pedidos:</div>
-    <div>Operadores seleccionados:</div>
-    <div>Mutantes realmente generados:</div>
 
-    <h2>Detalles de los mutantes</h2>
+    <dl class="dl-horizontal">
+        <dt>Identificador:</dt>
+        <dd>{{ mutacion.id }}</dd>
+        <dt>Fecha:</dt>
+        <dd>{{ mutacion.fecha_creacion|date:'l d F Y - h:i:s A' }}</dd>
+        <dt>Mutantes pedidos:</dt>
+        <dd>{{ mutacion.numero_mutantes }}</dd>
+        <dt>Operadores seleccionados:</dt>
+        <dd>
+            <ul>
+                {% for operador in mutacion.operadores.all %}
+                    <li>{{ operador.nombre }}</li>
+                {% endfor %}
+            </ul>
+        </dd>
+        <dt>Mutantes realmente generados / mutantes vivos:</dt>
+        <dd>{{ mutacion.mutante_set.count }} / {{ mutacion.mutantes_vivos|length }}</dd>
+    </dl>
+
+    <h2>Detalles de los mutantes </h2>
+
+    <div class="row">
+        {% for mutante in mutacion.mutante_set.all %}
+
+            <div class="col-sm-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Mutante # {{ mutante.numero_mutante }}</h5>
+                        <p class="card-text">Operador: {{ mutante.operador.nombre }}</p>
+                        <div class="card-text">Detalle:</div>
+                        <p><small class="blockquote-footer">{{ mutante.detalle }}</small></p>
+                        <div class="card-text">Solicitudes:</div>
+                        {% if mutante.solicitudes %}
+                            <p class="card-text">
+                                {% for solicitud in mutante.solicitudes %}
+                                    {% if solicitud.terminada %}
+                                        <a href="{% url 'ver_resultados' solicitud.id %}" data-toggle="tooltip"
+                                           title="Estrategia: {{ solicitud.estrategia.nombre }}"
+                                           class="badge badge-pill badge-success">{{ solicitud.id }}</a>
+                                    {% else %}
+                                        <a data-toggle="tooltip" style="cursor: help"
+                                           title="Estrategia: {{ solicitud.estrategia.nombre }}"
+                                           class="badge badge-pill badge-warning">{{ solicitud.id }}</a>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <p class="font-weight-bold">Aún no tiene solicitudes</p>
+                        {% endif %}
+                        {% if mutante.asesinado_por %}
+                            <div class="card-text">Estado:</div>
+                            <p class="font-weight-bold text-danger">Muerto
+                                {% for solicitud in mutante.asesinado_por %}
+                                    <a href="{% url 'ver_resultados' solicitud.id %}"
+                                       class="badge badge-pill badge-danger">{{ solicitud.id }}</a>
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <div class="card-text">Estado: <p class="font-weight-bold text-success">Vivo</p></div>
+                        {% endif %}
+                        <form action="{% url 'mutacion_mutantes' mutacion.id %}" method="post"
+                              enctype="multipart/form-data" class="needs-validation">
+                            {% csrf_token %}
+                            <input type='hidden' name="id_mutante" value="{{ mutante.id }}"/>
+                            <div class="card-text">Probar mutante:
+                                <div class="input-group mt-1 mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="inputGroupSelect01">Estrategia</label>
+                                    </div>
+                                    <select name="id_estrategia" class="custom-select" id="inputGroupSelect01" required>
+                                        <option class="hidden" value="" selected disabled>Seleccione la estrategia
+                                        </option>
+                                        {% for e in estrategias %}
+                                            <option value="{{ e.id }}">{{ e.nombre }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Lanzar estrategia">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
 
 {% endblock content %}

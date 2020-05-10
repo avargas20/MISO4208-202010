@@ -231,14 +231,20 @@ def recoger_reportes_mutacion(mutacion):
 
 def recoger_mutantes(mutacion):
     ruta_mutantes = os.path.join(settings.MUTAPK_PATH, settings.RUTAS_INTERNAS2.Mutacion.value)
+    # Se saca el log que tiene el detalle de cada mutante, se lee y se guarda en lineas
+    with open(mutacion.reporte_log.path, 'r') as f:
+        lineas = f.readlines()
     # se recorren todos los folders de la ruta de muteAPK/mutants
     for folder_mutante in os.listdir(ruta_mutantes):
+        # En el directorio quedan las carpetas y los logs, solo recorrer las carpetas
         if os.path.isdir(os.path.join(ruta_mutantes, folder_mutante)):
             # el numero del mutante lo saque del ultimo digito de la carpeta
-            numero_mutante = int(folder_mutante[-1])
+            numero_mutante = folder_mutante.replace(mutacion.version.nombre_paquete+'-mutant', '')
             numero_operador = obtener_numero_operador(numero_mutante, mutacion)
+            # se busca en lineas el log que corresponde al mutante con la formula #mutante*2-1
+            detalle = lineas[int(numero_mutante)*2].strip()
             operador = Operador.objects.get(numero=numero_operador)
-            mutante = Mutante(mutacion=mutacion, operador=operador)
+            mutante = Mutante(mutacion=mutacion, operador=operador, detalle=detalle, numero_mutante=numero_mutante)
             mutante.save()
             # obtener el manifest del mutante, no todos los mutantes lo generan
             if os.path.isfile(os.path.join(ruta_mutantes, folder_mutante, 'AndroidManifest.xml')):
@@ -267,7 +273,10 @@ def recoger_mutantes(mutacion):
 def obtener_numero_operador(numero_mutante, mutacion):
     with open(mutacion.reporte_csv.path, 'r') as file:
         lineas = file.readlines()
-        return lineas[numero_mutante].split(';')[1]
+        for linea in lineas:
+            cadena = linea.split(';')
+            if cadena[0] == numero_mutante:
+                return int(cadena[1])
 
 
 # recibe un folder y elimina de forma segura todos los archivos y las carpetas con las subcarpetas
@@ -342,5 +351,5 @@ def generar_aleatorio(llave):
 
 
 if __name__ == '__main__':
-    mutacion = Mutacion.objects.get(id=6)
+    mutacion = Mutacion.objects.get(id=20)
     recoger_mutantes(mutacion)

@@ -24,6 +24,7 @@ if __name__ == '__main__':
                 mutacion_id = message.message_attributes.get('Id').get('StringValue')
                 mutacion = Mutacion.objects.get(id=int(mutacion_id))
                 util.configurar_archivo_operadores(mutacion)
+                # Siempre se limpia el folder de los mutantes
                 util.limpiar_folder(os.path.join(settings.MUTAPK_PATH, settings.RUTAS_INTERNAS2.Mutacion.value))
                 # Copio el archivo apk de la version a la ruta de MutAPK para que la tome desde alli el comando
                 copyfile(mutacion.version.apk.path, os.path.join(settings.MUTAPK_PATH, mutacion.version.apk.name))
