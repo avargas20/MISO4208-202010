@@ -31,8 +31,9 @@ urlpatterns = [
     path('solicitudes/<int:solicitud_id>/resultados', views.ver_resultados, name='ver_resultados'),
     path('mutacion/', views.crear_mutacion, name='mutacion'),
     path('mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
-    path('mutaciones/evidencias/<int:mutacion_id>/', views.descargar_evidencias_mutacion, name='descargar_evidencias_mutacion'),
-    path('mutaciones/<int:mutacion_id>/', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),
+    path('mutaciones/<int:mutacion_id>/evidencias/', views.descargar_evidencias_mutacion, name='descargar_evidencias_mutacion'),
+    path('mutaciones/<int:mutacion_id>/resultados/', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),
     path('mutaciones/<int:mutacion_id>/mutantes/', views.mutacion_mutantes, name='mutacion_mutantes'),
+    path('mutaciones/<int:mutacion_id>/mutantes/<int:mutante_id>', views.mutacion_mutante_solicitud, name='mutacion_mutante_solicitud'),
 
 ]

@@ -81,33 +81,25 @@ def ver_resultados_mutacion(request, mutacion_id):
 
 def mutacion_mutantes(request, mutacion_id):
     # Cuando el metodo es GET mostramos los datos de la mutacion
+    mutacion = get_object_or_404(Mutacion, pk=mutacion_id)
     if request.method == 'GET':
-        mutacion = get_object_or_404(Mutacion, pk=mutacion_id)
-        print('sfsdfd',mutacion.mutantes_vivos)
         estrategias = Estrategia.objects.filter(aplicacion=mutacion.version.aplicacion)
         return render(request, 'pruebas_app/mutacion_mutantes.html', {'mutacion': mutacion, 'estrategias': estrategias})
-    # Cuando el metodo es POST creamos la solicitud y mandamos los mensajes a las colas respectivas
+    # Cuando el metodo es POST creamos las solicitudes para todos los mutantes
     elif request.method == 'POST':
-        solicitud = Solicitud()
-        solicitud.dispositivo = Dispositivo.objects.get(id=1)
-        solicitud.estrategia = Estrategia.objects.get(id=int(request.POST['id_estrategia']))
-        solicitud.mutante = Mutante.objects.get(id=int(request.POST['id_mutante']))
-        solicitud.save()
-        tipo_aplicacion = solicitud.estrategia.aplicacion.tipo.tipo
+        dispositivo = Dispositivo.objects.get(id=1)
+        estrategia = Estrategia.objects.get(id=int(request.POST['id_estrategia']))
+        for mutante in mutacion.mutante_set.all():
+            crear_solicitud(dispositivo, estrategia, mutante)
+    return HttpResponseRedirect(reverse('mutacion_mutantes', args=[mutacion_id]))
 
-        for prueba in solicitud.estrategia.prueba_set.all():
-            tipo_prueba = prueba.tipo.nombre
-            resultado = Resultado()
-            resultado.solicitud = solicitud
-            resultado.prueba = prueba
-            resultado.save()
-            herramienta = prueba.herramienta.nombre
-            if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
-                if herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
-                    enviar_mensaje_cola(COLA_CALABASH, herramienta, resultado)
-            elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
-                if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
-                    enviar_mensaje_cola(COLA_MONKEY_MOVIL, herramienta, resultado)
+
+def mutacion_mutante_solicitud(request, mutacion_id, mutante_id):
+    if request.method == 'POST':
+        dispositivo = Dispositivo.objects.get(id=1)
+        estrategia = Estrategia.objects.get(id=int(request.POST['id_estrategia']))
+        mutante = Mutante.objects.get(id=int(mutante_id))
+        crear_solicitud(dispositivo, estrategia, mutante)
     return HttpResponseRedirect(reverse('mutacion_mutantes', args=[mutacion_id]))
 
 
@@ -124,3 +116,26 @@ def enviar_mensaje_cola(cola, herramienta, resultado):
     message = PROCESAR_PARA + herramienta
     cola.send_message(MessageBody=message,
                       MessageAttributes=construir_message_attributes(resultado))
+
+
+def crear_solicitud(dispositivo, estrategia, mutante):
+    solicitud = Solicitud()
+    solicitud.dispositivo = dispositivo
+    solicitud.estrategia = estrategia
+    solicitud.mutante = mutante
+    solicitud.save()
+    tipo_aplicacion = solicitud.estrategia.aplicacion.tipo.tipo
+
+    for prueba in solicitud.estrategia.prueba_set.all():
+        tipo_prueba = prueba.tipo.nombre
+        resultado = Resultado()
+        resultado.solicitud = solicitud
+        resultado.prueba = prueba
+        resultado.save()
+        herramienta = prueba.herramienta.nombre
+        if tipo_prueba == settings.TIPOS_PRUEBAS["e2e"]:
+            if herramienta == settings.TIPOS_HERRAMIENTAS["calabash"]:
+                enviar_mensaje_cola(COLA_CALABASH, herramienta, resultado)
+        elif tipo_prueba == settings.TIPOS_PRUEBAS["aleatorias"]:
+            if tipo_aplicacion == settings.TIPOS_APLICACION['movil']:
+                enviar_mensaje_cola(COLA_MONKEY_MOVIL, herramienta, resultado)
