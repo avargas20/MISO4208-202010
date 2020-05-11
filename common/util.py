@@ -46,18 +46,18 @@ def copiar_contenido(resultado, ruta_herramienta, ruta_interna, extension_archiv
 
 # Este metodo valida que si la solicitud esta terminada, debe agrupar todos los resultados en un solo .zip y
 # guardarlos como evidencias, todos los workers lo deben llamar
-def validar_ultimo(resultado):
-    if resultado.solicitud.terminada:
+def validar_ultimo(solicitud):
+    if solicitud.terminada:
         zip_objetcs = ZipFile(settings.BASE_DIR + '//evidencias.zip', 'w')
 
-        if bool(resultado.solicitud.solicitud_VRT) and resultado.exitoso:
-            ejecutar_vrt(resultado.solicitud)
+        if bool(solicitud.solicitud_VRT):
+            ejecutar_vrt(solicitud)
 
-        for a in resultado.solicitud.resultadovrt_set.all():
+        for a in solicitud.resultadovrt_set.all():
             if bool(a.imagen_diferencias):
                 zip_objetcs.write(a.imagen_diferencias.path, a.imagen_diferencias.name)
 
-        for r in resultado.solicitud.resultado_set.all():
+        for r in solicitud.resultado_set.all():
             if bool(r.resultado):
                 zip_objetcs.write(r.resultado.path, r.resultado.name)
             if bool(r.log):
@@ -69,75 +69,79 @@ def validar_ultimo(resultado):
         zip_objetcs.close()
         archivo = open(settings.BASE_DIR + "//evidencias.zip", 'rb')
         archivo_zip = File(archivo)
-        resultado.solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
+        solicitud.evidencia.save('evidencias.zip', archivo_zip, save=True)
         archivo_zip.close()
         os.remove(settings.BASE_DIR + "//evidencias.zip")
 
 
 # Este metodo valida si la prueba de VRT reporta cambios segun el % proporcionado al momento de la ejecucion
 def validar_resultado_vrt(informacion, sensibilidad_VRT):
-    if informacion >= sensibilidad_VRT:
-        fallida = True
-    else:
-        fallida = False
-    return fallida
+    return True if informacion >= sensibilidad_VRT else False
 
 
-# Este metodo se ejecuta cuando una solicitud tiene VRT y lo que hace es recorrer todos los resultados de ambas
-# solicitudes y todos sus screenshoots y a cada screensoot reciproco le ejecuta VRT
-def ejecutar_vrt(solicitud_posterior):
+# Este metodo consolida todos los screenshots de todas las pruebas
+def screenshots_vrt(solicitud_posterior):
     # Se sacan los resultados de ambas solicitudes
     resultados_posteriores = solicitud_posterior.resultado_set.all()
     print('posteriores:', resultados_posteriores)
     resultados_anteriores = solicitud_posterior.solicitud_VRT.resultado_set.all()
     print('anteriores:', resultados_anteriores)
+    # Se sacan los screenshots de cada prueba
+    consolidado_posteriores = []
+    consolidado_anteriores = []
 
-    # Se recorren los resultados
-    for i in range(resultados_anteriores.count()):
-        # de cada resultado de cada solicitud se sacan los screenshots
-        screenshots_posteriores = resultados_posteriores[i].screenshot_set.all()
-        print('screen posteriores:', screenshots_posteriores)
-        screenshots_anteriores = resultados_anteriores[i].screenshot_set.all()
-        print('screen anteriores:', screenshots_anteriores)
+    for k in resultados_posteriores:
+        for x in k.screenshot_set.all():
+            consolidado_posteriores.append(x)
+    print('todos posteriores:', consolidado_posteriores, '--lenght----', len(consolidado_posteriores))
 
-        # Se recorre cada screenshot de cada resultado y esos son los que se comparan
-        for j in range(screenshots_anteriores.count()):
-            # las imagenes para comparar no es necesario subirlas nuevamente, solo se referencian las originales
-            imagen_posterior = screenshots_posteriores[j].imagen
-            imagen_anterior = screenshots_anteriores[j].imagen
+    for l in resultados_anteriores:
+        for x in l.screenshot_set.all():
+            consolidado_anteriores.append(x)
+    print('todos anteriores:', consolidado_anteriores, '--lenght----', len(consolidado_anteriores))
+    return consolidado_anteriores, consolidado_posteriores
 
-            # para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
-            imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(
-                solicitud_posterior.id) + 'diferencia.png'
 
-            comando = subprocess.run(
-                ['node', 'index.js', imagen_anterior.path, imagen_posterior.path,
-                 imagen_diferencias], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
-            print('returnCodeVRT:', comando.returncode)
-            # Se guarda en informacion el json generado por resemble
-            informacion = comando.stdout.decode('utf-8')
-            print("la salida es:", informacion)
+# Este metodo se ejecuta cuando una solicitud tiene VRT y lo que hace es recorrer todos los resultados de ambas
+# solicitudes y todos sus screenshoots y a cada screensoot reciproco le ejecuta VRT
+def ejecutar_vrt(solicitud_posterior):
+    consolidado_anteriores, consolidado_posteriores = screenshots_vrt(solicitud_posterior)
+    # se comparan imagenes
+    for i in consolidado_posteriores:
+        for j in consolidado_anteriores:
+            if i.nombre == j.nombre:
+                print("imagenes a comparar------------posterior: --->", i.nombre, "anterior: ----->", j.nombre)
+                # para la imagen diferencias se crea una ruta ficticia en la cual resemble creara la nueva imagen
+                imagen_diferencias = settings.BASE_DIR + '//archivos//screenshots//VRT//' + str(
+                    solicitud_posterior.id) + 'diferencia.png'
 
-            # Se valida resultado de vrt
-            json_content = json.dumps(informacion)
-            diferencia_real = json_content.split("'")[1].split("'")[-1]
-            validacion = validar_resultado_vrt(Decimal(diferencia_real), solicitud_posterior.sensibilidad_VRT)
-            print('validacion', validacion)
-            # Solo se guarda la imagen cuando se encuentran diferencias
-            if validacion:
-                resultado_vrt = ResultadoVRT()
-                resultado_vrt.screenshoot_previo = imagen_anterior
-                resultado_vrt.screenshoot_posterior = imagen_posterior
-                resultado_vrt.informacion = informacion
-                resultado_vrt.solicitud = solicitud_posterior
-                resultado_vrt.fallida = validacion
-                resultado_vrt.porcentaje = diferencia_real
+                comando = subprocess.run(
+                    ['node', 'index.js', j.imagen.path, i.imagen.path,
+                     imagen_diferencias], shell=True, cwd=settings.RESEMBLE_PATH, stdout=subprocess.PIPE)
+                print('returnCodeVRT:', comando.returncode)
+                # Se guarda en informacion el json generado por resemble
+                informacion = comando.stdout.decode('utf-8')
+                print("la salida es:", informacion)
 
-                imagen_diff = open(imagen_diferencias, 'rb')
-                resultado_vrt.imagen_diferencias.save('diferencia.png', File(imagen_diff), save=True)
-                imagen_diff.close()
-                resultado_vrt.save()
-            os.remove(imagen_diferencias)
+                # Se valida resultado de vrt
+                json_content = json.dumps(informacion)
+                diferencia_real = json_content.split("'")[1].split("'")[-1]
+                validacion = validar_resultado_vrt(Decimal(diferencia_real), solicitud_posterior.sensibilidad_VRT)
+                print('validacion', validacion)
+                # Solo se guarda la imagen cuando se encuentran diferencias
+                if validacion:
+                    resultado_vrt = ResultadoVRT()
+                    resultado_vrt.screenshoot_previo = j.imagen
+                    resultado_vrt.screenshoot_posterior = i.imagen
+                    resultado_vrt.informacion = informacion
+                    resultado_vrt.solicitud = solicitud_posterior
+                    resultado_vrt.fallida = validacion
+                    resultado_vrt.porcentaje = diferencia_real
+                    imagen_diff = open(imagen_diferencias, 'rb')
+                    resultado_vrt.imagen_diferencias.save('diferencia.png', File(imagen_diff), save=True)
+                    imagen_diff.close()
+                    resultado_vrt.save()
+                os.remove(imagen_diferencias)
 
 
 # Este metodo busca recoger todos los screenshoots tomados por los scripts y guardarlos en la tabla ScreenShoot

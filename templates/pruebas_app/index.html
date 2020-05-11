@@ -37,7 +37,11 @@
                     <td class="text-center">{{ solicitud.estrategia.nombre }}</td>
                     <td class="text-center">{% if solicitud.solicitud_VRT %} Solicitud {{ solicitud.solicitud_VRT.id }} {% endif %}</td>
                     <td class="text-center">{{ solicitud.estado }}</td>
+                    {% if solicitud.exitosa != null %}
                     <td class="text-center">{% if solicitud.exitosa %} Sí {% else %} No {% endif %}</td>
+                    {% else %}
+                        <td class="text-center"> </td>
+                    {% endif %}
                     {% if solicitud.terminada %}
                         <td class="text-center">
                             <a href="{% url 'ver_resultados' solicitud.id %}" class="mr-3">
