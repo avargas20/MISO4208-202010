@@ -92,3 +92,8 @@ Se agrega funcionalidad para mutacion
         mutants: aqui van a quedar todos los mutantes de manera temporal, en cada ciclo lo primero que se hace es borrarlos
         apk: se copian temporalmente el apk que se va a mutar
         properties: se crea siempre un archivo de operators.properties con los operadores seleccionados para la mutacion siguiendo el estandar
+
+configurar cucumber webdriverio
+    clonar el repositorio: https://github.com/stillirrom/worker-cucumber
+    hacer npm install del repositorio
+    configurar las variables de entorno con la ruta local a la instalación de cucumber
