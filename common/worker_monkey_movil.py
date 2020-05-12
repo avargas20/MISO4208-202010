@@ -20,9 +20,16 @@ if __name__ == '__main__':
         print('Entra ciclo')
         for message in COLA_MONKEY_MOVIL.receive_messages(MaxNumberOfMessages=1, MessageAttributeNames=['Id']):
             if message.message_attributes is not None:
+                nombre_paquete = ''
+                ruta_apk = ''
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
-                nombre_paquete = resultado.solicitud.version.nombre_paquete
+                if resultado.solicitud.mutante:
+                    nombre_paquete = resultado.solicitud.mutante.mutacion.version.nombre_paquete
+                    ruta_apk = resultado.solicitud.mutante.apk_firmado.path
+                else:
+                    nombre_paquete = resultado.solicitud.version.nombre_paquete
+                    ruta_apk = resultado.solicitud.version.apk.path
                 numero_eventos = str(resultado.prueba.numero_eventos)
                 semilla = resultado.prueba.semilla
                 # iniciamos el emulador y esperamos a que este listo (el metodo lo hace)
@@ -30,7 +37,7 @@ if __name__ == '__main__':
                 # primero desinstalamos la aplicación y luego la volvemos a instalar para limpiar cualquier estado
                 subprocess.call(['adb', 'uninstall', nombre_paquete], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
-                subprocess.call(['adb', 'install', resultado.solicitud.version.apk.path], shell=True, cwd=os.path.join(
+                subprocess.call(['adb', 'install', ruta_apk], shell=True, cwd=os.path.join(
                     settings.ANDROID_SDK, settings.RUTAS_INTERNAS_SDK_ANDROID['platform-tools']))
                 # Ahora ejecutar el monkey
                 if semilla:

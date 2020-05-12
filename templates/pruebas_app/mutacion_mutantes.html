@@ -1,0 +1,169 @@
+{% extends 'pruebas_app/layout.html' %}
+{% block head %}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+{% endblock head %}
+{% block subtitle %}<h1 class="mt-2">Estado de la mutación #{{ mutacion.id }}</h1>{% endblock subtitle %}
+
+{% block content %}
+    <h3>Detalles de la mutación</h3>
+    <div class="row border">
+        <div class="col-sm-6 mb-3 border-right">
+            <dl class="dl-horizontal ml-3">
+                <dt>Identificador:</dt>
+                <dd>{{ mutacion.id }}</dd>
+                <dt>Fecha:</dt>
+                <dd>{{ mutacion.fecha_creacion|date:'l d F Y - h:i:s A' }}</dd>
+                <dt>Mutantes pedidos:</dt>
+                <dd>{{ mutacion.numero_mutantes }}</dd>
+                <dt>Mutantes realmente generados / mutantes vivos:</dt>
+                <dd>{{ mutacion.mutante_set.count }} / {{ mutacion.mutantes_vivos|length }}</dd>
+            </dl>
+            <p>
+                <a data-toggle="collapse" href="#collapseExample" role="button"
+                   aria-expanded="false" aria-controls="collapseExample">
+                    Probar mutación completa
+                </a>
+            </p>
+            <div class="collapse" id="collapseExample">
+                <form action="{% url 'mutacion_mutantes' mutacion.id %}" method="post"
+                      enctype="multipart/form-data" class="needs-validation">
+                    {% csrf_token %}
+
+                    <div class="input-group mt-1 mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputGroupSelect01">Estrategia</label>
+                        </div>
+                        <select name="id_estrategia" class="custom-select" id="inputGroupSelect01" required>
+                            <option class="hidden" value="" selected disabled>Seleccione la estrategia
+                            </option>
+                            {% for e in estrategias %}
+                                <option value="{{ e.id }}">{{ e.nombre }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <input type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+                           value="Lanzar estrategia">
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Confirmar lanzamiento masivo</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Está a punto de lanzar de manera masiva una estrategia
+                                    contra {{ mutacion.mutante_set.count }} mutantes, está seguro que desea continuar?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Lanzar estrategia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-sm-6 mb-1">
+            <dt>Operadores seleccionados:</dt>
+            <dd>
+                <ul>
+                    {% for operador in mutacion.operadores.all %}
+                        <li>{{ operador.nombre }}</li>
+                    {% endfor %}
+                </ul>
+            </dd>
+        </div>
+
+    </div>
+
+    <h3>Detalles de los mutantes </h3>
+    <div class="row">
+
+        {% for mutante in mutacion.mutante_set.all %}
+
+            <div class="col-sm-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Mutante # {{ mutante.numero_mutante }}</h5>
+                        <p class="card-text font-weight-bold">Operador: {{ mutante.operador.nombre }}</p>
+                        <div class="card-text font-weight-bold">Detalle:</div>
+                        <p><small class="blockquote-footer">{{ mutante.detalle }}</small></p>
+                        <div class="card-text font-weight-bold">Solicitudes:</div>
+                        {% if mutante.solicitudes %}
+                            <p class="card-text">
+                                {% for solicitud in mutante.solicitudes %}
+                                    {% if solicitud.terminada %}
+                                        <a href="{% url 'ver_resultados' solicitud.id %}" data-toggle="tooltip"
+                                           title="Estrategia: {{ solicitud.estrategia.nombre }}"
+                                           class="badge badge-pill badge-success">{{ solicitud.id }}</a>
+                                    {% else %}
+                                        <a data-toggle="tooltip" style="cursor: help"
+                                           title="Estrategia: {{ solicitud.estrategia.nombre }}"
+                                           class="badge badge-pill badge-warning">{{ solicitud.id }}</a>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <p class="">Aún no tiene solicitudes</p>
+                        {% endif %}
+                        {% if mutante.asesinado_por %}
+                            <div class="card-text font-weight-bold">Estado:</div>
+                            <p class="font-weight-bold text-danger">Muerto
+                                {% for solicitud in mutante.asesinado_por %}
+                                    <a href="{% url 'ver_resultados' solicitud.id %}"
+                                       class="badge badge-pill badge-danger">{{ solicitud.id }}</a>
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <div class="card-text font-weight-bold">Estado: <p class="font-weight-bold text-success">
+                                Vivo</p></div>
+                        {% endif %}
+                        <form action="{% url 'mutacion_mutante_solicitud' mutacion.id mutante.id %}" method="post"
+                              enctype="multipart/form-data" class="needs-validation">
+                            {% csrf_token %}
+
+                            <div class="card-text font-weight-bold">Probar mutante:
+                                <div class="input-group mt-1 mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="inputGroupSelect01">Estrategia</label>
+                                    </div>
+                                    <select name="id_estrategia" class="custom-select" id="inputGroupSelect01" required>
+                                        <option class="hidden" value="" selected disabled>Seleccione la estrategia
+                                        </option>
+                                        {% for e in estrategias %}
+                                            <option value="{{ e.id }}">{{ e.nombre }}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="submit" class="btn btn-primary" value="Lanzar estrategia">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+
+{% endblock content %}

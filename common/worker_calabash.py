@@ -22,17 +22,21 @@ if __name__ == '__main__':
             if message.message_attributes is not None:
                 resultado_id = message.message_attributes.get('Id').get('StringValue')
                 resultado = Resultado.objects.get(id=int(resultado_id))
+                if resultado.solicitud.mutante:
+                    ruta_apk = resultado.solicitud.mutante.apk_firmado.path
+                else:
+                    ruta_apk = resultado.solicitud.version.apk.path
                 # Copiar el script de la prueba a donde lo necesita calabash para poder ejecutarlo
                 ruta_archivo = util.copiar_contenido(
                     resultado, settings.CALABASH_PATH, settings.RUTAS_INTERNAS["Calabash"], '.feature')
                 # Se firma el .apk
-                salida_firmado = subprocess.run(['calabash-android', 'resign', resultado.solicitud.version.apk.path],
+                salida_firmado = subprocess.run(['calabash-android', 'resign', ruta_apk],
                                                 shell=True, check=False, cwd=settings.CALABASH_PATH,
                                                 stdout=subprocess.PIPE)
                 # levantar el emulador y esperar hasta que este listo
                 util.iniciar_emulador(resultado.solicitud.dispositivo.nombre_tecnico)
                 # Ejecutar el comando de calabash
-                salida_ejecucion = subprocess.run(['calabash-android', 'run', resultado.solicitud.version.apk.path,
+                salida_ejecucion = subprocess.run(['calabash-android', 'run', ruta_apk,
                                                    ruta_archivo], check=False, shell=True, cwd=settings.CALABASH_PATH,
                                                   stdout=subprocess.PIPE)
                 # print('La salida firmado:', salida_firmado.stdout.decode('utf-8'))

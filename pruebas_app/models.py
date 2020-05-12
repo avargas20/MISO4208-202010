@@ -117,6 +117,11 @@ class Mutacion(models.Model):
     def __str__(self):
         return 'Creada: %s' % self.fecha_creacion
 
+    def _mutantes_vivos_(self):
+        return [mutante for mutante in Mutante.objects.filter(mutacion=self) if not bool(mutante.asesinado_por)]
+
+    mutantes_vivos = property(_mutantes_vivos_)
+
 
 class Operador(models.Model):
     numero = models.IntegerField()
@@ -140,14 +145,26 @@ class Mutante(models.Model):
     apk = models.FileField(upload_to=directorio_apk_mutante, null=True)
     apk_firmado = models.FileField(upload_to=directorio_apk_mutante, null=True)
     manifest = models.FileField(upload_to=directorio_apk_mutante, null=True)
+    detalle = models.CharField(max_length=500, null=True, blank=True)
+    numero_mutante = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return 'Mutante: %s' % self.apk.name
 
-    def _killer_requests(self):
-        return Solicitud.objects.filter(mutante=self, exitosa=False)
+    # Los mutantes son asesinados por solicitudes que esten terminadas y no hayan sido exitosas
+    # Si esta lista esta vacia es porque hasta ahora el mutenta sigue vivo
+    def _killer_requests_(self):
+        return [solicitud for solicitud in Solicitud.objects.filter(mutante=self) if (solicitud.terminada & (not solicitud.exitosa))]
 
-    asesinado_por = property(_killer_requests)
+    asesinado_por = property(_killer_requests_)
+
+    def _solicitudes_(self):
+        return [solicitud for solicitud in Solicitud.objects.filter(mutante=self)]
+
+    solicitudes = property(_solicitudes_)
+
+    class Meta:
+        ordering = ['numero_mutante']
 
 
 # ------------------------------------------Segundo mundo----------------------------------------------------------#
@@ -195,7 +212,7 @@ class Solicitud(models.Model):
     def _exitosa_(self):
         # Una solicitud es exitosa si esta terminada y todos sus resultados son exitosos
         return \
-            all(Resultado.objects.values_list('exitoso', flat=True).filter(solicitud=self)) if self.terminada else None
+            all(Resultado.objects.values_list('exitoso', flat=True).filter(solicitud=self)) if self.terminada else False
 
     exitosa = property(_exitosa_)
 

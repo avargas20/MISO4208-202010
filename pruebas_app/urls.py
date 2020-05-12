@@ -28,10 +28,12 @@ urlpatterns = [
     path('eliminar_version/<int:version_id>', views.eliminar_version, name='eliminar_version'),
     path('condiciones_de_lanzamiento/<int:estrategia_id>', views.condiciones_de_lanzamiento,
          name='condiciones_de_lanzamiento'),
-    path('ver_resultados/<int:solicitud_id>', views.ver_resultados, name='ver_resultados'),
+    path('solicitudes/<int:solicitud_id>/resultados', views.ver_resultados, name='ver_resultados'),
     path('mutacion/', views.crear_mutacion, name='mutacion'),
-    path('guardar_mutacion/', views.guardar_mutacion, name='guardar_mutacion'),
-    path('ver_mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
-    path('ver_resultados_mutacion/<int:mutacion_id>', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),
-    path('descargar_evidencias_mutacion/<int:mutacion_id>', views.descargar_evidencias_mutacion, name='descargar_evidencias_mutacion'),
+    path('mutaciones/', views.ver_mutaciones, name='ver_mutaciones'),
+    path('mutaciones/<int:mutacion_id>/evidencias/', views.descargar_evidencias_mutacion, name='descargar_evidencias_mutacion'),
+    path('mutaciones/<int:mutacion_id>/resultados/', views.ver_resultados_mutacion, name='ver_resultados_mutacion'),
+    path('mutaciones/<int:mutacion_id>/mutantes/', views.mutacion_mutantes, name='mutacion_mutantes'),
+    path('mutaciones/<int:mutacion_id>/mutantes/<int:mutante_id>', views.mutacion_mutante_solicitud, name='mutacion_mutante_solicitud'),
+
 ]
