@@ -50,7 +50,7 @@
                 <th># ID</th>
                 <th>Nombre estrategia</th>
                 <th>Aplicación</th>
-                <th>Acción</th>
+                <th>Acciones</th>
 
 
             </tr>
@@ -66,13 +66,13 @@
                     <td>{{ e.aplicacion.nombre }}</td>
                     <td>
 
-                        <a class="btn btn-success text-right btn-sm" style="cursor: pointer"
+                        <a class="btn btn-success btn-sm"
                            onclick="return abrir_modal('{% url 'condiciones_de_lanzamiento' e.id %}')">
-                            <i class="far fa-play-circle"></i>
+                            <i class="fas fa-play-circle"></i>
                         </a>
 
-                        <a class="btn btn-warning text-right btn-sm" href="{% url 'agregar_prueba' e.id %}">
-                            <i class="fas fa-edit"></i>
+                        <a class="btn btn-warning text-right btn-sm" href="{% url 'copiar_estrategia' e.id %}">
+                            <i class="fas fa-copy"></i>
                         </a>
 
                         <a class="btn btn-danger text-right btn-sm" href="{% url 'eliminar_estrategia' e.id %}">

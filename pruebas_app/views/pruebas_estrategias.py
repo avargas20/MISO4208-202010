@@ -139,7 +139,7 @@ def guardar_estrategia(request):
 def eliminar_estrategia(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
     estrategia.delete()
-    return lanzar_estrategia(request)
+    return HttpResponseRedirect(reverse('lanzar_estrategia'))
 
 
 def agregar_prueba(request, estrategia_id):
@@ -150,6 +150,23 @@ def agregar_prueba(request, estrategia_id):
     return render(request, 'pruebas_app/agregar_prueba.html',
                   {'aplicacion': estrategia.aplicacion, 'estrategia': estrategia,
                    'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
+
+
+def copiar_estrategia(request, estrategia_id):
+    estrategia_anterior = Estrategia.objects.get(id=estrategia_id)
+    estrategia = estrategia_anterior
+    estrategia.pk = None
+    estrategia.save()
+    estrategia.nombre = '%s_%s' % (estrategia.nombre, str(estrategia.pk))
+    estrategia.save()
+
+    pruebas_anteriores = Prueba.objects.filter(estrategia=estrategia_id)
+    for p in pruebas_anteriores:
+        prueba = p
+        prueba.estrategia = estrategia
+        prueba.pk = None
+        prueba.save()
+    return HttpResponseRedirect(reverse('agregar_prueba', args=(estrategia.id,)))
 
 
 def eliminar_prueba(request, prueba_id):
