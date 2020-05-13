@@ -201,11 +201,7 @@ class Solicitud(models.Model):
 
     def _fallo_vrt_(self):
         fallo_vrt = ResultadoVRT.objects.filter(fallida=True, solicitud=self).count()
-        if fallo_vrt > 0:
-            resultado = "Cambios encontrados"
-        else:
-            resultado = "Sin cambios"
-        return resultado
+        return "Cambios encontrados" if fallo_vrt > 0 else "Sin cambios"
 
     resultado_vrt = property(_fallo_vrt_)
 
@@ -258,6 +254,7 @@ def directorio_vrt(instance, filename):
 
 class ResultadoVRT(models.Model):
     solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
+    script = models.CharField(max_length=300, null=True)
     screenshoot_previo = models.ImageField(upload_to=directorio_vrt, null=True)
     screenshoot_posterior = models.ImageField(upload_to=directorio_vrt, null=True)
     imagen_diferencias = models.ImageField(upload_to=directorio_vrt, null=True)
