@@ -40,10 +40,10 @@
                     {% if solicitud.terminada != False %}
                         <td class="text-center">{% if solicitud.exitosa %} Sí {% else %} No {% endif %}</td>
                         <td class="text-center">
-                            <a href="{% url 'ver_resultados' solicitud.id %}" class="btn btn-primary btn-sm" >
-                                <i class="fas fa-search-plus"></i>
+                            <a href="{% url 'ver_resultados' solicitud.id %}" class="btn btn-info btn-sm" >
+                                <i class="fas fa-search"></i>
                             </a>
-                            <a href="{% url 'descargar_evidencias' solicitud.id %}" class="btn btn-secondary btn-sm">
+                            <a href="{% url 'descargar_evidencias' solicitud.id %}" class="btn btn-dark btn-sm">
                                 <i class="fas fa-download"></i>
                             </a>
                         </td>
