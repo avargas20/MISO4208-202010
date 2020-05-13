@@ -1,7 +1,7 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-        <form role="form" id="form-version" action="{% url 'guardar_version' aplicacion.id %}" method="post"
+        <form role="form" id="form-version" action="{% url 'aplicaciones_versiones' aplicacion.id %}" method="post"
               enctype="multipart/form-data" class="needs-validation">
             {% csrf_token %}
             <div class="modal-header">
@@ -62,7 +62,7 @@
                             {% endif %}
                             <td>
                                 <a class="btn btn-danger text-right btn-sm"
-                                   href="{% url 'eliminar_version' version.id %}">
+                                   href="{% url 'eliminar_version' version.aplicacion.id version.id %}">
                                     <i class="far fa-trash-alt"></i>
                                 </a>
                             </td>

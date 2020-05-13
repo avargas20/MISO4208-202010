@@ -10,15 +10,13 @@ from pruebas_app.models import Aplicacion, Version, TipoAplicacion
 from pruebas_automaticas import settings
 
 
-def nueva_aplicacion(request):
-    aplicaciones = Aplicacion.objects.all()
-    tipos = TipoAplicacion.objects.all()
-    return render(request, 'pruebas_app/nueva_aplicacion.html',
-                  {'aplicaciones': aplicaciones, 'tipos': tipos})
-
-
-def guardar_aplicacion(request):
-    if request.method == 'POST':
+def aplicaciones(request):
+    if request.method == 'GET':
+        aplicaciones = Aplicacion.objects.all()
+        tipos = TipoAplicacion.objects.all()
+        return render(request, 'pruebas_app/nueva_aplicacion.html',
+                      {'aplicaciones': aplicaciones, 'tipos': tipos})
+    elif request.method == 'POST':
         print(request.POST)
         nombre_aplicacion = request.POST['nombre_aplicacion']
         descripcion_aplicacion = request.POST['descripcion_aplicacion']
@@ -28,23 +26,23 @@ def guardar_aplicacion(request):
         aplicacion = Aplicacion(
             nombre=nombre_aplicacion, descripcion=descripcion_aplicacion, tipo=tipo_aplicacion)
         aplicacion.save()
-        return HttpResponseRedirect(reverse('nueva_aplicacion'))
+        return HttpResponseRedirect(reverse('aplicaciones'))
 
 
 def eliminar_aplicacion(request, aplicacion_id):
-    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
-    aplicacion.delete()
-    return nueva_aplicacion(request)
+    if request.method == 'POST':
+        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+        aplicacion.delete()
+        return HttpResponseRedirect(reverse('aplicaciones'))
 
 
-def agregar_version(request, aplicacion_id):
-    versiones = Version.objects.filter(aplicacion=aplicacion_id)
-    aplicacion = Aplicacion.objects.get(id=aplicacion_id)
-    return render(request, 'pruebas_app/agregar_version.html',
-                  {'versiones': versiones, 'aplicacion': aplicacion})
+def aplicaciones_versiones(request, aplicacion_id):
+    if request.method == 'GET':
+        versiones = Version.objects.filter(aplicacion=aplicacion_id)
+        aplicacion = Aplicacion.objects.get(id=aplicacion_id)
+        return render(request, 'pruebas_app/agregar_version.html',
+                      {'versiones': versiones, 'aplicacion': aplicacion})
 
-
-def guardar_version(request, aplicacion_id):
     if request.method == 'POST':
         print(request.POST)
         aplicacion = Aplicacion.objects.get(id=aplicacion_id)
@@ -81,13 +79,14 @@ def guardar_version(request, aplicacion_id):
             version.nombre_paquete = nombre_paquete
             version.save()
 
-        return HttpResponseRedirect(reverse('nueva_aplicacion'))
+        return HttpResponseRedirect(reverse('aplicaciones'))
 
 
-def eliminar_version(version_id):
+def eliminar_version(request, aplicacion_id, version_id):
     version = Version.objects.get(id=version_id)
     version.delete()
-    return HttpResponseRedirect(reverse('nueva_aplicacion'))
+    print(request.method)
+    return HttpResponseRedirect(reverse('aplicaciones'))
 
 
 def obtener_versiones_de_una_aplicacion(request):

@@ -24,7 +24,7 @@
 {% endblock subtitle %}
 {% block content %}
     <div class="container-fluid" class="p-5">
-        <form action="{% url 'guardar_aplicacion' %}" method="post" class="needs-validation" novalidate>
+        <form action="{% url 'aplicaciones' %}" method="post" class="needs-validation" novalidate>
             {% csrf_token %}
 
             <div class="form-group">
@@ -76,14 +76,17 @@
                         <td>{{ aplicacion.descripcion }}</td>
                         <td>{{ aplicacion.tipo }}</td>
                         <td>
-                            <a class="btn btn-success text-right btn-sm" style="cursor: pointer"
-                               onclick="return abrir_modal('{% url 'agregar_version' aplicacion.id %}')">
-                                <i class="far fa-plus-square"></i>
-                            </a>
-                            <a class="btn btn-danger text-right btn-sm"
-                               href="{% url 'eliminar_aplicacion' aplicacion.id %}">
-                                <i class="far fa-trash-alt"></i>
-                            </a>
+                            <form action="{% url 'eliminar_aplicacion' aplicacion.id %}" method="post"
+                                  class="needs-validation" novalidate>
+                                {% csrf_token %}
+                                <a class="btn btn-success text-right btn-sm" style="cursor: pointer"
+                                   onclick="return abrir_modal('{% url 'aplicaciones_versiones' aplicacion.id %}')">
+                                    <i class="far fa-plus-square"></i>
+                                </a>
+
+                                <button type="submit" class="btn btn-danger text-right btn-sm"><i
+                                        class="far fa-trash-alt"></i></button>
+                            </form>
                         </td>
 
                     </tr>
