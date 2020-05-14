@@ -131,6 +131,7 @@ def ejecutar_vrt(solicitud_posterior):
                 # Solo se guarda la imagen cuando se encuentran diferencias
                 if validacion:
                     resultado_vrt = ResultadoVRT()
+                    resultado_vrt.script = j.resultado.prueba.filename
                     resultado_vrt.screenshoot_previo = j.imagen
                     resultado_vrt.screenshoot_posterior = i.imagen
                     resultado_vrt.informacion = informacion

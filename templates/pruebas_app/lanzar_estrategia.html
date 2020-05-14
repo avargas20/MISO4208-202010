@@ -4,11 +4,18 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
     <script>
-        function abrir_modal(url) {
+        function abrir_modal_lanzamiento(url) {
             $('#popup').load(url, function () {
                 $(this).modal('show');
 
                 document.getElementById('sensibilidad_VRT').style.visibility = 'hidden';
+            });
+            return false;
+        }
+
+        function abrir_modal_ver(url) {
+            $('#popup').load(url, function () {
+                $(this).modal('show');
             });
             return false;
         }
@@ -50,7 +57,7 @@
                 <th># ID</th>
                 <th>Nombre estrategia</th>
                 <th>Aplicación</th>
-                <th>Acción</th>
+                <th>Acciones</th>
 
 
             </tr>
@@ -65,14 +72,16 @@
                     <td>{{ e.nombre }}</td>
                     <td>{{ e.aplicacion.nombre }}</td>
                     <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                          <button type="button" class="btn btn-info btn-sm" onclick="return abrir_modal_ver('{% url 'detalle_estrategia' e.id %}')"><i class="fas fa-search"></i> </button>
+                        </div>
 
-                        <a class="btn btn-success text-right btn-sm" style="cursor: pointer"
-                           onclick="return abrir_modal('{% url 'condiciones_de_lanzamiento' e.id %}')">
-                            <i class="far fa-play-circle"></i>
-                        </a>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                          <button type="button" class="btn btn-success btn-sm" onclick="return abrir_modal_lanzamiento('{% url 'condiciones_de_lanzamiento' e.id %}')"><i class="fas fa-play"></i> </button>
+                        </div>
 
-                        <a class="btn btn-warning text-right btn-sm" href="{% url 'agregar_prueba' e.id %}">
-                            <i class="fas fa-edit"></i>
+                        <a class="btn btn-secondary text-right btn-sm" href="{% url 'copiar_estrategia' e.id %}">
+                            <i class="fas fa-copy"></i>
                         </a>
 
                         <a class="btn btn-danger text-right btn-sm" href="{% url 'eliminar_estrategia' e.id %}">

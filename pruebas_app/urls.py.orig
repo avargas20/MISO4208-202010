@@ -14,15 +14,23 @@ urlpatterns = [
 
     path('obtener_versiones_de_una_aplicacion/', views.obtener_versiones_de_una_aplicacion,
          name='obtener_versiones_de_una_aplicacion'),
+<<<<<<< HEAD
 
     path('estrategias/', views.estrategias, name='estrategias'),
     path('estrategias/<int:estrategia_id>/pruebas/', views.estrategias_pruebas, name='agregar_prueba'),
     path('estrategias/<int:estrategia_id>/condiciones/', views.condiciones_de_lanzamiento,
          name='condiciones_de_lanzamiento'),
-    path('estrategia/<int:estrategia_id>', views.detalle_estrategia, name='detalle_estrategia'),
-    path('estrategia/<int:estrategia_id>/copia', views.copiar_estrategia, name='copiar_estrategia'),
     path('estrategias/lanzamientos/', views.lanzar_estrategia, name='lanzar_estrategia'),
 
+=======
+    path('lanzar_estrategia/', views.lanzar_estrategia, name='lanzar_estrategia'),
+    path('nueva_aplicacion/', views.nueva_aplicacion, name='nueva_aplicacion'),
+    path('guardar_estrategia/', views.guardar_estrategia, name='guardar_estrategia'),
+    path('estrategia/<int:estrategia_id>', views.detalle_estrategia, name='detalle_estrategia'),
+    path('estrategia/<int:estrategia_id>/copia', views.copiar_estrategia, name='copiar_estrategia'),
+    path('agregar_prueba/<int:estrategia_id>', views.agregar_prueba, name='agregar_prueba'),
+    path('guardar_prueba/<int:estrategia_id>', views.guardar_prueba, name='guardar_prueba'),
+>>>>>>> master
     path('eliminar_prueba/<int:prueba_id>', views.eliminar_prueba, name='eliminar_prueba'),
     path('eliminar_estrategia/<int:estrategia_id>', views.eliminar_estrategia, name='eliminar_estrategia'),
 
