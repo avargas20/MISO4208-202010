@@ -19,8 +19,16 @@ SQS = boto3.resource('sqs', region_name='us-east-1')
 COLA_MUTACION = SQS.get_queue_by_name(QueueName=settings.SQS_MUTACION_NAME)
 
 
-def guardar_prueba(request, estrategia_id):
-    if request.method == 'POST':
+def estrategias_pruebas(request, estrategia_id):
+    if request.method == 'GET':
+        estrategia = Estrategia.objects.get(id=estrategia_id)
+        herramientas = Herramienta.objects.all()
+        tipos = Tipo.objects.all()
+        pruebas = Prueba.objects.filter(estrategia=estrategia)
+        return render(request, 'pruebas_app/agregar_prueba.html',
+                      {'aplicacion': estrategia.aplicacion, 'estrategia': estrategia,
+                       'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
+    elif request.method == 'POST':
         estrategia = Estrategia.objects.get(id=estrategia_id)
         tipo = Tipo.objects.get(id=request.POST['tipo'])
         # Si el tipo es E2E necesitamos el script y la herramienta
@@ -32,7 +40,7 @@ def guardar_prueba(request, estrategia_id):
             guardar_aleatorias(estrategia, request, tipo)
         else:
             raise Exception("Este %s no es soportado por la aplicación", tipo_prueba)
-        return agregar_prueba(request, estrategia_id)
+        return HttpResponseRedirect(reverse('agregar_prueba', args=[estrategia_id]))
 
 
 def guardar_e2e(estrategia, request, tipo):
@@ -112,20 +120,18 @@ def configurar_cucumber(request, estrategia_id):
 
 def guardar_configuracion_cucumber(request, estrategia_id):
     print(request)
-    guardar_prueba(request, estrategia_id)
+    estrategias_pruebas(request, estrategia_id)
     return HttpResponseRedirect(reverse('agregar_prueba', args=[estrategia_id]))
 
 
-def agregar_estrategia(request):
-    aplicaciones = Aplicacion.objects.all()
-    herramientas = Herramienta.objects.all()
-    tipos = Tipo.objects.all()
-    return render(request, 'pruebas_app/agregar_estrategia.html',
-                  {'aplicaciones': aplicaciones, 'herramientas': herramientas, 'tipos': tipos})
-
-
-def guardar_estrategia(request):
-    if request.method == 'POST':
+def estrategias(request):
+    if request.method == 'GET':
+        aplicaciones = Aplicacion.objects.all()
+        herramientas = Herramienta.objects.all()
+        tipos = Tipo.objects.all()
+        return render(request, 'pruebas_app/agregar_estrategia.html',
+                      {'aplicaciones': aplicaciones, 'herramientas': herramientas, 'tipos': tipos})
+    elif request.method == 'POST':
         print(request.POST)
         nombre_estrategia = request.POST['nombre_estrategia']
         descripcion_estrategia = request.POST['descripcion_estrategia']
@@ -142,23 +148,9 @@ def eliminar_estrategia(request, estrategia_id):
     return lanzar_estrategia(request)
 
 
-def agregar_prueba(request, estrategia_id):
-    estrategia = Estrategia.objects.get(id=estrategia_id)
-    herramientas = Herramienta.objects.all()
-    tipos = Tipo.objects.all()
-    pruebas = Prueba.objects.filter(estrategia=estrategia)
-    return render(request, 'pruebas_app/agregar_prueba.html',
-                  {'aplicacion': estrategia.aplicacion, 'estrategia': estrategia,
-                   'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
-
-
 def eliminar_prueba(request, prueba_id):
     prueba = Prueba.objects.get(id=prueba_id)
     estrategia_id = prueba.estrategia.id
     prueba.delete()
-    return agregar_prueba(request, estrategia_id)
+    return HttpResponseRedirect(reverse('agregar_prueba', args=[estrategia_id]))
 
-
-def ver_estrategia(request):
-    estrategias = Estrategia.objects.all()
-    return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})

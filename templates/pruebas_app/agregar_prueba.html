@@ -192,7 +192,7 @@
 
             {% endfor %}
             <!-- Pruebas Nuevas -->
-            <form action="{% url 'guardar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data"
+            <form action="{% url 'agregar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data"
                   class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="row register-form">

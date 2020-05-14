@@ -31,8 +31,11 @@ def home(request):
     return render(request, 'pruebas_app/index.html', {'solicitudes': solicitudes_out})
 
 
-def ejecutar_estrategia(request):
-    if request.method == 'POST':
+def lanzar_estrategia(request):
+    if request.method == 'GET':
+        estrategias = Estrategia.objects.all()
+        return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
+    elif request.method == 'POST':
         solicitud = Solicitud()
         print('solicitud POST', request.POST)
         if 'solicitud_VRT' in request.POST:
@@ -93,11 +96,6 @@ def setup_vrt(request, solicitud):
     solicitud_vrt = Solicitud.objects.get(id=id_solicitud_vrt)
     solicitud.solicitud_VRT = solicitud_vrt
     solicitud.sensibilidad_VRT = sensibilidad_vrt
-
-
-def lanzar_estrategia(request):
-    estrategias = Estrategia.objects.all()
-    return render(request, 'pruebas_app/lanzar_estrategia.html', {'estrategias': estrategias})
 
 
 def condiciones_de_lanzamiento(request, estrategia_id):
