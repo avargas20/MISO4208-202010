@@ -152,6 +152,16 @@ def agregar_prueba(request, estrategia_id):
                    'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
 
 
+def detalle_estrategia(request, estrategia_id):
+    estrategia = Estrategia.objects.get(id=estrategia_id)
+    herramientas = Herramienta.objects.all()
+    tipos = Tipo.objects.all()
+    pruebas = Prueba.objects.filter(estrategia=estrategia)
+    return render(request, 'pruebas_app/detalle_estrategia.html',
+                  {'aplicacion': estrategia.aplicacion, 'estrategia': estrategia,
+                   'herramientas': herramientas, 'tipos': tipos, 'pruebas': pruebas})
+
+
 def copiar_estrategia(request, estrategia_id):
     estrategia_anterior = Estrategia.objects.get(id=estrategia_id)
     estrategia = estrategia_anterior
