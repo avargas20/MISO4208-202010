@@ -148,8 +148,6 @@ def eliminar_estrategia(request, estrategia_id):
     return HttpResponseRedirect(reverse('lanzar_estrategia'))
 
 
-
-
 def detalle_estrategia(request, estrategia_id):
     estrategia = Estrategia.objects.get(id=estrategia_id)
     herramientas = Herramienta.objects.all()
@@ -175,6 +173,8 @@ def copiar_estrategia(request, estrategia_id):
         prueba.pk = None
         prueba.save()
     return HttpResponseRedirect(reverse('agregar_prueba', args=(estrategia.id,)))
+
+
 def eliminar_prueba(request, prueba_id):
     prueba = Prueba.objects.get(id=prueba_id)
     estrategia_id = prueba.estrategia.id
