@@ -83,22 +83,28 @@
                 $('.fileScript').hide();
                 $("#customFileLang").attr("required", false);
                 $("#botonAgregar").hide();
+                $("#customFileCucumber").attr("required", true);
+                $("#numero_datos").attr("required", true);
+                $(".inputCucumber").attr("required", true);
             } else {
                 $("#cucumberConfig").hide();
                 $('.fileScript').show();
                 $("#customFileLang").attr("required", true);
                 $("#botonAgregar").show();
+                $("#customFileCucumber").attr("required", false);
+                $("#numero_datos").attr("required", false);
+                $(".inputCucumber").attr("required", false);
             }
         }
 
         function agregar_example(){
             var divHtml = '<div class="row mb-3">'+
                 '<div class="col-md-6">'+
-                    '<input type="text" class="form-control" placeholder="Encabezado" value="" '+
-                           'name="nombre_encabezado" required/>'+
+                    '<input type="text" class="form-control inputCucumber" placeholder="Encabezado" value="" '+
+                           'name="nombre_encabezado"/>'+
                 '</div>'+
                 '<div class="col-md-4">'+
-                    '<select name="tipo_dato" class="form-control" required>'+
+                    '<select name="tipo_dato" class="form-control inputCucumber">'+
                         '<option class="hidden" value="" selected disabled>Tipo de dato</option>'+
                         '<option value="TEXTO">TEXTO</option>'+
                         '<option value="EMAIL">EMAIL</option>'+
@@ -293,7 +299,7 @@
                     <div class="input-group mb-3">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="customFileCucumber" lang="es"
-                                   name="archivo" multiple="multiple" required>
+                                   name="archivo" multiple="multiple">
                             <label class="custom-file-label" for="customFileCucumber"
                                    aria-describedby="customFileCucumber">Seleccionar
                                 Archivo</label>
@@ -301,7 +307,7 @@
                     </div>
                     <div class="form-group">
                         <input type="number" class="form-control" placeholder="Cuántos datos desea generar"
-                               name="numero_datos" min="1" id="numero_datos" required/>
+                               name="numero_datos" min="1" id="numero_datos"/>
                     </div>
 
                     <div class="form-group">
@@ -310,11 +316,11 @@
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Encabezado" value=""
-                                   name="nombre_encabezado" required/>
+                            <input type="text" class="form-control inputCucumber" placeholder="Encabezado" value=""
+                                   name="nombre_encabezado"/>
                         </div>
                         <div class="col-md-4">
-                            <select name='tipo_dato' id='tipo_dato' class="form-control" required>
+                            <select name='tipo_dato' id='tipo_dato' class="form-control inputCucumber">
                                 <option class="hidden" value="" selected disabled>Tipo de dato</option>
                                 <option value="TEXTO">TEXTO</option>
                                 <option value="EMAIL">EMAIL</option>
