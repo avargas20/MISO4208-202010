@@ -19,12 +19,14 @@
                     <!--Table head-->
                     <thead>
                     <tr class="table-secondary" align="center">
-                        <th colspan="3">Lista de pruebas</th>
+                        <th colspan="5">Lista de pruebas</th>
                     </tr>
                     <tr>
                         <th>Tipo</th>
                         <th>Herramienta</th>
                         <th>Script</th>
+                        <th># eventos</th>
+                        <th>Semilla</th>
                     </tr>
                     </thead>
                     <!--Table head-->
@@ -33,9 +35,23 @@
                     <tbody>
                     {% for p in pruebas %}
                     <tr>
-                        <td>{{ p.tipo }}</td>
-                        <td>{{ p.herramienta.nombre }}</td>
-                        <td>{{ p.filename }}</td>
+                        {% if p.tipo.nombre == 'E2E' %}
+                            <td>{{ p.tipo.nombre }}</td>
+                            <td>{{ p.herramienta.nombre }}</td>
+                            <td>{{ p.filename }}</td>
+                            <td> </td>
+                            <td> </td>
+                        {% else %}
+                            <td>{{ p.tipo.nombre }}</td>
+                            <td> </td>
+                            <td> </td>
+                            <td>{{ p.numero_eventos }}</td>
+                            {% if p.semilla == None %}
+                                <td> </td>
+                            {% else %}
+                                <td>{{ p.semilla }}</td>
+                            {% endif %}
+                        {% endif %}
                     </tr>
                     {% endfor %}
                     </tbody>
