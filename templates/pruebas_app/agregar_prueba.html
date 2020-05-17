@@ -1,9 +1,9 @@
 {% extends 'pruebas_app/layout.html' %}
 {% block head %}
 
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
-    <script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+<script>
         $(document).ready(function () {
             $("#tipo").change(function () {
                 if ($("#tipo option:selected").html() == "Tipo") {
@@ -80,193 +80,261 @@
         function toggleCucumber() {
             if ($('#checkboxCucumber').prop("checked") == true) {
                 $("#cucumberConfig").show();
-                $('.custom-file').hide();
+                $('.fileScript').hide();
                 $("#customFileLang").attr("required", false);
                 $("#botonAgregar").hide();
             } else {
                 $("#cucumberConfig").hide();
-                $('.custom-file').show();
+                $('.fileScript').show();
                 $("#customFileLang").attr("required", true);
                 $("#botonAgregar").show();
             }
         }
-    </script>
+
+        function agregar_example(){
+            var divHtml = '<div class="row mb-3">'+
+                '<div class="col-md-6">'+
+                    '<input type="text" class="form-control" placeholder="Encabezado" value="" '+
+                           'name="nombre_encabezado" required/>'+
+                '</div>'+
+                '<div class="col-md-4">'+
+                    '<select name="tipo_dato" class="form-control" required>'+
+                        '<option class="hidden" value="" selected disabled>Tipo de dato</option>'+
+                        '<option value="TEXTO">TEXTO</option>'+
+                        '<option value="EMAIL">EMAIL</option>'+
+                    '</select>'+
+                '</div>'+
+            '</div>'
+
+            document.getElementById("div-card-example").insertAdjacentHTML("beforeend", divHtml)
+        }
+
+
+
+</script>
 
 {% endblock head %}
 {% block subtitle %}<h1 class="mt-3">Agregar Estrategia</h1>
 {% endblock subtitle %}
 {% block content %}
-    <div class="container-fluid">
+<div class="container-fluid">
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <select name='aplicaciones' id='aplicaciones' class="form-control">
-                        <option selected disabled>{{ aplicacion.nombre }}</option>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <select name='aplicaciones' id='aplicaciones' class="form-control">
+                    <option selected disabled>{{ aplicacion.nombre }}</option>
 
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Nombre de la estrategia"
-                   value="{{ estrategia.nombre }}"
-                   name="nombre_estrategia"/>
-        </div>
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Descripcion de la estrategia"
-                   value="{{ estrategia.descripcion }}" name="descripcion_estrategia"/>
-        </div>
-
-
-        <div class="row mb-3">
-
-            <div class="col-9">
-                <h5 class="mt-2">Adicione scripts a esta estrategia</h5>
-            </div>
-            <div class="col-3 text-right">
-
-            </div>
-        </div>
-        <div id="container">
-            <!-- Pruebas existentes -->
-            {% for p in pruebas %}
-                <div class="row" id="fila">
-
-                    <div class="col-3">
-                        <div class="form-group">
-                            <select class="form-control" id="select-tipo">
-                                <option class="hidden" selected disabled>Tipo</option>
-                                <option selected disabled>{{ p.tipo.nombre }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    {% if p.tipo.nombre == 'Aleatorias' %}
-                        <div class="row col-8">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Número de eventos" disabled
-                                       value="{{ p.numero_eventos }}"
-                                />
-                            </div>
-                            {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                                {% if p.semilla %}
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" placeholder="Semilla" disabled
-                                                   value="{{ p.semilla }}"
-                                            />
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-
-                        </div>
-                    {% endif %}
-                    {% if p.tipo.nombre == 'E2E' %}
-                        <div class="row col-8">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <select class="form-control">
-                                        <option class="hidden" selected disabled>Herramienta</option>
-                                        <option selected disabled>{{ p.herramienta.nombre }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class=" col-6 input-group mb-3">
-                                <div class="custom-file2">
-                                    <input type="file" class="custom-file-input" id="customFileLang2">
-                                    <label class="custom-file-label" for="customFileLang2"
-                                           aria-describedby="customFileLang2">{{ p.script }}</label>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="col-1">
-                        <div class="form-group">
-                            <a class="btn btn-danger btn-sm" href="{% url 'eliminar_prueba' p.id %}">
-                                <i class="far fa-trash-alt"></i></a>
-                        </div>
-                    </div>
-
-                </div>
-
-            {% endfor %}
-            <!-- Pruebas Nuevas -->
-            <form action="{% url 'agregar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data"
-                  class="needs-validation" novalidate>
-                {% csrf_token %}
-                <div class="row register-form">
-                    <div class="col-3">
-                        <div class="form-group">
-                            <select name="tipo" id="tipo" class="form-control custom-select" required>
-                                <option class="hidden" value="" selected disabled>Tipo</option>
-                                {% for t in tipos %}
-                                    <option value="{{ t.id }}">{{ t.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div id="random-required" class="row col-8">
-                        <div class="form-group">
-                            <input type="number" class="form-control" placeholder="Número de eventos"
-                                   name="numero_eventos" min="1" id="numero_eventos"/>
-                        </div>
-                        {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Semilla"
-                                           name="semilla" id="semilla"/>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div id="e2e-required" class="row col-8">
-                        <div class="col-4">
-                            <div class="form-group">
-                                <select name="herramienta" id="herramienta" class="form-control custom-select">
-                                    <option class="hidden" value="" selected disabled>Herramienta</option>
-                                    {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
-                                        {% for h in estrategia.aplicacion.tipo.herramientas.all %}
-                                            <option value="{{ h.id }}">{{ h.nombre }}</option>
-                                        {% endfor %}
-                                    {% elif estrategia.aplicacion.tipo.tipo == 'Web' %}
-                                        {% for h in estrategia.aplicacion.tipo.herramientas.all %}
-                                            <option value="{{ h.id }}">{{ h.nombre }}</option>
-                                        {% endfor %}
-                                    {% endif %}
-                                </select>
-                            </div>
-                        </div>
-                        <div id="checkCucumber" class="col-2">
-                            Data Gen
-                            <input type="checkbox" name="checkboxCucumber" id="checkboxCucumber" value="false"
-                                   onclick="toggleCucumber()">
-                        </div>
-                        <div class=" col-6 input-group mb-3">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="customFileLang" lang="es"
-                                       name="archivo" multiple="multiple">
-                                <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar
-                                    Archivo</label>
-                            </div>
-                            <div class="cucumber-config">
-                                <a class="btn btn-warning" id="cucumberConfig"
-                                   name="cucumberConfig"
-                                   onclick="return abrir_modal('{% url 'configurar_cucumber' estrategia.id %}', $('#tipo'), $('#herramienta'), $('#checkboxCucumber'))">
-                                    Configurar Cucumber
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-1">
-                        <button type="submit" class="btn btn-success btn-sm" id="botonAgregar">
-                            <i class="far fa-plus-square"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <div id="popup" class="modal fade" role="dialog">
+                </select>
             </div>
         </div>
     </div>
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Nombre de la estrategia"
+               value="{{ estrategia.nombre }}"
+               name="nombre_estrategia"/>
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Descripcion de la estrategia"
+               value="{{ estrategia.descripcion }}" name="descripcion_estrategia"/>
+    </div>
+
+
+    <div class="row mb-3">
+
+        <div class="col-9">
+            <h5 class="mt-2">Adicione scripts a esta estrategia</h5>
+        </div>
+        <div class="col-3 text-right">
+
+        </div>
+    </div>
+    <div id="container">
+        <!-- Pruebas existentes -->
+        {% for p in pruebas %}
+        <div class="row" id="fila">
+
+            <div class="col-3">
+                <div class="form-group">
+                    <select class="form-control" id="select-tipo">
+                        <option class="hidden" selected disabled>Tipo</option>
+                        <option selected disabled>{{ p.tipo.nombre }}</option>
+                    </select>
+                </div>
+            </div>
+            {% if p.tipo.nombre == 'Aleatorias' %}
+            <div class="row col-8">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Número de eventos" disabled
+                           value="{{ p.numero_eventos }}"
+                    />
+                </div>
+                {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                {% if p.semilla %}
+                <div class="col-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Semilla" disabled
+                               value="{{ p.semilla }}"
+                        />
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
+            </div>
+            {% endif %}
+            {% if p.tipo.nombre == 'E2E' %}
+            <div class="row col-8">
+                <div class="col-4">
+                    <div class="form-group">
+                        <select class="form-control">
+                            <option class="hidden" selected disabled>Herramienta</option>
+                            <option selected disabled>{{ p.herramienta.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class=" col-6 input-group mb-3">
+                    <div class="custom-file2">
+                        <input type="file" class="custom-file-input" id="customFileLang2">
+                        <label class="custom-file-label" for="customFileLang2"
+                               aria-describedby="customFileLang2">{{ p.script }}</label>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="col-1">
+                <div class="form-group">
+                    <a class="btn btn-danger btn-sm" href="{% url 'eliminar_prueba' p.id %}">
+                        <i class="far fa-trash-alt"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        {% endfor %}
+        <!-- Pruebas Nuevas -->
+        <form action="{% url 'agregar_prueba' estrategia.id %}" method="post" enctype="multipart/form-data"
+              class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row register-form">
+                <div class="col-3">
+                    <div class="form-group">
+                        <select name="tipo" id="tipo" class="form-control custom-select" required>
+                            <option class="hidden" value="" selected disabled>Tipo</option>
+                            {% for t in tipos %}
+                            <option value="{{ t.id }}">{{ t.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div id="random-required" class="row col-8">
+                    <div class="form-group">
+                        <input type="number" class="form-control" placeholder="Número de eventos"
+                               name="numero_eventos" min="1" id="numero_eventos"/>
+                    </div>
+                    {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Semilla"
+                                   name="semilla" id="semilla"/>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div id="e2e-required" class="row col-8">
+                    <div class="col-4">
+                        <div class="form-group">
+                            <select name="herramienta" id="herramienta" class="form-control custom-select">
+                                <option class="hidden" value="" selected disabled>Herramienta</option>
+                                {% if estrategia.aplicacion.tipo.tipo == 'Móvil' %}
+                                {% for h in estrategia.aplicacion.tipo.herramientas.all %}
+                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                {% endfor %}
+                                {% elif estrategia.aplicacion.tipo.tipo == 'Web' %}
+                                {% for h in estrategia.aplicacion.tipo.herramientas.all %}
+                                <option value="{{ h.id }}">{{ h.nombre }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                    <div id="checkCucumber" class="col-2 my-1">
+                        <div class="custom-control custom-checkbox mr-sm-2">
+                            <input type="checkbox" class="custom-control-input" name="checkboxCucumber"
+                                   id="checkboxCucumber" onclick="toggleCucumber()">
+                            <label class="custom-control-label" for="checkboxCucumber">Data Gen</label>
+                        </div>
+                    </div>
+                    <div class=" col-6 input-group mb-3">
+                        <div class="custom-file fileScript">
+                            <input type="file" class="custom-file-input" id="customFileLang" lang="es"
+                                   name="archivo" multiple="multiple">
+                            <label class="custom-file-label" for="customFileLang" aria-describedby="customFileLang">Seleccionar
+                                Archivo</label>
+                        </div>
+                        <div class="cucumber-config">
+                            <a class="btn btn-info" id="cucumberConfig" data-toggle="collapse" href="#collapseExample"
+                               role="button"
+                               aria-expanded="false" aria-controls="collapseExample">
+                                Configurar Cucumber
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1">
+                    <button type="submit" class="btn btn-success btn-sm" id="botonAgregar">
+                        <i class="far fa-plus-square"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- CONFIGURACION CUCUMBER -->
+            <div class="collapse" id="collapseExample">
+                <div class="card card-body" id="div-card-example">
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="customFileCucumber" lang="es"
+                                   name="archivo" multiple="multiple" required>
+                            <label class="custom-file-label" for="customFileCucumber"
+                                   aria-describedby="customFileCucumber">Seleccionar
+                                Archivo</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" class="form-control" placeholder="Cuántos datos desea generar"
+                               name="numero_datos" min="1" id="numero_datos" required/>
+                    </div>
+
+                    <div class="form-group">
+                        <h5 class="mt-2">Ingrese la información para la tabla de ejemplos</h5>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Encabezado" value=""
+                                   name="nombre_encabezado" required/>
+                        </div>
+                        <div class="col-md-4">
+                            <select name='tipo_dato' id='tipo_dato' class="form-control" required>
+                                <option class="hidden" value="" selected disabled>Tipo de dato</option>
+                                <option value="TEXTO">TEXTO</option>
+                                <option value="EMAIL">EMAIL</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-info btn-sm" id="botonAgregarExample" onclick="agregar_example()"
+                               role="button">
+                                <i class="far fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+        <!--<div id="popup" class="modal fade" role="dialog">
+        </div>-->
+    </div>
+</div>
 {% endblock content %}
